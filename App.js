@@ -1,14 +1,17 @@
-import 'react-native-gesture-handler';
-
+import "react-native-gesture-handler";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import AuthNavigator from "./components/navigation/AuthNavigator";
+
+import AppNavigator from "./components/navigation/AppNavigator";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <AuthNavigator />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

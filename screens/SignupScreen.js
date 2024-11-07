@@ -21,7 +21,7 @@ const SignupScreen = () => {
       >
         <View style={styles.content}>
           <View style={styles.logoContainer}>
-            <Logo />
+            <Logo style={styles.logo} />
           </View>
           <SignupForm />
         </View>
@@ -34,6 +34,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primaryBeige,
+  },
+  logoContainer: {
+    position: "absolute",
+    width: 333,
+    height: 160,
+    left: 20,
+    top: 78,
   },
   keyboardAvoid: {
     flex: 1,

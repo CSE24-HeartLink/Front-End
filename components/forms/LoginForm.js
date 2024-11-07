@@ -14,6 +14,14 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const handleLogin = () => {
+    // TODO: 실제 로그인 로직은 나중에 구현
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "MainFeed" }],
+    });
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -35,61 +43,94 @@ const LoginForm = () => {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.loginButton}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.forgotPassword}>
-        <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
-      </TouchableOpacity>
+      <View style={styles.linkSection}>
+        <TouchableOpacity
+          style={styles.signupContainer}
+          onPress={() => navigation.navigate("Signup")}
+        >
+          <Text style={styles.signupText}>회원이 아니신가요?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.forgotPasswordContainer}
+          onPress={() => navigation.navigate("ForgotPassword")}
+        >
+          <Text style={styles.forgotPasswordText}>비밀번호 찾기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: "absolute",
     width: "100%",
-    paddingHorizontal: 16,
+    top: 242,
+    paddingHorizontal: 40,
   },
   input: {
-    backgroundColor: Colors.white,
-    borderRadius: 8,
-    height: 52,
+    width: 313,
+    height: 48,
+    backgroundColor: Colors.lightBeige,
+    borderRadius: 16,
     paddingHorizontal: 16,
     marginBottom: 16,
     fontSize: 16,
+    fontFamily: "Pretendard",
+    fontWeight: "600",
     color: Colors.gray50,
-    elevation: 2,
-    shadowColor: Colors.gray50,  // 그림자 색상도 Colors에서 가져옴
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
   },
   loginButton: {
+    width: 313,
+    height: 77,
     backgroundColor: Colors.pink30,
-    borderRadius: 8,
-    height: 52,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 24,
+    padding: 24,
   },
   loginButtonText: {
-    color: Colors.white,
-    fontSize: 16,
+    color: Colors.lightBeige,
+    fontSize: 24,
+    fontFamily: "Pretendard",
     fontWeight: "600",
+    lineHeight: 29,
   },
-  forgotPassword: {
+  linkSection: {
+    width: "100%",
     alignItems: "center",
     marginTop: 16,
-    height: 44,
-    justifyContent: "center",
+  },
+  signupContainer: {
+    width: 123,
+    height: 19,
+    marginBottom: 8,
+  },
+  signupText: {
+    fontFamily: "Pretendard",
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 19,
+    textAlign: "center",
+    color: Colors.pink40,
+  },
+  forgotPasswordContainer: {
+    width: 87,
+    height: 19,
   },
   forgotPasswordText: {
-    color: Colors.gray40,
-    fontSize: 14,
+    fontFamily: "Pretendard",
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 19,
+    textAlign: "center",
+    color: Colors.pink40,
   },
 });
 
