@@ -40,50 +40,50 @@ export const DUMMY_FRIENDS = [
   {
     id: "1",
     nickname: "다연이",
-    group: "friends", // "동기들"에 해당하는 id
+    group: "동기들", // "동기들"에 해당하는 id
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "2",
     nickname: "구준표",
-    group: "f4",
+    group: "F4",
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "3",
     nickname: "정연경",
-    group: "friends",
+    group: "동기들",
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "4",
     nickname: "대박쓰",
-    group: "family",
+    group: "가족",
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "5",
     nickname: "지혜",
-    group: "friends",
+    group: "동기들",
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "6",
     nickname: "정호",
-    group: "friends",
+    group: "동기들",
     profileImage: require("../../assets/icon.png"),
   },
   {
     id: "7",
     nickname: "XG",
-    group: "f4",
+    group: "F4",
     profileImage: require("../../assets/icon.png"),
   },
 ];
 
 export const GROUPS = [
-  { id: "all", name: "전체" },
-  { id: "family", name: "가족" },
-  { id: "f4", name: "F4" },
-  { id: "friends", name: "동기들" },
+  { id: "전체", name: "전체" },
+  { id: "가족", name: "가족" },
+  { id: "F4", name: "F4" },
+  { id: "동기들", name: "동기들" },
 ];

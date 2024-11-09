@@ -4,6 +4,10 @@ import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "../../screens/WelcomeScreen";
 import LoginScreen from "../../screens/LoginScreen";
 import SignupScreen from "../../screens/SignupScreen";
+import MainFeedScreen from "../../screens/MainFeedScreen";
+import FriendsScreen from "../../screens/FriendsScreen";
+import GroupSelectScreen from "../../screens/GroupSelectScreen";
+import AlbumScreen from "../../screens/AlbumScreen";
 
 // import FriendsScreen from "../../screens/FriendsScreen";
 // import GroupSelectScreen from "../../screens/GroupSelectScreen";
@@ -25,6 +29,10 @@ const AppNavigator = () => {
 
       {/* Main App Screen with Bottom Tabs */}
       <Stack.Screen name="MainTab" component={BottomTabNavigator} />
+      <Stack.Screen name="MainFeedScreen" component={MainFeedScreen} />
+      <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
+      <Stack.Screen name="GroupSelectScreen" component={GroupSelectScreen} />
+      <Stack.Screen name="AlbumScreen" component={AlbumScreen} />
     </Stack.Navigator>
   );
 };

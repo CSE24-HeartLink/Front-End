@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, Alert, SafeAreaView } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/Feather";
 
-import MainHeader from "../components/navigation/MainHeader";
+import TopFilterButton from "../components/ui/TopFilterButton";
 import FriendsItem from "../components/FriendItem";
 import useFriendStore from "../store/friendStore";
 import Colors from "../constants/colors";
@@ -13,8 +22,6 @@ const FriendsScreen = () => {
   const selectedGroup = route.params?.selectedGroup;
   const friends = useFriendStore((state) => state.friends);
   const [filteredFriends, setFilteredFriends] = useState(friends);
-  const deleteFriend = useFriendStore((state) => state.deleteFriend);
-  const updateFriendGroup = useFriendStore((state) => state.updateFriendGroup);
 
   useEffect(() => {
     if (selectedGroup && selectedGroup !== "all") {
@@ -25,6 +32,10 @@ const FriendsScreen = () => {
       setFilteredFriends(friends);
     }
   }, [selectedGroup, friends]);
+
+  const handleCategoryPress = () => {
+    navigation.navigate("GroupSelectScreen", { fromScreen: "FriendsScreen" });
+  };
 
   const handleMoveGroup = (friendId) => {
     // TODO: 그룹 선택 모달 구현
@@ -53,11 +64,21 @@ const FriendsScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <MainHeader
-          selectedGroup={selectedGroup}
-          onPressCategory={() => navigation.navigate("GroupSelect")}
-          onPressNotification={() => console.log("notification")}
-        />
+        {/* 조건부로 뒤로가기 버튼 렌더링 */}
+        {selectedGroup && selectedGroup !== "all" && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
+          </TouchableOpacity>
+        )}
+        <View style={styles.headerContainer}>
+          <TopFilterButton
+            onPress={handleCategoryPress}
+            getGroupName={() => (selectedGroup ? selectedGroup : "전체")}
+          />
+        </View>
         <FlatList
           data={filteredFriends}
           renderItem={({ item }) => (
@@ -84,9 +105,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.primaryBeige,
   },
+  headerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  backButton: {
+    padding: 8,
+    position: "absolute",
+    left: 16,
+    zIndex: 1,
+    top: 8, // 추가
+  },
+
   listContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 72, // BottomTab height
+    paddingBottom: 72,
   },
 });
 

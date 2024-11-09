@@ -1,16 +1,14 @@
-//공감(이모지) 버튼을 표시하는 컴포넌트입니다.
-//이모지 버튼을 나열하여 사용자들이 반응할 수 있게 합니다.
-
 import React from "react";
-import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import Colors from "../../constants/colors";
 
 const REACTIONS = [
-  { type: "smile", source: require("../../../assets/images/Smile.png") },
-  { type: "love", source: require("../../../assets/images/Love.png") },
-  { type: "cry", source: require("../../../assets/images/Cry.png") },
-  { type: "afraid", source: require("../../../assets/images/Afraid.png") },
-  { type: "angry", source: require("../../../assets/images/Angry.png") },
+  { type: "smile", emoji: "😊" },
+  { type: "love", emoji: "🥰" },
+  { type: "cry", emoji: "😢" },
+  { type: "afraid", emoji: "😱" },
+  { type: "congrats", emoji: "🥳" },
+  { type: "angry", emoji: "😡" },
 ];
 
 const ReactionButtons = ({ selectedReaction, onSelectReaction }) => {
@@ -22,13 +20,14 @@ const ReactionButtons = ({ selectedReaction, onSelectReaction }) => {
           onPress={() => onSelectReaction(reaction.type)}
           style={styles.reactionButton}
         >
-          <Image
-            source={reaction.source}
+          <Text
             style={[
-              styles.reactionIcon,
+              styles.reactionEmoji,
               { opacity: selectedReaction === reaction.type ? 1 : 0.5 },
             ]}
-          />
+          >
+            {reaction.emoji}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -45,14 +44,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
   },
   reactionButton: {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
-  reactionIcon: {
-    width: 24,
-    height: 24,
+  reactionEmoji: {
+    fontSize: 30,
   },
 });
 
