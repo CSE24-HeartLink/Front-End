@@ -129,13 +129,13 @@
 // ];
 export const initialFeeds = [
   {
-    id: "1",
+    id: "1", //feedid
     userId: "user1",
     nickname: "다연이",
     profileImage: require("../../assets/images/Smile.png"),
     content: "엄마가 해준 김치찌개가 먹고싶은 가을의 어느 날입니다.",
     createdAt: new Date("2024-07-06T12:21:00"),
-    group: "가족",  // 그룹 필드 추가
+    group: "가족", // 그룹 필드 추가
     reactions: [
       { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
@@ -148,12 +148,28 @@ export const initialFeeds = [
   },
   {
     id: "2",
-    userId: "user2",
-    nickname: "정호우",
-    profileImage: require("../../assets/images/Cry.png"),
-    content: "11도 날씨 맑음",
-    createdAt: new Date("2024-05-25T14:41:00"),
-    group: "F4",  // 그룹 필드 추가
+    nickname: "다연이",
+    group: "동기들",
+    profileImage: require("../../assets/images/Smile.png"),
+    content: "배고팡.",
+    createdAt: new Date("2024-07-06T12:21:00"),
+    reactions: [
+      { type: "grinning", count: 1, users: ["user2"] },
+      { type: "heart-eyes", count: 0, users: [] },
+      { type: "crying", count: 0, users: [] },
+      { type: "scream", count: 0, users: [] },
+      { type: "party", count: 0, users: [] },
+      { type: "angry", count: 0, users: [] },
+    ],
+    isMyPost: true,
+  },
+  {
+    id: "3",
+    nickname: "정연경",
+    group: "동기들",
+    profileImage: require("../../assets/images/Smile.png"),
+    content: "3빠요",
+    createdAt: new Date("2024-07-06T12:21:00"),
     reactions: [
       { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
@@ -165,15 +181,14 @@ export const initialFeeds = [
     isMyPost: false,
   },
   {
-    id: "3",
-    userId: "user3",
-    nickname: "지혜",
+    id: "4",
+    nickname: "정연경",
+    group: "동기들",
     profileImage: require("../../assets/images/Smile.png"),
-    content: "동기들과 함께하는 점심시간!",
-    createdAt: new Date("2024-05-24T12:30:00"),
-    group: "동기들",  // 그룹 필드 추가
+    content: "나정연경정니연경정년이보는중",
+    createdAt: new Date("2024-07-06T12:21:00"),
     reactions: [
-      { type: "grinning", count: 0, users: [] },
+      { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
       { type: "crying", count: 0, users: [] },
       { type: "scream", count: 0, users: [] },
@@ -183,15 +198,14 @@ export const initialFeeds = [
     isMyPost: false,
   },
   {
-    id: "4",
-    userId: "user4",
-    nickname: "구준표",
-    profileImage: require("../../assets/images/Smile.png"),
-    content: "F4 모임!",
-    createdAt: new Date("2024-05-23T18:00:00"),
-    group: "F4",  // 그룹 필드 추가
+    id: "5",
+    nickname: "정호",
+    group: "동기들",
+    profileImage: require("../../assets/images/Cry.png"),
+    content: "5번째글인디",
+    createdAt: new Date("2024-05-25T14:41:00"),
     reactions: [
-      { type: "grinning", count: 0, users: [] },
+      { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
       { type: "crying", count: 0, users: [] },
       { type: "scream", count: 0, users: [] },
@@ -200,7 +214,41 @@ export const initialFeeds = [
     ],
     isMyPost: false,
   },
- ];
+  {
+    id: "6",
+    nickname: "대박쓰",
+    group: "가족",
+    profileImage: require("../../assets/images/Cry.png"),
+    content: "나6번째글인데.",
+    createdAt: new Date("2024-05-25T14:41:00"),
+    reactions: [
+      { type: "grinning", count: 1, users: ["user2"] },
+      { type: "heart-eyes", count: 0, users: [] },
+      { type: "crying", count: 0, users: [] },
+      { type: "scream", count: 0, users: [] },
+      { type: "party", count: 0, users: [] },
+      { type: "angry", count: 0, users: [] },
+    ],
+    isMyPost: false,
+  },
+  {
+    id: "7",
+    nickname: "대박쓰",
+    group: "가족",
+    profileImage: require("../../assets/images/Cry.png"),
+    content: "나7번째글인데",
+    createdAt: new Date("2024-05-25T14:41:00"),
+    reactions: [
+      { type: "grinning", count: 1, users: ["user2"] },
+      { type: "heart-eyes", count: 0, users: [] },
+      { type: "crying", count: 0, users: [] },
+      { type: "scream", count: 0, users: [] },
+      { type: "party", count: 0, users: [] },
+      { type: "angry", count: 0, users: [] },
+    ],
+    isMyPost: false,
+  },
+];
 
 export const DUMMY_FRIENDS = [
   {
