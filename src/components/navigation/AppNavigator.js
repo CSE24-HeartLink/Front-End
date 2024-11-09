@@ -5,8 +5,8 @@ import WelcomeScreen from "../../screens/WelcomeScreen";
 import LoginScreen from "../../screens/LoginScreen";
 import SignupScreen from "../../screens/SignupScreen";
 
-// import FriendsScreen from "../../screens/FriendsScreen";
-// import GroupSelectScreen from "../../screens/GroupSelectScreen";
+import FeedGroupSelectScreen from "../../screens/FeedGroupSelectScreen";
+
 import BottomTabNavigator from "./BottomTabNavigator";
 
 const Stack = createStackNavigator();
@@ -24,6 +24,7 @@ const AppNavigator = () => {
       <Stack.Screen name="Signup" component={SignupScreen} />
 
       {/* Main App Screen with Bottom Tabs */}
+      <Stack.Screen name="FeedGroupSelect" component={FeedGroupSelectScreen} />
       <Stack.Screen name="MainTab" component={BottomTabNavigator} />
     </Stack.Navigator>
   );

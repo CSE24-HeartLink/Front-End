@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, Alert, SafeAreaView } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 import MainHeader from "../components/navigation/MainHeader";
 import FriendsItem from "../components/FriendItem";
+
 import useFriendStore from "../store/friendStore";
+
+import AddFriendModal from "../components/modals/AddFriendModal";
 import Colors from "../constants/colors";
 
 const FriendsScreen = () => {
@@ -13,6 +24,7 @@ const FriendsScreen = () => {
   const selectedGroup = route.params?.selectedGroup;
   const friends = useFriendStore((state) => state.friends);
   const [filteredFriends, setFilteredFriends] = useState(friends);
+  const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const deleteFriend = useFriendStore((state) => state.deleteFriend);
   const updateFriendGroup = useFriendStore((state) => state.updateFriendGroup);
 
@@ -26,11 +38,17 @@ const FriendsScreen = () => {
     }
   }, [selectedGroup, friends]);
 
-  const handleMoveGroup = (friendId) => {
-    // TODO: 그룹 선택 모달 구현
-    updateFriendGroup(friendId, "새 그룹");
+  const handleAddFriend = (email) => {
+    // 친구 추가 로직 구현
+    console.log("Add friend with email:", email);
+    setIsAddFriendModalVisible(false);
   };
 
+  const handleMoveGroup = (friendId, newGroup) => {
+    updateFriendGroup(friendId, newGroup);
+  };
+
+  //alert 자동 띄움
   const handleDelete = (friendId) => {
     Alert.alert(
       "친구 삭제",
@@ -70,6 +88,23 @@ const FriendsScreen = () => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
         />
+        {/* 친구 추가 버튼 */}
+        {!route.params?.selectedGroup && ( // GroupSelect 화면이 아닐 때만 보이도록
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setIsAddFriendModalVisible(true)}
+          >
+            <Image
+              source={require("../../assets/images/AddGroup.png")}
+              style={styles.addButtonImage}
+            />
+          </TouchableOpacity>
+        )}
+        <AddFriendModal
+          visible={isAddFriendModalVisible}
+          onClose={() => setIsAddFriendModalVisible(false)}
+          onConfirm={handleAddFriend}
+        />
       </View>
     </SafeAreaView>
   );
@@ -87,6 +122,18 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 16,
     paddingBottom: 72, // BottomTab height
+  },
+  addButton: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    left: 309,
+    top: 696,
+    zIndex: 1,
+  },
+  addButtonImage: {
+    width: "100%",
+    height: "100%",
   },
 });
 

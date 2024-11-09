@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, StyleSheet, SafeAreaView } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+
 import useFeedStore from "../store/feedStore";
 import FeedItem from "../components/feed/FeedItem";
 
@@ -10,6 +12,9 @@ const MainFeedScreen = () => {
   const feeds = useFeedStore((state) => state.feeds);
   const loadInitialData = useFeedStore((state) => state.loadInitialData);
 
+  const navigation = useNavigation();
+  const [selectedGroup, setSelectedGroup] = useState("all"); // 기본값을 'all'로 설정
+
   useEffect(() => {
     loadInitialData();
   }, []);
@@ -18,7 +23,11 @@ const MainFeedScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <MainHeader />
+      <MainHeader
+        selectedGroup={selectedGroup} // selectedGroup prop 전달
+        onPressCategory={() => navigation.navigate("FeedGroupSelect")}
+        onPressNotification={() => console.log("notification")}
+      />
       <FlatList
         data={feeds}
         renderItem={renderItem}
