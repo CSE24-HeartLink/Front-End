@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Image, // Image import 추가
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
 import Colors from "../constants/colors";
@@ -15,12 +15,24 @@ import { GROUPS } from "../constants/dummydata";
 
 const GroupSelectScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // route로부터 파라미터 가져오기
 
   const handleSelectGroup = (groupId) => {
-    navigation.navigate("친구", {
-      screen: "FriendsList",
-      params: { selectedGroup: groupId },
-    });
+    const fromScreen = route.params?.fromScreen;
+
+    if (fromScreen === "MainFeedScreen") {
+      navigation.navigate("MainFeedScreen", {
+        selectedGroup: groupId,
+      });
+    } else if (fromScreen === "FriendsScreen") {
+      navigation.navigate("FriendsScreen", {
+        selectedGroup: groupId,
+      });
+    } else {
+      // 기본 동작 설정 (필요 시 추가)
+      console.warn("Unhandled fromScreen:", fromScreen);
+      navigation.goBack();
+    }
   };
 
   return (
