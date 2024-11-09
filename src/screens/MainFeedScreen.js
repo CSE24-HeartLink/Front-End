@@ -13,6 +13,7 @@ const MainFeedScreen = () => {
   const setSelectedGroup = useFeedStore((state) => state.setSelectedGroup);
   const loadInitialData = useFeedStore((state) => state.loadInitialData);
   const navigation = useNavigation();
+  const [selectedGroup, setSelectedGroup] = useState("all"); // 기본값 'all'
   const route = useRoute();
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const MainFeedScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <MainHeader
+        selectedGroup={selectedGroup}
         selectedGroup={route.params?.selectedGroupId || "all"}
         onPressCategory={() => navigation.navigate("FeedGroupSelect")}
         onPressNotification={() => console.log("notification")}

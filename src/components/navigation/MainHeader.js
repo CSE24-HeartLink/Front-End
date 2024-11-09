@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
 import Colors from "../../constants/colors";
 import { GROUPS } from "../../constants/dummydata";
+import TopFilterButton from "../ui/TopFilterButton"; // 새로 추가된 import
 
 import TopFilterButton from "../ui/TopFilterButton";
 
@@ -24,7 +25,7 @@ const MainHeader = ({
         style={styles.notificationButton}
         onPress={onPressNotification}
       >
-        <Icon name="bell" size={20} color={Colors.pink40} />
+        <Icon name="bell" size={24} color={Colors.pink40} />
       </TouchableOpacity>
     </View>
   );
