@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import AppNavigator from "./components/navigation/AppNavigator";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import BottomTabNavigator from "./components/navigation/BottomTabNavigator";
 
 const App = () => {
   return (

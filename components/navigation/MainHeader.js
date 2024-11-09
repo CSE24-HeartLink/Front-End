@@ -1,13 +1,24 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/Feather"; // Feather 아이콘 세트 import
-import Colors from "../../constants/colors";
+import Icon from "react-native-vector-icons/Feather";
 
-const MainHeader = ({ onPressNotification }) => {
+import Colors from "../../constants/colors";
+import { GROUPS } from "../../constants/dummydata";
+
+const MainHeader = ({
+  onPressNotification,
+  onPressCategory,
+  selectedGroup,
+}) => {
+  const getGroupName = () => {
+    const group = GROUPS.find((g) => g.id === selectedGroup);
+    return group ? group.name : "전체";
+  };
+
   return (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.categoryButton}>
-        <Text style={styles.categoryText}>전체</Text>
+      <TouchableOpacity style={styles.categoryButton} onPress={onPressCategory}>
+        <Text style={styles.categoryText}>{getGroupName()}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity

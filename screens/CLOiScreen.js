@@ -1,12 +1,12 @@
-// Front-End/screens/AlbumScreen.js
-
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+// import CLOiIcon from "../assets/images/icons/tabMenu3.svg";
 
-const AlbumScreen = () => {
+const CLOiScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Album Screen</Text>
+      <Text>CLOi Screen</Text>
+      {/* <CLOiIcon width={25} height={24} fill="#4E4E4E" /> */}
     </View>
   );
 };
@@ -19,4 +19,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AlbumScreen;
+export default CLOiScreen;

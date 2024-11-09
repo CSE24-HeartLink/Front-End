@@ -4,8 +4,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "../../screens/WelcomeScreen";
 import LoginScreen from "../../screens/LoginScreen";
 import SignupScreen from "../../screens/SignupScreen";
-import MainFeedScreen from "../../screens/MainFeedScreen";
 
+// import FriendsScreen from "../../screens/FriendsScreen";
+// import GroupSelectScreen from "../../screens/GroupSelectScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 
 const Stack = createStackNavigator();
@@ -22,8 +23,7 @@ const AppNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
 
-      {/* Main App Screens */}
-      <Stack.Screen name="MainFeed" component={MainFeedScreen} />
+      {/* Main App Screen with Bottom Tabs */}
       <Stack.Screen name="MainTab" component={BottomTabNavigator} />
     </Stack.Navigator>
   );

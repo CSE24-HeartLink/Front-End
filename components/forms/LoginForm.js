@@ -15,10 +15,10 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    // TODO: 실제 로그인 로직은 나중에 구현
+    // TODO: 실제 로그인 로직 구현
     navigation.reset({
       index: 0,
-      routes: [{ name: "MainFeed" }],
+      routes: [{ name: "MainTab" }],
     });
   };
 

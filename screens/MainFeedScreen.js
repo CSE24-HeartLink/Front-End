@@ -5,7 +5,6 @@ import FeedItem from "../components/feed/FeedItem";
 
 import Colors from "../constants/colors";
 import MainHeader from "../components/navigation/MainHeader";
-import BottomTabNavigator from "../components/navigation/BottomTabNavigator";
 
 const MainFeedScreen = () => {
   const feeds = useFeedStore((state) => state.feeds);
@@ -26,7 +25,6 @@ const MainFeedScreen = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
-      <BottomTabNavigator />
     </SafeAreaView>
   );
 };
