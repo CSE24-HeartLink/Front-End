@@ -5,6 +5,8 @@ import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
 import { GROUPS } from "../../constants/dummydata";
 
+import TopFilterButton from "../ui/TopFilterButton";
+
 const MainHeader = ({
   onPressNotification,
   onPressCategory,
@@ -17,10 +19,7 @@ const MainHeader = ({
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.categoryButton} onPress={onPressCategory}>
-        <Text style={styles.categoryText}>{getGroupName()}</Text>
-      </TouchableOpacity>
-
+      <TopFilterButton onPress={onPressCategory} getGroupName={getGroupName} />
       <TouchableOpacity
         style={styles.notificationButton}
         onPress={onPressNotification}
@@ -39,23 +38,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     backgroundColor: Colors.primaryBeige,
-  },
-  categoryButton: {
-    width: 160,
-    height: 40,
-    backgroundColor: Colors.red10,
-    borderRadius: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    opacity: 1,
-  },
-  categoryText: {
-    color: Colors.lightBeige,
-    fontSize: 16,
-    fontFamily: "Pretendard",
-    fontWeight: "600",
-    lineHeight: 24,
-    textAlign: "center",
   },
   notificationButton: {
     position: "absolute",

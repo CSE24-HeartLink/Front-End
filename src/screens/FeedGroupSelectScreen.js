@@ -23,12 +23,15 @@ const FeedGroupSelectScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
 
   const handleSelectGroup = (groupId) => {
-    // TODO: 선택된 그룹 처리 로직
-    navigation.goBack();
+    navigation.navigate("MainTab", {
+      screen: "피드",
+      params: {
+        selectedGroupId: groupId,
+      },
+    });
   };
   const handleAddGroup = (groupName) => {
     // TODO: 그룹 추가 로직 구현
-    console.log("Add group:", groupName);
     setIsAddGroupModalVisible(false);
   };
   const handleGroupLongPress = (group) => {

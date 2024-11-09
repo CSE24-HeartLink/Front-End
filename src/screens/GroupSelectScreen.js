@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Image, // Image import 추가
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
@@ -46,7 +47,10 @@ const GroupSelectScreen = () => {
               style={styles.groupItem}
               onPress={() => handleSelectGroup(group.id)}
             >
-              <View style={styles.heartIcon} />
+              <Image
+                source={require("../../assets/images/Heart.png")}
+                style={styles.heartIcon}
+              />
               <Text style={styles.groupName}>{group.name}</Text>
             </TouchableOpacity>
           ))}
@@ -101,8 +105,6 @@ const styles = StyleSheet.create({
   heartIcon: {
     width: 80,
     height: 80,
-    backgroundColor: Colors.pink30,
-    borderRadius: 40,
     marginBottom: 8,
   },
   groupName: {
