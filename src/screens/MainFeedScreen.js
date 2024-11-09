@@ -32,7 +32,7 @@ const MainFeedScreen = () => {
     navigation.navigate("GroupSelectScreen", { fromScreen: "MainFeedScreen" });
   };
 
-  const renderItem = ({ item }) => <FeedItem feedId={item.id} />;
+  const renderItem = ({ item }) => <FeedItem feedId={item.feedId} />; //수정
 
   return (
     <SafeAreaView style={styles.container}>
@@ -43,7 +43,7 @@ const MainFeedScreen = () => {
       <FlatList
         data={filteredFeeds}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.feedId} // id -> feedId를 사용하여 고유한 key를 지정
         contentContainerStyle={styles.listContainer}
       />
     </SafeAreaView>

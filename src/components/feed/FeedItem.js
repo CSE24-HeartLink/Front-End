@@ -15,8 +15,8 @@ import Colors from "../../constants/colors";
 
 const FeedItem = ({ feedId }) => {
   const navigation = useNavigation();
-  const feed = useFeedStore((state) =>
-    state.feeds.find((f) => f.id === feedId)
+  const feed = useFeedStore(
+    (state) => state.feeds.find((f) => f.feedId === feedId) //f.feedId여야 함
   );
   const selectedReaction = useFeedStore(
     (state) => state.selectedReactions[feedId]
