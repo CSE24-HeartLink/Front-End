@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Colors from "../../.expo/constants/colors";
+
+import Colors from "../../constants/colors";
+
 import TabMenu1 from "../../assets/images/icons/tabMenu1.svg";
 import TabMenu2 from "../../assets/images/icons/tabMenu2.svg";
 import TabMenu3 from "../../assets/images/icons/tabMenu3.svg";

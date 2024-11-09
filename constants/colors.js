@@ -2,10 +2,10 @@
 
 const Colors = {
   lightBeige: "#FEFAFB",
-  primaryBeige: "#FCF1EC",
+  primaryBeige: "#FCF1EC", //background
   pink10: "#F4C8D7",
   pink20: "#F09AB4",
-  pink30: "#EC6C90",
+  pink30: "#EC6C90", //login button
   pink40: "#EA466E",
   red10: "#E4324F",
   red20: "#B5233F",
