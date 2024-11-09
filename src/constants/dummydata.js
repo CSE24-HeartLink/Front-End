@@ -1,3 +1,132 @@
+// export const initialFeeds = [
+//   {
+//     feedId: "1", //친구 id랑 헷갈릴 것 같아서 feedId로 수정함
+//     id: "user1",
+//     nickname: "다연이",
+//     group: "동기들",
+//     profileImage: require("../../assets/images/Smile.png"),
+//     content: "엄마가 해준 김치찌개가 먹고싶은 가을의 어느 날입니다.",
+//     createdAt: new Date("2024-07-06T12:21:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: true,
+//   },
+//   {
+//     feedId: "2", //친구 id랑 헷갈릴 것 같아서 feedId로 수정함
+//     id: "user1",
+//     nickname: "다연이",
+//     group: "동기들",
+//     profileImage: require("../../assets/images/Smile.png"),
+//     content: "배고팡.",
+//     createdAt: new Date("2024-07-06T12:21:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: true,
+//   },
+//   {
+//     feedId: "3", //친구 id랑 헷갈릴 것 같아서 feedId로 수정함
+//     id: "user3",
+//     nickname: "정연경",
+//     group: "동기들",
+//     profileImage: require("../../assets/images/Smile.png"),
+//     content: "3빠요",
+//     createdAt: new Date("2024-07-06T12:21:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: false,
+//   },
+//   {
+//     feedId: "4", //친구 id랑 헷갈릴 것 같아서 feedId로 수정함
+//     id: "user3",
+//     nickname: "정연경",
+//     group: "동기들",
+//     profileImage: require("../../assets/images/Smile.png"),
+//     content: "나정연경정니연경정년이보는중",
+//     createdAt: new Date("2024-07-06T12:21:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: false,
+//   },
+//   {
+//     feedId: "5",
+//     id: "user6",
+//     nickname: "정호",
+//     group: "동기들",
+//     profileImage: require("../../assets/images/Cry.png"),
+//     content: "5번째글인디",
+//     createdAt: new Date("2024-05-25T14:41:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: false,
+//   },
+//   {
+//     feedId: "6",
+//     id: "user4",
+//     nickname: "대박쓰",
+//     group: "가족",
+//     profileImage: require("../../assets/images/Cry.png"),
+//     content: "나6번째글인데.",
+//     createdAt: new Date("2024-05-25T14:41:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: false,
+//   },
+//   {
+//     feedId: "7",
+//     id: "user4",
+//     nickname: "대박쓰",
+//     group: "가족",
+//     profileImage: require("../../assets/images/Cry.png"),
+//     content: "나7번째글인데",
+//     createdAt: new Date("2024-05-25T14:41:00"),
+//     reactions: [
+//       { type: "grinning", count: 1, users: ["user2"] },
+//       { type: "heart-eyes", count: 0, users: [] },
+//       { type: "crying", count: 0, users: [] },
+//       { type: "scream", count: 0, users: [] },
+//       { type: "party", count: 0, users: [] },
+//       { type: "angry", count: 0, users: [] },
+//     ],
+//     isMyPost: false,
+//   },
+//   // 더 많은 초기 데이터...
+// ];
 export const initialFeeds = [
   {
     id: "1",
@@ -6,6 +135,7 @@ export const initialFeeds = [
     profileImage: require("../../assets/images/Smile.png"),
     content: "엄마가 해준 김치찌개가 먹고싶은 가을의 어느 날입니다.",
     createdAt: new Date("2024-07-06T12:21:00"),
+    group: "가족",  // 그룹 필드 추가
     reactions: [
       { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
@@ -21,8 +151,9 @@ export const initialFeeds = [
     userId: "user2",
     nickname: "정호우",
     profileImage: require("../../assets/images/Cry.png"),
-    content: "된장찌개가 머고시퍼요우.",
+    content: "11도 날씨 맑음",
     createdAt: new Date("2024-05-25T14:41:00"),
+    group: "F4",  // 그룹 필드 추가
     reactions: [
       { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },
@@ -33,57 +164,92 @@ export const initialFeeds = [
     ],
     isMyPost: false,
   },
-  // 더 많은 초기 데이터...
-];
-
-export const DUMMY_FRIENDS = [
-  {
-    id: "1",
-    nickname: "다연이",
-    group: "friends", // "동기들"에 해당하는 id
-    profileImage: require("../../assets/icon.png"),
-  },
-  {
-    id: "2",
-    nickname: "구준표",
-    group: "f4",
-    profileImage: require("../../assets/icon.png"),
-  },
   {
     id: "3",
-    nickname: "정연경",
-    group: "friends",
-    profileImage: require("../../assets/icon.png"),
+    userId: "user3",
+    nickname: "지혜",
+    profileImage: require("../../assets/images/Smile.png"),
+    content: "동기들과 함께하는 점심시간!",
+    createdAt: new Date("2024-05-24T12:30:00"),
+    group: "동기들",  // 그룹 필드 추가
+    reactions: [
+      { type: "grinning", count: 0, users: [] },
+      { type: "heart-eyes", count: 0, users: [] },
+      { type: "crying", count: 0, users: [] },
+      { type: "scream", count: 0, users: [] },
+      { type: "party", count: 0, users: [] },
+      { type: "angry", count: 0, users: [] },
+    ],
+    isMyPost: false,
   },
   {
     id: "4",
+    userId: "user4",
+    nickname: "구준표",
+    profileImage: require("../../assets/images/Smile.png"),
+    content: "F4 모임!",
+    createdAt: new Date("2024-05-23T18:00:00"),
+    group: "F4",  // 그룹 필드 추가
+    reactions: [
+      { type: "grinning", count: 0, users: [] },
+      { type: "heart-eyes", count: 0, users: [] },
+      { type: "crying", count: 0, users: [] },
+      { type: "scream", count: 0, users: [] },
+      { type: "party", count: 0, users: [] },
+      { type: "angry", count: 0, users: [] },
+    ],
+    isMyPost: false,
+  },
+ ];
+
+export const DUMMY_FRIENDS = [
+  {
+    id: "user1",
+    nickname: "다연이",
+    group: "동기들", // "동기들"에 해당하는 id
+    profileImage: require("../../assets/icon.png"),
+  },
+  {
+    id: "user2",
+    nickname: "구준표",
+    group: "F4",
+    profileImage: require("../../assets/icon.png"),
+  },
+  {
+    id: "user3",
+    nickname: "정연경",
+    group: "동기들",
+    profileImage: require("../../assets/icon.png"),
+  },
+  {
+    id: "user4",
     nickname: "대박쓰",
-    group: "family",
+    group: "가족",
     profileImage: require("../../assets/icon.png"),
   },
   {
-    id: "5",
+    id: "user5",
     nickname: "지혜",
-    group: "friends",
+    group: "동기들",
     profileImage: require("../../assets/icon.png"),
   },
   {
-    id: "6",
+    id: "user6",
     nickname: "정호",
-    group: "friends",
+    group: "동기들",
     profileImage: require("../../assets/icon.png"),
   },
   {
-    id: "7",
+    id: "user7",
     nickname: "XG",
-    group: "f4",
+    group: "F4",
     profileImage: require("../../assets/icon.png"),
   },
 ];
 
 export const GROUPS = [
   { id: "all", name: "전체" },
-  { id: "family", name: "가족" },
-  { id: "f4", name: "F4" },
-  { id: "friends", name: "동기들" },
+  { id: "가족", name: "가족" },
+  { id: "F4", name: "F4" },
+  { id: "동기들", name: "동기들" },
 ];

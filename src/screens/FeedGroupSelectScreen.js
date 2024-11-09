@@ -12,7 +12,6 @@ import Icon from "react-native-vector-icons/Feather";
 
 import AddGroupModal from "../components/modals/AddGroupModal";
 import EditGroupNameModal from "../components/modals/EditGroupNameModal";
-
 import Colors from "../constants/colors";
 import { GROUPS } from "../constants/dummydata";
 
@@ -25,22 +24,21 @@ const FeedGroupSelectScreen = () => {
   const handleSelectGroup = (groupId) => {
     navigation.navigate("MainTab", {
       screen: "피드",
-      params: {
-        selectedGroupId: groupId,
-      },
+      params: { selectedGroupId: groupId }
     });
   };
+
   const handleAddGroup = (groupName) => {
-    // TODO: 그룹 추가 로직 구현
+    console.log("Add group:", groupName);
     setIsAddGroupModalVisible(false);
   };
+
   const handleGroupLongPress = (group) => {
     setSelectedGroup(group);
     setIsEditGroupModalVisible(true);
   };
 
   const handleEditGroupName = (newName) => {
-    // TODO: 그룹 이름 수정 로직 구현
     console.log("Edit group name:", selectedGroup.id, newName);
     setIsEditGroupModalVisible(false);
   };
@@ -48,7 +46,6 @@ const FeedGroupSelectScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -61,7 +58,6 @@ const FeedGroupSelectScreen = () => {
           </View>
         </View>
 
-        {/* Groups Grid */}
         <View style={styles.groupsContainer}>
           {GROUPS.map((group) => (
             <TouchableOpacity
@@ -79,7 +75,6 @@ const FeedGroupSelectScreen = () => {
           ))}
         </View>
 
-        {/* 그룹 추가 버튼 */}
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setIsAddGroupModalVisible(true)}
@@ -89,13 +84,13 @@ const FeedGroupSelectScreen = () => {
             style={styles.addButtonImage}
           />
         </TouchableOpacity>
-        {/* 그룹 추가 모달 */}
+
         <AddGroupModal
           visible={isAddGroupModalVisible}
           onClose={() => setIsAddGroupModalVisible(false)}
           onConfirm={handleAddGroup}
         />
-        {/* 그룹 이름 수정 모달 */}
+        
         <EditGroupNameModal
           visible={isEditGroupModalVisible}
           onClose={() => setIsEditGroupModalVisible(false)}
