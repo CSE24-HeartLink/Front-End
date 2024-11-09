@@ -6,6 +6,8 @@ import Colors from "../../constants/colors";
 import { GROUPS } from "../../constants/dummydata";
 import TopFilterButton from "../ui/TopFilterButton"; // 새로 추가된 import
 
+import TopFilterButton from "../ui/TopFilterButton";
+
 const MainHeader = ({
   onPressNotification,
   onPressCategory,
@@ -19,7 +21,6 @@ const MainHeader = ({
   return (
     <View style={styles.header}>
       <TopFilterButton onPress={onPressCategory} getGroupName={getGroupName} />
-
       <TouchableOpacity
         style={styles.notificationButton}
         onPress={onPressNotification}

@@ -3,17 +3,19 @@ import {
   View,
   FlatList,
   StyleSheet,
-  Alert,
   SafeAreaView,
+  Alert,
   TouchableOpacity,
-  Text,
+  Image,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Feather";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
-import TopFilterButton from "../components/ui/TopFilterButton";
+import MainHeader from "../components/navigation/MainHeader";
 import FriendsItem from "../components/FriendItem";
+
 import useFriendStore from "../store/friendStore";
+
+import AddFriendModal from "../components/modals/AddFriendModal";
 import Colors from "../constants/colors";
 
 const FriendsScreen = () => {
@@ -22,6 +24,9 @@ const FriendsScreen = () => {
   const selectedGroup = route.params?.selectedGroup;
   const friends = useFriendStore((state) => state.friends);
   const [filteredFriends, setFilteredFriends] = useState(friends);
+  const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
+  const deleteFriend = useFriendStore((state) => state.deleteFriend);
+  const updateFriendGroup = useFriendStore((state) => state.updateFriendGroup);
 
   useEffect(() => {
     if (selectedGroup && selectedGroup !== "all") {
@@ -33,15 +38,17 @@ const FriendsScreen = () => {
     }
   }, [selectedGroup, friends]);
 
-  const handleCategoryPress = () => {
-    navigation.navigate("GroupSelectScreen", { fromScreen: "FriendsScreen" });
+  const handleAddFriend = (email) => {
+    // 친구 추가 로직 구현
+    console.log("Add friend with email:", email);
+    setIsAddFriendModalVisible(false);
   };
 
-  const handleMoveGroup = (friendId) => {
-    // TODO: 그룹 선택 모달 구현
-    updateFriendGroup(friendId, "새 그룹");
+  const handleMoveGroup = (friendId, newGroup) => {
+    updateFriendGroup(friendId, newGroup);
   };
 
+  //alert 자동 띄움
   const handleDelete = (friendId) => {
     Alert.alert(
       "친구 삭제",
@@ -64,21 +71,11 @@ const FriendsScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* 조건부로 뒤로가기 버튼 렌더링 */}
-        {selectedGroup && selectedGroup !== "all" && (
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
-          </TouchableOpacity>
-        )}
-        <View style={styles.headerContainer}>
-          <TopFilterButton
-            onPress={handleCategoryPress}
-            getGroupName={() => (selectedGroup ? selectedGroup : "전체")}
-          />
-        </View>
+        <MainHeader
+          selectedGroup={selectedGroup}
+          onPressCategory={() => navigation.navigate("GroupSelect")}
+          onPressNotification={() => console.log("notification")}
+        />
         <FlatList
           data={filteredFriends}
           renderItem={({ item }) => (
@@ -90,6 +87,23 @@ const FriendsScreen = () => {
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
+        />
+        {/* 친구 추가 버튼 */}
+        {!route.params?.selectedGroup && ( // GroupSelect 화면이 아닐 때만 보이도록
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setIsAddFriendModalVisible(true)}
+          >
+            <Image
+              source={require("../../assets/images/AddGroup.png")}
+              style={styles.addButtonImage}
+            />
+          </TouchableOpacity>
+        )}
+        <AddFriendModal
+          visible={isAddFriendModalVisible}
+          onClose={() => setIsAddFriendModalVisible(false)}
+          onConfirm={handleAddFriend}
         />
       </View>
     </SafeAreaView>
@@ -105,22 +119,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.primaryBeige,
   },
-  headerContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  backButton: {
-    padding: 8,
-    position: "absolute",
-    left: 16,
-    zIndex: 1,
-    top: 8, // 추가
-  },
-
   listContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 72,
+    paddingBottom: 72, // BottomTab height
+  },
+  addButton: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    left: 309,
+    top: 696,
+    zIndex: 1,
+  },
+  addButtonImage: {
+    width: "100%",
+    height: "100%",
   },
 });
 

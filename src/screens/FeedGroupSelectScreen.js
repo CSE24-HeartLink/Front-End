@@ -1,38 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Image, // Image import 추가
+  Image,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
+
+import AddGroupModal from "../components/modals/AddGroupModal";
+import EditGroupNameModal from "../components/modals/EditGroupNameModal";
 
 import Colors from "../constants/colors";
 import { GROUPS } from "../constants/dummydata";
 
-const GroupSelectScreen = () => {
+const FeedGroupSelectScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute(); // route로부터 파라미터 가져오기
+  const [isAddGroupModalVisible, setIsAddGroupModalVisible] = useState(false);
+  const [isEditGroupModalVisible, setIsEditGroupModalVisible] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   const handleSelectGroup = (groupId) => {
-    const fromScreen = route.params?.fromScreen;
+    navigation.navigate("MainTab", {
+      screen: "피드",
+      params: {
+        selectedGroupId: groupId,
+      },
+    });
+  };
+  const handleAddGroup = (groupName) => {
+    // TODO: 그룹 추가 로직 구현
+    setIsAddGroupModalVisible(false);
+  };
+  const handleGroupLongPress = (group) => {
+    setSelectedGroup(group);
+    setIsEditGroupModalVisible(true);
+  };
 
-    if (fromScreen === "MainFeedScreen") {
-      navigation.navigate("MainFeedScreen", {
-        selectedGroup: groupId,
-      });
-    } else if (fromScreen === "FriendsScreen") {
-      navigation.navigate("FriendsScreen", {
-        selectedGroup: groupId,
-      });
-    } else {
-      // 기본 동작 설정 (필요 시 추가)
-      console.warn("Unhandled fromScreen:", fromScreen);
-      navigation.goBack();
-    }
+  const handleEditGroupName = (newName) => {
+    // TODO: 그룹 이름 수정 로직 구현
+    console.log("Edit group name:", selectedGroup.id, newName);
+    setIsEditGroupModalVisible(false);
   };
 
   return (
@@ -47,7 +57,7 @@ const GroupSelectScreen = () => {
             <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>그룹 목록</Text>
+            <Text style={styles.title}>전체</Text>
           </View>
         </View>
 
@@ -58,6 +68,7 @@ const GroupSelectScreen = () => {
               key={group.id}
               style={styles.groupItem}
               onPress={() => handleSelectGroup(group.id)}
+              onLongPress={() => handleGroupLongPress(group)}
             >
               <Image
                 source={require("../../assets/images/Heart.png")}
@@ -67,6 +78,30 @@ const GroupSelectScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* 그룹 추가 버튼 */}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setIsAddGroupModalVisible(true)}
+        >
+          <Image
+            source={require("../../assets/images/AddGroup.png")}
+            style={styles.addButtonImage}
+          />
+        </TouchableOpacity>
+        {/* 그룹 추가 모달 */}
+        <AddGroupModal
+          visible={isAddGroupModalVisible}
+          onClose={() => setIsAddGroupModalVisible(false)}
+          onConfirm={handleAddGroup}
+        />
+        {/* 그룹 이름 수정 모달 */}
+        <EditGroupNameModal
+          visible={isEditGroupModalVisible}
+          onClose={() => setIsEditGroupModalVisible(false)}
+          onConfirm={handleEditGroupName}
+          currentGroupName={selectedGroup?.name || ""}
+        />
       </View>
     </SafeAreaView>
   );
@@ -125,6 +160,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.darkRed20,
   },
+  addButton: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    right: 20,
+    bottom: 20,
+    zIndex: 1,
+  },
+  addButtonImage: {
+    width: "100%",
+    height: "100%",
+  },
 });
 
-export default GroupSelectScreen;
+export default FeedGroupSelectScreen;
