@@ -6,11 +6,11 @@ import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import Colors from "../../constants/colors";
 
 const REACTIONS = [
-  { type: "smile", source: require("../../assets/images/Smile.png") },
-  { type: "love", source: require("../../assets/images/Love.png") },
-  { type: "cry", source: require("../../assets/images/Cry.png") },
-  { type: "afraid", source: require("../../assets/images/Afraid.png") },
-  { type: "angry", source: require("../../assets/images/Angry.png") },
+  { type: "smile", source: require("../../../assets/images/Smile.png") },
+  { type: "love", source: require("../../../assets/images/Love.png") },
+  { type: "cry", source: require("../../../assets/images/Cry.png") },
+  { type: "afraid", source: require("../../../assets/images/Afraid.png") },
+  { type: "angry", source: require("../../../assets/images/Angry.png") },
 ];
 
 const ReactionButtons = ({ selectedReaction, onSelectReaction }) => {

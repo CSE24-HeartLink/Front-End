@@ -3,16 +3,17 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 import Colors from "../../constants/colors";
 
-import TabMenu1 from "../../assets/images/icons/tabMenu1.svg";
-import TabMenu2 from "../../assets/images/icons/tabMenu2.svg";
-import TabMenu3 from "../../assets/images/icons/tabMenu3.svg";
-import TabMenu4 from "../../assets/images/icons/tabMenu4.svg";
-import TabMenu5 from "../../assets/images/icons/tabMenu5.svg";
-import TabMenu1active from "../../assets/images/icons/tabMenu1active.svg";
-import TabMenu2active from "../../assets/images/icons/tabMenu2active.svg";
-import TabMenu3active from "../../assets/images/icons/tabMenu3active.svg";
-import TabMenu4active from "../../assets/images/icons/tabMenu4active.svg";
-import TabMenu5active from "../../assets/images/icons/tabMenu5active.svg";
+import TabMenu1 from "../../../assets/images/icons/tabMenu1.svg";
+import TabMenu2 from "../../../assets/images/icons/tabMenu2.svg";
+import TabMenu3 from "../../../assets/images/icons/tabMenu3.svg";
+import TabMenu4 from "../../../assets/images/icons/tabMenu4.svg";
+import TabMenu5 from "../../../assets/images/icons/tabMenu5.svg";
+import TabMenu1active from "../../../assets/images/icons/tabMenu1active.svg";
+import TabMenu2active from "../../../assets/images/icons/tabMenu2active.svg";
+import TabMenu3active from "../../../assets/images/icons/tabMenu3active.svg";
+import TabMenu4active from "../../../assets/images/icons/tabMenu4active.svg";
+import TabMenu5active from "../../../assets/images/icons/tabMenu5active.svg";
+
 import * as Animatable from "react-native-animatable"; // 추가
 
 const icons = [

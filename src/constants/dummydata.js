@@ -3,7 +3,7 @@ export const initialFeeds = [
     id: "1",
     userId: "user1",
     nickname: "다연이",
-    profileImage: require("../assets/images/Smile.png"),
+    profileImage: require("../../assets/images/Smile.png"),
     content: "엄마가 해준 김치찌개가 먹고싶은 가을의 어느 날입니다.",
     createdAt: new Date("2024-07-06T12:21:00"),
     reactions: [
@@ -20,7 +20,7 @@ export const initialFeeds = [
     id: "2",
     userId: "user2",
     nickname: "정호우",
-    profileImage: require("../assets/images/Cry.png"),
+    profileImage: require("../../assets/images/Cry.png"),
     content: "된장찌개가 머고시퍼요우.",
     createdAt: new Date("2024-05-25T14:41:00"),
     reactions: [
@@ -41,37 +41,43 @@ export const DUMMY_FRIENDS = [
     id: "1",
     nickname: "다연이",
     group: "friends", // "동기들"에 해당하는 id
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
   },
   {
     id: "2",
     nickname: "구준표",
     group: "f4",
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
   },
   {
     id: "3",
     nickname: "정연경",
     group: "friends",
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
   },
   {
     id: "4",
-    nickname: "김차누",
+    nickname: "대박쓰",
     group: "family",
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
   },
   {
     id: "5",
     nickname: "지혜",
     group: "friends",
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
   },
   {
     id: "6",
     nickname: "정호",
     group: "friends",
-    profileImage: require("../assets/icon.png"),
+    profileImage: require("../../assets/icon.png"),
+  },
+  {
+    id: "7",
+    nickname: "XG",
+    group: "f4",
+    profileImage: require("../../assets/icon.png"),
   },
 ];
 
