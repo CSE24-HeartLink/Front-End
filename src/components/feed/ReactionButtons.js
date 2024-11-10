@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 16,
     backgroundColor: Colors.white,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    // borderBottomLeftRadius: 16,
+    // borderBottomRightRadius: 16,
   },
   reactionButton: {
     width: 40,
