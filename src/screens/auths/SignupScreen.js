@@ -7,11 +7,11 @@ import {
   StatusBar,
   StyleSheet,
 } from "react-native";
-import Logo from "../components/Logo";
-import LoginForm from "../components/forms/LoginForm";
-import Colors from "../constants/colors";
+import Logo from "../../components/Logo";
+import SignupForm from "./components/forms/SignupForm";
+import Colors from "../../constants/colors";
 
-const LoginScreen = () => {
+const SignupScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -23,7 +23,7 @@ const LoginScreen = () => {
           <View style={styles.logoContainer}>
             <Logo style={styles.logo} />
           </View>
-          <LoginForm />
+          <SignupForm />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -35,24 +35,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.primaryBeige,
   },
-  keyboardAvoid: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    position: 'relative',
-  },
   logoContainer: {
-    position: 'absolute',
+    position: "absolute",
     width: 333,
     height: 160,
     left: 20,
     top: 78,
   },
-  logo: {
-    width: '100%',
-    height: '100%',
-  }
+  keyboardAvoid: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 60,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
 });
 
-export default LoginScreen;
+export default SignupScreen;

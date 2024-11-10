@@ -9,8 +9,8 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Logo from "../components/Logo";
-import Colors from "../constants/colors";
+import Logo from "../../components/Logo";
+import Colors from "../../constants/colors";
 
 const windowWidth = Dimensions.get('window').width;
 

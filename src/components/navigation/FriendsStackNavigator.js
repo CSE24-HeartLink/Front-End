@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import FriendsScreen from "../../screens/FriendsScreen";
+import FriendsScreen from "../../screens/friends/FriendsScreen";
 import GroupSelectScreen from "../../screens/GroupSelectScreen";
 
 const FriendsStack = createStackNavigator();

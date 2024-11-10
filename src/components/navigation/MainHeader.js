@@ -1,20 +1,21 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from '@react-navigation/native';
 
 import Colors from "../../constants/colors";
 import { GROUPS } from "../../constants/dummydata";
 
 import TopFilterButton from "../ui/TopFilterButton";
 
-const MainHeader = ({
-  onPressNotification,
-  onPressCategory,
-  selectedGroup,
-}) => {
+const MainHeader = ({ onPressCategory, selectedGroup }) => {
+  const navigation = useNavigation();
   const getGroupName = () => {
     const group = GROUPS.find((g) => g.id === selectedGroup);
     return group ? group.name : "전체";
+  };
+  const handleNotificationPress = () => {
+    navigation.navigate("Notifications");
   };
 
   return (
@@ -22,7 +23,7 @@ const MainHeader = ({
       <TopFilterButton onPress={onPressCategory} getGroupName={getGroupName} />
       <TouchableOpacity
         style={styles.notificationButton}
-        onPress={onPressNotification}
+        onPress={handleNotificationPress}
       >
         <Icon name="bell" size={20} color={Colors.pink40} />
       </TouchableOpacity>
