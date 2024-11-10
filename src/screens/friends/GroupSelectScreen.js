@@ -10,8 +10,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
-import Colors from "../constants/colors";
-import { GROUPS } from "../constants/dummydata";
+import Colors from "../../constants/colors";
+import { GROUPS } from "../../constants/dummydata";
 
 const GroupSelectScreen = () => {
   const navigation = useNavigation();
@@ -48,7 +48,7 @@ const GroupSelectScreen = () => {
               onPress={() => handleSelectGroup(group.id)}
             >
               <Image
-                source={require("../../assets/images/Heart.png")}
+                source={require("../../../assets/images/Heart.png")}
                 style={styles.heartIcon}
               />
               <Text style={styles.groupName}>{group.name}</Text>
