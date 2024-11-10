@@ -1,10 +1,9 @@
-// FeedGroupSelectScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet, // StyleSheet import 추가
+  StyleSheet,
   SafeAreaView,
   Image,
 } from "react-native";
@@ -16,26 +15,42 @@ import EditGroupNameModal from "../components/modals/EditGroupNameModal";
 import Colors from "../constants/colors";
 import { GROUPS } from "../constants/dummydata";
 
-const FeedGroupSelectScreen = () => {
+const WritingGroupSelectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [isAddGroupModalVisible, setIsAddGroupModalVisible] = useState(false);
   const [isEditGroupModalVisible, setIsEditGroupModalVisible] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [currentGroupId, setCurrentGroupId] = useState("all");
+  const [currentSelected, setCurrentSelected] = useState("all");
 
+  // 현재 선택된 그룹 정보 받아오기
   useEffect(() => {
-    if (route.params?.currentGroupId) {
-      setCurrentGroupId(route.params.currentGroupId);
+    if (route.params?.currentSelected) {
+      setCurrentSelected(route.params.currentSelected);
     }
-  }, [route.params?.currentGroupId]);
+  }, [route.params?.currentSelected]);
 
-  const handleSelectGroup = (groupId) => {
-    navigation.navigate("MainTab", {
-      screen: "피드",
-      params: { selectedGroupId: groupId },
-      initial: false,
+  const handleSelectGroup = (groupId, groupName) => {
+    // WritingScreen으로 돌아가면서 선택된 그룹 정보 전달
+    navigation.navigate("WritingScreen", {
+      selectedGroupId: groupId,
+      selectedGroupName: groupName,
     });
+  };
+
+  const handleAddGroup = (groupName) => {
+    console.log("Add group:", groupName);
+    setIsAddGroupModalVisible(false);
+  };
+
+  const handleGroupLongPress = (group) => {
+    setSelectedGroup(group);
+    setIsEditGroupModalVisible(true);
+  };
+
+  const handleEditGroupName = (newName) => {
+    console.log("Edit group name:", selectedGroup.id, newName);
+    setIsEditGroupModalVisible(false);
   };
 
   return (
@@ -49,9 +64,7 @@ const FeedGroupSelectScreen = () => {
             <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>
-              {GROUPS.find((g) => g.id === currentGroupId)?.name || "전체"}
-            </Text>
+            <Text style={styles.title}>그룹 선택</Text>
           </View>
         </View>
 
@@ -61,9 +74,9 @@ const FeedGroupSelectScreen = () => {
               key={group.id}
               style={[
                 styles.groupItem,
-                currentGroupId === group.id && styles.selectedGroupItem,
+                currentSelected === group.id && styles.selectedGroupItem,
               ]}
-              onPress={() => handleSelectGroup(group.id)}
+              onPress={() => handleSelectGroup(group.id, group.name)}
               onLongPress={() => handleGroupLongPress(group)}
             >
               <Image
@@ -73,7 +86,7 @@ const FeedGroupSelectScreen = () => {
               <Text
                 style={[
                   styles.groupName,
-                  currentGroupId === group.id && styles.selectedGroupName,
+                  currentSelected === group.id && styles.selectedGroupName,
                 ]}
               >
                 {group.name}
@@ -92,18 +105,18 @@ const FeedGroupSelectScreen = () => {
           />
         </TouchableOpacity>
 
-        {/* <AddGroupModal
+        <AddGroupModal
           visible={isAddGroupModalVisible}
           onClose={() => setIsAddGroupModalVisible(false)}
           onConfirm={handleAddGroup}
-        /> */}
+        />
 
-        {/* <EditGroupNameModal
+        <EditGroupNameModal
           visible={isEditGroupModalVisible}
           onClose={() => setIsEditGroupModalVisible(false)}
           onConfirm={handleEditGroupName}
           currentGroupName={selectedGroup?.name || ""}
-        /> */}
+        />
       </View>
     </SafeAreaView>
   );
@@ -162,6 +175,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.darkRed20,
   },
+  selectedGroupItem: {
+    opacity: 0.8,
+    // 선택된 그룹 스타일 추가
+  },
+  selectedGroupName: {
+    color: Colors.red20,
+    // 선택된 그룹 이름 스타일 추가
+  },
   addButton: {
     position: "absolute",
     width: 64,
@@ -176,4 +197,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FeedGroupSelectScreen;
+export default WritingGroupSelectScreen;

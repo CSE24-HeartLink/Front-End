@@ -10,6 +10,7 @@ import FeedGroupSelectScreen from "../../screens/FeedGroupSelectScreen.js";
 import AlbumScreen from "../../screens/AlbumScreen";
 import RecordScreen from "../../screens/RecordScreen";
 import WritingScreen from "../../screens/WritingScreen.js";
+import WritingGroupSelectScreen from "../../screens/WritingGroupSelectScreen.js";
 
 // import FriendsScreen from "../../screens/FriendsScreen";
 // import GroupSelectScreen from "../../screens/GroupSelectScreen";
@@ -43,6 +44,10 @@ const AppNavigator = () => {
       <Stack.Screen name="CreatePost" component={CreatePost} />
       <Stack.Screen name="RecordScreen" component={RecordScreen} />
       <Stack.Screen name="WritingScreen" component={WritingScreen} />
+      <Stack.Screen
+        name="WritingGroupSelect"
+        component={WritingGroupSelectScreen}
+      />
     </Stack.Navigator>
   );
 };
