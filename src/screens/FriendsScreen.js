@@ -125,15 +125,13 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: "absolute",
-    width: 64,
-    height: 64,
-    left: 309,
-    top: 696,
-    zIndex: 1,
+    bottom: 60,
+    right: 20,
   },
   addButtonImage: {
-    width: "100%",
-    height: "100%",
+    width: 64,
+    height: 64,
+    resizeMode: "contain",
   },
 });
 

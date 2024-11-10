@@ -11,7 +11,7 @@ import AlbumScreen from "../../screens/AlbumScreen";
 import RecordScreen from "../../screens/RecordScreen";
 import WritingScreen from "../../screens/WritingScreen.js";
 import WritingGroupSelectScreen from "../../screens/WritingGroupSelectScreen.js";
-
+import RenameModal from "../modals/RenameModal.js";
 // import FriendsScreen from "../../screens/FriendsScreen";
 // import GroupSelectScreen from "../../screens/GroupSelectScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -48,6 +48,8 @@ const AppNavigator = () => {
         name="WritingGroupSelect"
         component={WritingGroupSelectScreen}
       />
+
+      <Stack.Screen name="RenameModal" component={RenameModal} />
     </Stack.Navigator>
   );
 };
