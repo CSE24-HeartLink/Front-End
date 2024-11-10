@@ -4,9 +4,12 @@ import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "../../screens/WelcomeScreen";
 import LoginScreen from "../../screens/LoginScreen";
 import SignupScreen from "../../screens/SignupScreen";
+
 import MainFeedScreen from "../../screens/MainFeedScreen";
 import FriendsScreen from "../../screens/FriendsScreen";
 import FeedGroupSelectScreen from "../../screens/FeedGroupSelectScreen.js";
+import NotificationScreen from "../../screens/notification/NotificationScreen.js";
+
 import AlbumScreen from "../../screens/AlbumScreen";
 import RecordScreen from "../../screens/RecordScreen";
 import WritingScreen from "../../screens/WritingScreen.js";
@@ -39,8 +42,13 @@ const AppNavigator = () => {
         name="FeedGroupSelectScreen"
         component={FeedGroupSelectScreen}
       />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={{ headerShown: false }}
+      />
+      
       <Stack.Screen name="AlbumScreen" component={AlbumScreen} />
-
       <Stack.Screen name="CreatePost" component={CreatePost} />
       <Stack.Screen name="RecordScreen" component={RecordScreen} />
       <Stack.Screen name="WritingScreen" component={WritingScreen} />

@@ -29,6 +29,22 @@ const FeedGroupSelectScreen = () => {
       setCurrentGroupId(route.params.currentGroupId);
     }
   }, [route.params?.currentGroupId]);
+  const handleAddGroup = (groupName) => {
+    // TODO: 그룹 추가 로직 구현
+    console.log("Add group:", groupName);
+    setIsAddGroupModalVisible(false);
+  };
+
+  const handleGroupLongPress = (group) => {
+    setSelectedGroup(group);
+    setIsEditGroupModalVisible(true);
+  };
+
+  const handleEditGroupName = (newName) => {
+    // TODO: 그룹 이름 수정 로직 구현
+    console.log("Edit group name:", selectedGroup.id, newName);
+    setIsEditGroupModalVisible(false);
+  };
 
   const handleSelectGroup = (groupId) => {
     navigation.navigate("MainTab", {
@@ -92,18 +108,18 @@ const FeedGroupSelectScreen = () => {
           />
         </TouchableOpacity>
 
-        {/* <AddGroupModal
+        <AddGroupModal
           visible={isAddGroupModalVisible}
           onClose={() => setIsAddGroupModalVisible(false)}
           onConfirm={handleAddGroup}
-        /> */}
+        />
 
-        {/* <EditGroupNameModal
+        <EditGroupNameModal
           visible={isEditGroupModalVisible}
           onClose={() => setIsEditGroupModalVisible(false)}
           onConfirm={handleEditGroupName}
           currentGroupName={selectedGroup?.name || ""}
-        /> */}
+        />
       </View>
     </SafeAreaView>
   );
