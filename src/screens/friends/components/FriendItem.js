@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-import EditGroupModal from "./modals/EditGroupModal";
-import DeleteConfirmModal from "./modals/DeleteConfirmModal";
+import EditGroupModal from "../../../components/modals/EditGroupModal";
+import DeleteConfirmModal from "./Modal/FriendDeleteModal";
 
-import Colors from "../constants/colors";
+import Colors from "../../../constants/colors";
 
 const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);

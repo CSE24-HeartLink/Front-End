@@ -10,13 +10,12 @@ import {
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
-import MainHeader from "../components/navigation/MainHeader";
-import FriendsItem from "../components/FriendItem";
+import MainHeader from "../../components/navigation/MainHeader";
+import FriendsItem from "./components/FriendItem";
+import AddFriendModal from "./components/Modal/AddFriendModal";
 
-import useFriendStore from "../store/friendStore";
-
-import AddFriendModal from "../components/modals/AddFriendModal";
-import Colors from "../constants/colors";
+import useFriendStore from "../../store/friendStore";
+import Colors from "../../constants/colors";
 
 const FriendsScreen = () => {
   const navigation = useNavigation();
@@ -95,7 +94,7 @@ const FriendsScreen = () => {
             onPress={() => setIsAddFriendModalVisible(true)}
           >
             <Image
-              source={require("../../assets/images/AddGroup.png")}
+              source={require("../../../assets/images/AddGroup.png")}
               style={styles.addButtonImage}
             />
           </TouchableOpacity>

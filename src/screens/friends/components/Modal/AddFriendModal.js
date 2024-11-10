@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import Colors from "../../constants/colors";
+import Colors from "../../../../constants/colors";
 
 const AddFriendModal = ({ visible, onClose, onConfirm }) => {
   const [email, setEmail] = useState("");

@@ -1,9 +1,8 @@
-// src/components/modals/DeleteConfirmModal.js
 import React from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
-import Colors from "../../constants/colors";
+import Colors from "../../../../constants/colors";
 
-const DeleteConfirmModal = ({ visible, onClose, onConfirm, friendName }) => {
+const FriendDeleteModal = ({ visible, onClose, onConfirm, friendName }) => {
   return (
     <Modal
       visible={visible}
@@ -109,4 +108,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DeleteConfirmModal;
+export default FriendDeleteModal;

@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Colors from "../../constants/colors";
+import Colors from "../../../../constants/colors";
 
 const LoginForm = () => {
   const navigation = useNavigation();

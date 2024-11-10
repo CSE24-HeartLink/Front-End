@@ -8,7 +8,7 @@ const Colors = {
   pink30: "#EC6C90", //login button
   pink40: "#EA466E",
   red10: "#E4324F",
-  red20: "#B5233F",
+  red20: "#B5233F", //title text
   darkRed10: "#86192F",
   darkRed20: "#570D1E",
   primaryGreen: "#B4DF7E",
