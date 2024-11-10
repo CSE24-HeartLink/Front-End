@@ -2,10 +2,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import CLOiScreen from "../../screens/CLOiScreen";
-import AlbumScreen from "../../screens/AlbumScreen";
-import MainFeedScreen from "../../screens/MainFeedScreen";
-import MyPageScreen from "../../screens/MyPageScreen";
+import CLOiScreen from "../../screens/cloi/CLOiScreen";
+import AlbumScreen from "../../screens/album/AlbumScreen";
+import MainFeedScreen from "../../screens/feed/MainFeedScreen";
+import MyPageScreen from "../../screens/mypage/MyPageScreen";
 
 import FriendsStackNavigator from "./FriendsStackNavigator";
 import CustomBottomTabBar from "./CustomBottomTabBar";

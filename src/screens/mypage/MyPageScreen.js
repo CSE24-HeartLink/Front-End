@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, SafeAreaView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import Colors from "../constants/colors";
-import ProfileCard from "../components/ui/ProfileCard";
-import RenameModal from "../components/modals/RenameModal";
+
+import Colors from "../../constants/colors";
+
+import ProfileCard from "../../components/ui/ProfileCard";
+import RenameModal from "../../components/modals/RenameModal";
 
 const ToMeButton = ({ title, onPress }) => {
   return (

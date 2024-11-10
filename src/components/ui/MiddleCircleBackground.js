@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import Colors from "../../constants/colors";
 
-const BigCircleBackground = ({ children }) => {
+const MiddleCircleBackground = ({ children }) => {
   return <View style={styles.circle}>{children}</View>;
 };
 
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BigCircleBackground;
+export default MiddleCircleBackground;

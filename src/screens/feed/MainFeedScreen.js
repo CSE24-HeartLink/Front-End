@@ -13,11 +13,11 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
-import useFeedStore from "../store/feedStore";
-import FeedItem from "../components/feed/FeedItem";
-import Colors from "../constants/colors";
-import MainHeader from "../components/navigation/MainHeader";
-import AddFeedIcon from "../../assets/images/AddFeed.png";
+import useFeedStore from "../../store/feedStore";
+import FeedItem from "./components/FeedItem";
+import Colors from "../../constants/colors";
+import MainHeader from "../../components/navigation/MainHeader";
+import AddFeedIcon from "../../../assets/images/AddFeed.png";
 
 const MainFeedScreen = () => {
   const feeds = useFeedStore((state) => state.feeds);

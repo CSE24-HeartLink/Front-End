@@ -10,10 +10,10 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
-import AddGroupModal from "../components/modals/AddGroupModal";
-import EditGroupNameModal from "../components/modals/EditGroupNameModal";
-import Colors from "../constants/colors";
-import { GROUPS } from "../constants/dummydata";
+import AddGroupModal from "../../components/modals/AddGroupModal";
+import EditGroupNameModal from "../../components/modals/EditGroupNameModal";
+import Colors from "../../constants/colors";
+import { GROUPS } from "../../constants/dummydata";
 
 const WritingGroupSelectScreen = () => {
   const navigation = useNavigation();
@@ -80,7 +80,7 @@ const WritingGroupSelectScreen = () => {
               onLongPress={() => handleGroupLongPress(group)}
             >
               <Image
-                source={require("../../assets/images/Heart.png")}
+                source={require("../../../assets/images/Heart.png")}
                 style={styles.heartIcon}
               />
               <Text
@@ -100,7 +100,7 @@ const WritingGroupSelectScreen = () => {
           onPress={() => setIsAddGroupModalVisible(true)}
         >
           <Image
-            source={require("../../assets/images/AddGroup.png")}
+            source={require("../../../assets/images/AddGroup.png")}
             style={styles.addButtonImage}
           />
         </TouchableOpacity>

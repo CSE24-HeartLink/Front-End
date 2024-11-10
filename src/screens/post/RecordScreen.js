@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import BigCircleBackground from "../components/ui/BigCircleBackground";
-import MicIcon from "../../assets/images/icons/MicIcon.svg"; // SVG 아이콘
-import Colors from "../constants/colors";
+
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons"; // 뒤로가기 아이콘을 위한 임포트
-import RecordingPic from "../../assets/images/recording.png"; // 녹음 시각화 이미지
+
+import RecordingPic from "../../../assets/images/recording.png"; // 녹음 시각화 이미지
+import MicIcon from "../../../assets/images/icons/MicIcon.svg"; // SVG 아이콘
+import BigCircleBackground from "../../components/ui/BigCircleBackground";
+import Colors from "../../constants/colors";
 
 const RecordScreen = () => {
   const navigation = useNavigation();

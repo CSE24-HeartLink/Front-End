@@ -5,18 +5,18 @@ import WelcomeScreen from "../../screens/auths/WelcomeScreen.js";
 import LoginScreen from "../../screens/auths/LoginScreen.js";
 import SignupScreen from "../../screens/auths/SignupScreen.js";
 
-import MainFeedScreen from "../../screens/MainFeedScreen";
+import MainFeedScreen from "../../screens/feed/MainFeedScreen.js";
 import NotificationScreen from "../../screens/notification/NotificationScreen.js";
 import FriendsScreen from "../../screens/friends/FriendsScreen.js";
-import FeedGroupSelectScreen from "../../screens/FeedGroupSelectScreen.js";
-import AlbumScreen from "../../screens/AlbumScreen";
-import RecordScreen from "../../screens/RecordScreen";
-import WritingScreen from "../../screens/WritingScreen.js";
-import WritingGroupSelectScreen from "../../screens/WritingGroupSelectScreen.js";
+import FeedGroupSelectScreen from "../../screens/feed/FeedGroupSelectScreen.js";
+import AlbumScreen from "../../screens/album/AlbumScreen.js";
+import RecordScreen from "../../screens/post/RecordScreen.js";
+import WritingScreen from "../../screens/post/WritingScreen.js";
+import WritingGroupSelectScreen from "../../screens/post/WritingGroupSelectScreen.js";
 import RenameModal from "../modals/RenameModal.js";
 
 import BottomTabNavigator from "./BottomTabNavigator";
-import CreatePost from "../../screens/CreatePost";
+import CreatePost from "../../screens/post/CreatePost.js";
 
 const Stack = createStackNavigator();
 

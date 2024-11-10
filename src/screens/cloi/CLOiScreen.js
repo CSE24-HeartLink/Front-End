@@ -8,17 +8,17 @@ import {
   SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import Colors from "../constants/colors";
-import ProgressBar from "../components/ui/ProgressBar";
-import SpeechBubble from "../components/ui/SpeechBubble";
+import Colors from "../../constants/colors";
+import ProgressBar from "../../components/ui/ProgressBar";
+import SpeechBubble from "../../components/ui/SpeechBubble";
 // 이미지 직접 import
-import CLOiLv1 from "../../assets/images/CLOiLv1.png";
-import CLOiLv2 from "../../assets/images/CLOiLv2.png";
-import CLOiLv3 from "../../assets/images/CLOiLv3.png";
-import CLOiLv4 from "../../assets/images/CLOiLv4.png";
-import CLOiLv5 from "../../assets/images/CLOiLv5.png";
-import CLOiBackground from "../../assets/images/CLOiBackground.png";
-import RenameModal from "../components/modals/RenameModal";
+import CLOiLv1 from "../../../assets/images/CLOiLv1.png";
+import CLOiLv2 from "../../../assets/images/CLOiLv2.png";
+import CLOiLv3 from "../../../assets/images/CLOiLv3.png";
+import CLOiLv4 from "../../../assets/images/CLOiLv4.png";
+import CLOiLv5 from "../../../assets/images/CLOiLv5.png";
+import CLOiBackground from "../../../assets/images/CLOiBackground.png";
+import RenameModal from "../../components/modals/RenameModal";
 
 const CLOiScreen = () => {
   const [name, setName] = useState("클로이");

@@ -16,14 +16,17 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import TopFilterButton from "../components/ui/TopFilterButton";
-import AIImageIcon from "../../assets/images/icons/AIImageIcon.svg";
-import CameraIcon from "../../assets/images/icons/CameraIcon.svg";
-import MiddleCircleBackground from "../components/ui/MiddleCircleBackground";
-import AIdummy from "../../assets/images/AIdummy.png";
-import Colors from "../constants/colors";
-import useFeedStore from "../store/feedStore";
-import { GROUPS } from "../constants/dummydata";
+
+import TopFilterButton from "../../components/ui/TopFilterButton";
+import AIImageIcon from "../../../assets/images/icons/AIImageIcon.svg";
+import CameraIcon from "../../../assets/images/icons/CameraIcon.svg";
+import AIdummy from "../../../assets/images/AIdummy.png";
+
+import MiddleCircleBackground from "../../components/ui/MiddleCircleBackground";
+import useFeedStore from "../../store/feedStore";
+
+import Colors from "../../constants/colors";
+import { GROUPS } from "../../constants/dummydata";
 
 const screenWidth = Dimensions.get("window").width;
 const imageContainerWidth = screenWidth - 32; // 양쪽 마진 16씩 제외
@@ -75,7 +78,7 @@ const WritingScreen = () => {
     try {
       setIsLoading(true);
       setTimeout(() => {
-        setSelectedImage(require("../../assets/images/AIdummy.png"));
+        setSelectedImage(require("../../../assets/images/AIdummy.png"));
         setIsLoading(false);
       }, 1500);
     } catch (error) {

@@ -5,7 +5,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-import Colors from "../../constants/colors";
+import Colors from "../../../constants/colors";
 
 const AccountInfo = ({
   profileImage,

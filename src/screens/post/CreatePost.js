@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import BigCircleBackground from "../components/ui/BigCircleBackground";
-import MicIcon from "../../assets/images/icons/MicIcon.svg"; // SVG 아이콘
-import Colors from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons"; // 아이콘 사용을 위한 임포트
+
+import BigCircleBackground from "../../components/ui/BigCircleBackground";
+import MicIcon from "../../../assets/images/icons/MicIcon.svg"; // SVG 아이콘
+import Colors from "../../constants/colors";
 
 const CreatePost = () => {
   const navigation = useNavigation();

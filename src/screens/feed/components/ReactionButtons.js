@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import Colors from "../../constants/colors";
+import Colors from "../../../constants/colors";
 
 const REACTIONS = [
   { type: "smile", emoji: "😊" },

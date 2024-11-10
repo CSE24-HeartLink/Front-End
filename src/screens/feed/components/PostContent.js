@@ -1,7 +1,8 @@
 // components/feed/PostContent.js
 import React from "react";
 import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
-import Colors from "../../constants/colors";
+
+import Colors from "../../../constants/colors";
 
 const screenWidth = Dimensions.get("window").width;
 const imageSize = screenWidth - 64; // 좌우 패딩 32 제외
