@@ -25,8 +25,10 @@ const AlbumGroupSelectScreen = () => {
   }, [route.params?.currentGroupId]);
 
   const handleSelectGroup = (groupId) => {
-    navigation.navigate("AlbumScreen", {
-      selectedGroup: groupId,
+    navigation.navigate("MainTab", {
+      screen: "앨범",
+      params: { selectedGroup: groupId },
+      initial: false,
     });
   };
 
