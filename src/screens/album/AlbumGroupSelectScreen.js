@@ -1,27 +1,21 @@
-// FeedGroupSelectScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet, // StyleSheet import 추가
+  StyleSheet,
   SafeAreaView,
   Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
-import AddGroupModal from "../components/modals/AddGroupModal";
-import EditGroupNameModal from "../components/modals/EditGroupNameModal";
-import Colors from "../constants/colors";
-import { GROUPS } from "../constants/dummydata";
+import Colors from "../../constants/colors";
+import { GROUPS } from "../../constants/dummydata";
 
-const FeedGroupSelectScreen = () => {
+const AlbumGroupSelectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const [isAddGroupModalVisible, setIsAddGroupModalVisible] = useState(false);
-  const [isEditGroupModalVisible, setIsEditGroupModalVisible] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentGroupId, setCurrentGroupId] = useState("all");
 
   useEffect(() => {
@@ -29,29 +23,10 @@ const FeedGroupSelectScreen = () => {
       setCurrentGroupId(route.params.currentGroupId);
     }
   }, [route.params?.currentGroupId]);
-  const handleAddGroup = (groupName) => {
-    // TODO: 그룹 추가 로직 구현
-    console.log("Add group:", groupName);
-    setIsAddGroupModalVisible(false);
-  };
-
-  //꾹눌러서 그룹명 변경함수 실행ㄴ
-  const handleGroupLongPress = (group) => {
-    setSelectedGroup(group);
-    setIsEditGroupModalVisible(true);
-  };
-
-  const handleEditGroupName = (newName) => {
-    // TODO: 그룹 이름 수정 로직 구현
-    console.log("Edit group name:", selectedGroup.id, newName);
-    setIsEditGroupModalVisible(false);
-  };
 
   const handleSelectGroup = (groupId) => {
-    navigation.navigate("MainTab", {
-      screen: "피드",
-      params: { selectedGroupId: groupId },
-      initial: false,
+    navigation.navigate("AlbumScreen", {
+      selectedGroup: groupId,
     });
   };
 
@@ -73,6 +48,7 @@ const FeedGroupSelectScreen = () => {
         </View>
 
         <View style={styles.groupsContainer}>
+          {/* 그룹 목록 */}
           {GROUPS.map((group) => (
             <TouchableOpacity
               key={group.id}
@@ -81,10 +57,9 @@ const FeedGroupSelectScreen = () => {
                 currentGroupId === group.id && styles.selectedGroupItem,
               ]}
               onPress={() => handleSelectGroup(group.id)}
-              onLongPress={() => handleGroupLongPress(group)}
             >
               <Image
-                source={require("../../assets/images/Heart.png")}
+                source={require("../../../assets/images/Heart.png")}
                 style={styles.heartIcon}
               />
               <Text
@@ -98,29 +73,15 @@ const FeedGroupSelectScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => setIsAddGroupModalVisible(true)}
+          onPress={() => console.log("hi")}
         >
           <Image
-            source={require("../../assets/images/AddGroup.png")}
+            source={require("../../../assets/images/AICollage.png")}
             style={styles.addButtonImage}
           />
         </TouchableOpacity>
-
-        <AddGroupModal
-          visible={isAddGroupModalVisible}
-          onClose={() => setIsAddGroupModalVisible(false)}
-          onConfirm={handleAddGroup}
-        />
-
-        <EditGroupNameModal
-          visible={isEditGroupModalVisible}
-          onClose={() => setIsEditGroupModalVisible(false)}
-          onConfirm={handleEditGroupName}
-          currentGroupName={selectedGroup?.name || ""}
-        />
       </View>
     </SafeAreaView>
   );
@@ -151,7 +112,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "600",
     color: Colors.darkRed20,
@@ -168,16 +128,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
+  selectedGroupItem: {
+    backgroundColor: Colors.lightRed10,
+    borderRadius: 8,
+  },
   heartIcon: {
     width: 80,
     height: 80,
     marginBottom: 8,
   },
   groupName: {
-    fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "600",
     color: Colors.darkRed20,
+  },
+  selectedGroupName: {
+    color: Colors.darkRed,
   },
   addButton: {
     position: "absolute",
@@ -193,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FeedGroupSelectScreen;
+export default AlbumGroupSelectScreen;
