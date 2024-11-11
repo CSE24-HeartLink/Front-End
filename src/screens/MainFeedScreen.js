@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -20,6 +20,7 @@ import MainHeader from "../components/navigation/MainHeader";
 import AddFeedIcon from "../../assets/images/AddFeed.png";
 
 const MainFeedScreen = () => {
+  const flatListRef = useRef(null);
   const feeds = useFeedStore((state) => state.feeds);
   const filteredFeeds = useFeedStore((state) => state.filteredFeeds);
   const setSelectedGroup = useFeedStore((state) => state.setSelectedGroup);
@@ -40,7 +41,34 @@ const MainFeedScreen = () => {
       const groupId = route.params?.selectedGroupId || currentGroupId;
       setSelectedGroup(groupId);
       setCurrentGroupId(groupId);
-    }, [route.params?.selectedGroupId, currentGroupId])
+
+      // 선택된 피드가 있다면 해당 위치로 스크롤
+      if (
+        route.params?.selectedFeedId &&
+        flatListRef.current &&
+        filteredFeeds.length > 0
+      ) {
+        const selectedIndex = filteredFeeds.findIndex(
+          (feed) => feed.id === route.params.selectedFeedId
+        );
+
+        if (selectedIndex !== -1) {
+          const timer = setTimeout(() => {
+            flatListRef.current?.scrollToIndex({
+              index: selectedIndex,
+              animated: true,
+              viewPosition: 0,
+            });
+          }, 1000);
+
+          return () => clearTimeout(timer);
+        }
+      }
+    }, [
+      route.params?.selectedGroupId,
+      route.params?.selectedFeedId,
+      currentGroupId,
+    ])
   );
 
   // 그룹 변경 시 데이터 업데이트
@@ -84,6 +112,7 @@ const MainFeedScreen = () => {
         onPressNotification={() => console.log("notification")}
       />
       <FlatList
+        ref={flatListRef}
         data={filteredFeeds}
         renderItem={renderItem}
         keyExtractor={(item) => String(item.id)}
@@ -96,6 +125,15 @@ const MainFeedScreen = () => {
             colors={[Colors.red20]}
           />
         }
+        onScrollToIndexFailed={(info) => {
+          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+          wait.then(() => {
+            flatListRef.current?.scrollToIndex({
+              index: info.index,
+              animated: true,
+            });
+          });
+        }}
       />
       <TouchableOpacity
         style={styles.addFeedButton}
@@ -129,4 +167,3 @@ const styles = StyleSheet.create({
 });
 
 export default MainFeedScreen;
-``;

@@ -3,7 +3,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import CLOiScreen from "../../screens/CLOiScreen";
-import AlbumScreen from "../../screens/AlbumScreen";
+import AlbumScreen from "../../screens/album/AlbumScreen";
 import MainFeedScreen from "../../screens/MainFeedScreen";
 import MyPageScreen from "../../screens/MyPageScreen";
 
