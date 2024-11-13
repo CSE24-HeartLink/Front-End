@@ -1,4 +1,3 @@
-// src/components/modals/DeleteConfirmModal.js
 import React from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import Colors from "../../constants/colors";
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: 353,
     height: 184,
-    backgroundColor: "#FEFAFB",
+    backgroundColor: Colors.lightBeige,
     borderRadius: 16,
   },
   title: {
@@ -57,7 +56,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 21,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   message: {
     position: "absolute",
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     fontFamily: "Pretendard",
     fontSize: 16,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   buttonContainer: {
     position: "absolute",
@@ -82,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     marginRight: 8,
-    backgroundColor: "#D1D1D1",
+    backgroundColor: Colors.gray20,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 19,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   deleteText: {
     color: Colors.lightBeige,

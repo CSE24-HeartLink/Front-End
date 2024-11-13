@@ -32,7 +32,7 @@ const EditGroupNameModal = ({
             <TextInput
               style={styles.input}
               placeholder="그룹이름을 입력하세요"
-              placeholderTextColor="#999"
+              placeholderTextColor={Colors.gray30}
               value={groupName}
               onChangeText={setGroupName}
             />
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: 353,
     height: 184,
-    backgroundColor: "#FEFAFB",
+    backgroundColor: Colors.lightBeige,
     borderRadius: 16,
   },
   title: {
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 21,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   groupSelectContainer: {
     position: "absolute",
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     right: "9.92%",
     top: "33.15%",
     height: 40,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: Colors.gray15,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -96,17 +96,17 @@ const styles = StyleSheet.create({
     fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "600",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   dropdownList: {
     position: "absolute",
     top: "50%",
     left: "12.46%",
     right: "9.92%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.white,
     borderRadius: 8,
     elevation: 5,
-    shadowColor: "#000",
+    shadowColor: Colors.gray50,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -115,16 +115,16 @@ const styles = StyleSheet.create({
   dropdownItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#F2F2F2",
+    borderBottomColor: Colors.gray15,
   },
   dropdownItemSelected: {
-    backgroundColor: "#F2F2F2",
+    backgroundColor: Colors.gray15,
   },
   dropdownItemText: {
     fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "400",
-    color: "#1F1F1F",
+    color: Colors.gray50,
     textAlign: "center",
   },
   dropdownItemTextSelected: {
@@ -138,13 +138,13 @@ const styles = StyleSheet.create({
     top: "65.22%",
     bottom: "13.04%",
     justifyContent: "space-between",
-    zIndex: 1, // 이 부분 추가
+    zIndex: 1,
   },
   cancelButton: {
     flex: 1,
     height: "100%",
     marginRight: 8,
-    backgroundColor: "#D1D1D1",
+    backgroundColor: Colors.gray20,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     marginLeft: 8,
-    backgroundColor: "#B4DF7E",
+    backgroundColor: Colors.primaryGreen,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 19,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   inputContainer: {
     position: "absolute",
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     right: "9.92%",
     top: "33.15%",
     height: 40,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: Colors.gray15,
     borderRadius: 8,
     justifyContent: "center",
     paddingHorizontal: 12,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   input: {
     fontFamily: "Pretendard",
     fontSize: 16,
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
 });
 

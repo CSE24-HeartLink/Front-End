@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: Colors.primaryBeige, // 반전된 색상
-    fontFamily: "Pretendard-SemiBold",
+    fontFamily: "Pretendard",
     fontSize: 24,
     fontWeight: "600",
     marginBottom: 40,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   recordingText: {
     color: Colors.primaryBeige, // 반전된 색상
-    fontFamily: "Pretendard-Medium",
+    fontFamily: "Pretendard",
     fontSize: 24,
     fontWeight: "600",
     marginVertical: 16,

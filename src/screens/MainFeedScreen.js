@@ -88,7 +88,7 @@ const MainFeedScreen = () => {
 
   // 추가 버튼 클릭 핸들러 추가
   const handleAddFeedPress = () => {
-    navigation.navigate("WritingScreen", {
+    navigation.navigate("CreatePost", {
       currentGroupId: currentGroupId,
     });
   };
