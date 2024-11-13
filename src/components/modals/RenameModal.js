@@ -34,7 +34,7 @@ const RenameModal = ({ visible, onClose, onConfirm }) => {
             <TextInput
               style={styles.input}
               placeholder="새 이름을 입력하세요"
-              placeholderTextColor="#999"
+              placeholderTextColor={Colors.gray30}
               value={newName}
               onChangeText={setNewName}
             />
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: 353,
     height: 184,
-    backgroundColor: "#FEFAFB",
+    backgroundColor: Colors.lightBeige,
     borderRadius: 16,
   },
   title: {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 21,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   inputContainer: {
     position: "absolute",
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     right: "9.92%",
     top: "33.15%",
     height: 40,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: Colors.gray15,
     borderRadius: 8,
     justifyContent: "center",
     paddingHorizontal: 12,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "400",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
   buttonContainer: {
     position: "absolute",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     marginRight: 8,
-    backgroundColor: "#D1D1D1",
+    backgroundColor: Colors.gray20,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     marginLeft: 8,
-    backgroundColor: "#B4DF7E",
+    backgroundColor: Colors.primaryGreen,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 19,
     textAlign: "center",
-    color: "#1F1F1F",
+    color: Colors.gray50,
   },
 });
 
