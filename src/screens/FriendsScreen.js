@@ -1,10 +1,10 @@
+// FriendsScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   FlatList,
   StyleSheet,
   SafeAreaView,
-  Alert,
   TouchableOpacity,
   Image,
 } from "react-native";
@@ -12,11 +12,9 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 
 import MainHeader from "../components/navigation/MainHeader";
 import FriendsItem from "../components/FriendItem";
-
-import useFriendStore from "../store/friendStore";
-
 import AddFriendModal from "../components/modals/AddFriendModal";
 import Colors from "../constants/colors";
+import useFriendStore from "../store/friendStore";
 
 const FriendsScreen = () => {
   const navigation = useNavigation();
@@ -39,7 +37,6 @@ const FriendsScreen = () => {
   }, [selectedGroup, friends]);
 
   const handleAddFriend = (email) => {
-    // 친구 추가 로직 구현
     console.log("Add friend with email:", email);
     setIsAddFriendModalVisible(false);
   };
@@ -48,24 +45,8 @@ const FriendsScreen = () => {
     updateFriendGroup(friendId, newGroup);
   };
 
-  //alert 자동 띄움
   const handleDelete = (friendId) => {
-    Alert.alert(
-      "친구 삭제",
-      "정말 삭제하시겠습니까?",
-      [
-        {
-          text: "취소",
-          style: "cancel",
-        },
-        {
-          text: "삭제",
-          onPress: () => deleteFriend(friendId),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
+    deleteFriend(friendId);
   };
 
   return (
@@ -88,8 +69,8 @@ const FriendsScreen = () => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
         />
-        {/* 친구 추가 버튼 */}
-        {!route.params?.selectedGroup && ( // GroupSelect 화면이 아닐 때만 보이도록
+
+        {!route.params?.selectedGroup && (
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => setIsAddFriendModalVisible(true)}
@@ -109,7 +90,6 @@ const FriendsScreen = () => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

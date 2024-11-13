@@ -1,71 +1,112 @@
-// store/feedStore.js
 import { create } from "zustand";
 import { initialFeeds } from "../constants/dummydata";
 
-const useFeedStore = create((set, get) => ({
-  feeds: initialFeeds,
-  selectedReactions: {}, // 기존 코드
-  selectedGroupId: "all",
-  filteredFeeds: initialFeeds,
+const useFeedStore = create((set) => ({
+  feeds: [],
+  filteredFeeds: [],
+  selectedGroup: "all",
+  selectedReactions: {},
 
-  // toggleReaction 함수 추가
-  toggleReaction: (feedId, reactionType) =>
-    set((state) => ({
-      selectedReactions: {
-        ...state.selectedReactions,
-        [feedId]:
-          state.selectedReactions[feedId] === reactionType
-            ? null
-            : reactionType,
-      },
-    })),
-
-  setSelectedGroup: (groupId) => {
-    const feeds = get().feeds;
-    const filteredFeeds =
-      groupId === "all"
-        ? feeds
-        : feeds.filter((feed) => feed.group === groupId);
-
+  loadInitialData: () => {
     set({
-      selectedGroupId: groupId,
-      filteredFeeds: filteredFeeds,
+      feeds: initialFeeds,
+      filteredFeeds: initialFeeds,
     });
   },
 
-  addFeed: (feed) =>
-    set((state) => {
-      const newFeeds = [feed, ...state.feeds];
-      const currentGroup = state.selectedGroupId;
-      const newFilteredFeeds =
-        currentGroup === "all"
-          ? newFeeds
-          : newFeeds.filter((f) => f.group === currentGroup);
-
-      return {
-        feeds: newFeeds,
-        filteredFeeds: newFilteredFeeds,
-      };
-    }),
-
-  loadInitialData: () =>
-    set((state) => {
-      const currentGroup = state.selectedGroupId;
-      return {
-        feeds: initialFeeds,
-        filteredFeeds:
-          currentGroup === "all"
-            ? initialFeeds
-            : initialFeeds.filter((feed) => feed.group === currentGroup),
-      };
-    }),
-
-  // 피드 삭제 함수도 추가
-  deleteFeed: (feedId) =>
+  setSelectedGroup: (groupId) => {
     set((state) => ({
-      feeds: state.feeds.filter((feed) => feed.id !== feedId),
-      filteredFeeds: state.filteredFeeds.filter((feed) => feed.id !== feedId),
-    })),
+      selectedGroup: groupId,
+      filteredFeeds:
+        groupId === "all"
+          ? state.feeds
+          : state.feeds.filter((feed) => feed.group === groupId),
+    }));
+  },
+
+  addFeed: (newFeed) => {
+    set((state) => {
+      const updatedFeeds = [newFeed, ...state.feeds];
+      return {
+        feeds: updatedFeeds,
+        filteredFeeds:
+          state.selectedGroup === "all"
+            ? updatedFeeds
+            : updatedFeeds.filter((feed) => feed.group === state.selectedGroup),
+      };
+    });
+  },
+
+  // 피드 수정 기능 추가
+  updateFeed: (feedId, updatedContent) => {
+    set((state) => {
+      const updatedFeeds = state.feeds.map((feed) =>
+        feed.id === feedId
+          ? {
+              ...feed,
+              ...updatedContent,
+              updatedAt: new Date(),
+            }
+          : feed
+      );
+      return {
+        feeds: updatedFeeds,
+        filteredFeeds:
+          state.selectedGroup === "all"
+            ? updatedFeeds
+            : updatedFeeds.filter((feed) => feed.group === state.selectedGroup),
+      };
+    });
+  },
+
+  // 피드 삭제 기능
+  deleteFeed: (feedId) => {
+    set((state) => {
+      const updatedFeeds = state.feeds.filter((feed) => feed.id !== feedId);
+      return {
+        feeds: updatedFeeds,
+        filteredFeeds:
+          state.selectedGroup === "all"
+            ? updatedFeeds
+            : updatedFeeds.filter((feed) => feed.group === state.selectedGroup),
+      };
+    });
+  },
+
+  toggleReaction: (feedId, reactionType) => {
+    set((state) => {
+      const currentUserId = "user1"; // 현재 로그인한 사용자 ID
+
+      const updatedFeeds = state.feeds.map((feed) => {
+        if (feed.id === feedId) {
+          const updatedReactions = feed.reactions.map((reaction) => {
+            if (reaction.type === reactionType) {
+              const hasReacted = reaction.users.includes(currentUserId);
+              return {
+                ...reaction,
+                count: hasReacted ? reaction.count - 1 : reaction.count + 1,
+                users: hasReacted
+                  ? reaction.users.filter((id) => id !== currentUserId)
+                  : [...reaction.users, currentUserId],
+              };
+            }
+            return reaction;
+          });
+
+          return { ...feed, reactions: updatedReactions };
+        }
+        return feed;
+      });
+
+      return {
+        feeds: updatedFeeds,
+        filteredFeeds:
+          state.selectedGroup === "all"
+            ? updatedFeeds
+            : updatedFeeds.filter((feed) => feed.group === state.selectedGroup),
+      };
+    });
+  },
 }));
 
 export default useFeedStore;

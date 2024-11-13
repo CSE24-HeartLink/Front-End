@@ -1,10 +1,10 @@
+// FriendsItem.js
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import EditGroupModal from "./modals/EditGroupModal";
 import DeleteConfirmModal from "./modals/DeleteConfirmModal";
-
 import Colors from "../constants/colors";
 
 const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
@@ -16,12 +16,19 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
     setIsModalVisible(false);
   };
 
+  const handleDeleteClick = () => {
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(friend.id);
+    setIsDeleteModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
-      {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
         <Image source={friend.profileImage} style={styles.profileImage} />
-        {/* 친구 정보 */}
         <View style={styles.infoContainer}>
           <Text style={styles.nickname}>{friend.nickname}</Text>
           <Text style={styles.groupText}>{friend.group}</Text>
@@ -34,14 +41,13 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
         >
           <Text style={styles.groupButtonText}>그룹 이동</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton}>
-          <Feather
-            name="trash-2"
-            size={20}
-            color={Colors.gray30}
-            onPress={() => setIsDeleteModalVisible(true)}
-          />
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDeleteClick}
+        >
+          <Feather name="trash-2" size={20} color={Colors.gray30} />
         </TouchableOpacity>
+
         <EditGroupModal
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
@@ -49,13 +55,11 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
           selectedGroup={friend.group}
           friendName={friend.nickname}
         />
+
         <DeleteConfirmModal
           visible={isDeleteModalVisible}
           onClose={() => setIsDeleteModalVisible(false)}
-          onConfirm={() => {
-            onDelete(friend.id);
-            setIsDeleteModalVisible(false);
-          }}
+          onConfirm={handleConfirmDelete}
           friendName={friend.nickname}
         />
       </View>

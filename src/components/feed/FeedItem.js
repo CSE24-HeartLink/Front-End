@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Alert, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
@@ -28,18 +28,7 @@ const FeedItem = ({ feedId }) => {
   if (!feed) return null;
 
   const handleDelete = () => {
-    Alert.alert("피드 삭제", "정말 삭제하시겠습니까?", [
-      { text: "취소", style: "cancel" },
-      {
-        text: "삭제",
-        onPress: () => deleteFeed(feedId),
-        style: "destructive",
-      },
-    ]);
-  };
-
-  const handleEdit = () => {
-    navigation.navigate("FeedEdit", { feedId });
+    deleteFeed(feedId);
   };
 
   const handleAddComment = (text) => {
@@ -82,11 +71,21 @@ const FeedItem = ({ feedId }) => {
   return (
     <View style={styles.container}>
       <AccountInfo
+        feedId={feed.id}
         profileImage={feed.profileImage}
         nickname={feed.nickname}
         createdAt={feed.createdAt}
-        isMyPost={feed.isMyPost}
-        onEdit={handleEdit}
+        userId={feed.userId}
+        content={feed.content}
+        group={feed.group}
+        onEdit={() =>
+          navigation.navigate("WritingScreen", {
+            feedId: feed.id,
+            initialContent: feed.content,
+            selectedGroup: feed.group,
+            image: feed.image,
+          })
+        }
         onDelete={handleDelete}
       />
       <PostContent content={feed.content} image={feed.image} />
