@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+// MyPageScreen.js
+import React from "react";
 import { View, StyleSheet, Text, SafeAreaView } from "react-native";
 import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../constants/colors";
 import ProfileCard from "../components/ui/ProfileCard";
 import RenameModal from "../components/modals/RenameModal";
-
+import useMyPageStore from "../store/MypageStore";
 const ToMeButton = ({ title, onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
@@ -16,19 +17,15 @@ const ToMeButton = ({ title, onPress }) => {
 };
 
 const MyPageScreen = () => {
-  const [isRenameModalVisible, setIsRenameModalVisible] = useState(false);
+  const { isRenameModalVisible, setRenameModalVisible, handleRename } =
+    useMyPageStore();
 
   const handleProfilePress = () => {
-    setIsRenameModalVisible(true);
+    setRenameModalVisible(true);
   };
 
   const handleRenameClose = () => {
-    setIsRenameModalVisible(false);
-  };
-
-  const handleRenameConfirm = (newName) => {
-    console.log("New name:", newName);
-    setIsRenameModalVisible(false);
+    setRenameModalVisible(false);
   };
 
   return (
@@ -49,7 +46,7 @@ const MyPageScreen = () => {
         <RenameModal
           visible={isRenameModalVisible}
           onClose={handleRenameClose}
-          onConfirm={handleRenameConfirm}
+          onConfirm={handleRename}
         />
       </View>
     </SafeAreaView>

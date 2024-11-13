@@ -1,3 +1,4 @@
+// RenameModal.js
 import React, { useState } from "react";
 import {
   View,
@@ -8,6 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import Colors from "../../constants/colors";
+import useMyPageStore from "../../store/MypageStore";
 
 const RenameModal = ({ visible, onClose, onConfirm }) => {
   const [newName, setNewName] = useState("");
@@ -15,6 +17,7 @@ const RenameModal = ({ visible, onClose, onConfirm }) => {
   const handleConfirm = () => {
     if (newName.trim()) {
       onConfirm(newName);
+      setNewName("");
     }
     onClose();
   };

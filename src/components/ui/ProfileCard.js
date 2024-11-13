@@ -2,24 +2,26 @@ import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
-import { DUMMY_FRIENDS } from "../../constants/dummydata";
+import useMyPageStore from "../../store/MypageStore";
 
 const ProfileCard = ({ onPress }) => {
-  const currentUser = DUMMY_FRIENDS.find(
-    (friend) => friend.nickname === "다연이"
-  );
+  const { userProfile } = useMyPageStore();
 
   return (
     <TouchableOpacity style={styles.profileCard} onPress={onPress}>
       <View style={styles.headerRow}>
-        <Image source={currentUser.profileImage} style={styles.profileImage} />
-        <Text style={styles.nameText}>{currentUser.nickname}</Text>
+        <Image source={userProfile.profileImage} style={styles.profileImage} />
+        <Text style={styles.nameText}>{userProfile.nickname}</Text>
         <Icon name="chevron-right" size={24} color={Colors.Gray40} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.introText}>총 작성한 게시글 수 n개</Text>
-        <Text style={styles.introText}>클로이 레벨3</Text>
-        <Text style={styles.introText}>10일 연속 게시글 업로드🔥</Text>
+        <Text style={styles.introText}>
+          총 작성한 게시글 수 {userProfile.postCount}개
+        </Text>
+        <Text style={styles.introText}>클로이 레벨{userProfile.cloiLevel}</Text>
+        <Text style={styles.introText}>
+          {userProfile.streakDays}일 연속 게시글 업로드🔥
+        </Text>
       </View>
     </TouchableOpacity>
   );
