@@ -4,16 +4,21 @@ import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "../../screens/WelcomeScreen";
 import LoginScreen from "../../screens/LoginScreen";
 import SignupScreen from "../../screens/SignupScreen";
+
 import MainFeedScreen from "../../screens/MainFeedScreen";
 import FriendsScreen from "../../screens/FriendsScreen";
 import FeedGroupSelectScreen from "../../screens/FeedGroupSelectScreen.js";
-import AlbumScreen from "../../screens/AlbumScreen";
+import NotificationScreen from "../../screens/notification/NotificationScreen.js";
+
+import AlbumScreen from "../../screens/album/AlbumScreen.js";
+
+import AlbumGroupSelectScreen from "../../screens/album/AlbumGroupSelectScreen.js";
 import RecordScreen from "../../screens/RecordScreen";
 import WritingScreen from "../../screens/WritingScreen.js";
 import WritingGroupSelectScreen from "../../screens/WritingGroupSelectScreen.js";
+
 import RenameModal from "../modals/RenameModal.js";
-// import FriendsScreen from "../../screens/FriendsScreen";
-// import GroupSelectScreen from "../../screens/GroupSelectScreen";
+
 import BottomTabNavigator from "./BottomTabNavigator";
 import CreatePost from "../../screens/CreatePost";
 
@@ -39,8 +44,17 @@ const AppNavigator = () => {
         name="FeedGroupSelectScreen"
         component={FeedGroupSelectScreen}
       />
-      <Stack.Screen name="AlbumScreen" component={AlbumScreen} />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={{ headerShown: false }}
+      />
 
+      <Stack.Screen name="AlbumScreen" component={AlbumScreen} />
+      <Stack.Screen
+        name="AlbumGroupSelectScreen"
+        component={AlbumGroupSelectScreen}
+      />
       <Stack.Screen name="CreatePost" component={CreatePost} />
       <Stack.Screen name="RecordScreen" component={RecordScreen} />
       <Stack.Screen name="WritingScreen" component={WritingScreen} />

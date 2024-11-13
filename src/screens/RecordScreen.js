@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   title: {
+
     color: Colors.primaryBeige,
     fontFamily: "Pretendard",
     fontSize: 24,
@@ -66,7 +67,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   recordingText: {
+
     color: Colors.primaryBeige,
+
     fontFamily: "Pretendard",
     fontSize: 24,
     fontWeight: "600",

@@ -26,7 +26,6 @@ import AppNavigator from "./src/components/navigation/AppNavigator";
 
 // 폰트 스타일을 글로벌 설정으로 적용
 const App = () => {
-  // 커스텀 기본 폰트 스타일 적용 (Pretendard)
   const defaultTextStyle = Text.render;
   Text.render = function (...args) {
     const origin = defaultTextStyle.call(this, ...args);
