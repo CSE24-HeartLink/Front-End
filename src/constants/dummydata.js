@@ -6,7 +6,7 @@ export const initialFeeds = [
     profileImage: require("../../assets/images/Smile.png"),
     content: "엄마가 해준 김치찌개가 먹고싶은 가을의 어느 날입니다.",
     createdAt: new Date("2024-07-06T12:21:00"),
-    group: "가족", // 그룹 필드 추가
+    group: "동기들", // 그룹 필드 추가
     reactions: [
       { type: "grinning", count: 1, users: ["user2"] },
       { type: "heart-eyes", count: 0, users: [] },

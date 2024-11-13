@@ -1,20 +1,24 @@
-//계정 정보를 표시하는 컴포넌트입니다.
-//isOwner가 true일 경우 수정 및 삭제 버튼이 표시되도록 설정합니다.
-
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
-
+import FeedDeleteModal from "../modals/FeedDeleteModal";
 import Colors from "../../constants/colors";
+import useFeedStore from "../../store/feedStore";
 
 const AccountInfo = ({
+  feedId,
   profileImage,
   nickname,
   createdAt,
-  isOwner,
-  onEdit,
-  onDelete,
+  userId,
+  onEdit, // onEdit prop으로 받기
+  onDelete, // onDelete prop으로 받기
 }) => {
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+  // 현재 사용자가 게시글 작성자인지 확인 (다연이의 ID가 user1)
+  const isOwner = userId === "user1" || nickname === "다연이";
+
   const formatDate = (date) => {
     const now = new Date();
     const diffTime = Math.abs(now - date);
@@ -36,6 +40,15 @@ const AccountInfo = ({
     return `${hours}:${minutes}`;
   };
 
+  const handleDeleteClick = () => {
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete();
+    setIsDeleteModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
@@ -49,14 +62,23 @@ const AccountInfo = ({
       </View>
       {isOwner && (
         <View style={styles.actionButtons}>
-          <TouchableOpacity onPress={onEdit}>
-            <Feather name="edit" size={20} color={Colors.gray30} />
+          <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
+            <Feather name="edit-2" size={20} color={Colors.gray30} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={onDelete}>
-            <Feather name="trash" size={20} color={Colors.gray30} />
+          <TouchableOpacity
+            onPress={handleDeleteClick}
+            style={styles.actionButton}
+          >
+            <Feather name="trash-2" size={20} color={Colors.gray30} />
           </TouchableOpacity>
         </View>
       )}
+
+      <FeedDeleteModal
+        visible={isDeleteModalVisible}
+        onClose={() => setIsDeleteModalVisible(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </View>
   );
 };
@@ -95,6 +117,9 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: "row",
     gap: 16,
+  },
+  actionButton: {
+    padding: 4,
   },
 });
 
