@@ -11,8 +11,11 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
+import useGroupStore from "../store/groupStore";
+
 import AddGroupModal from "../components/modals/AddGroupModal";
 import EditGroupNameModal from "../components/modals/EditGroupNameModal";
+
 import Colors from "../constants/colors";
 import { GROUPS } from "../constants/dummydata";
 
@@ -24,26 +27,27 @@ const FeedGroupSelectScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentGroupId, setCurrentGroupId] = useState("all");
 
+  // Zustand store에서 상태와 액션들을 가져옴
+  const { groups, addGroup, editGroupName } = useGroupStore();
+
   useEffect(() => {
     if (route.params?.currentGroupId) {
       setCurrentGroupId(route.params.currentGroupId);
     }
   }, [route.params?.currentGroupId]);
+
   const handleAddGroup = (groupName) => {
-    // TODO: 그룹 추가 로직 구현
-    console.log("Add group:", groupName);
+    addGroup(groupName);
     setIsAddGroupModalVisible(false);
   };
 
-  //꾹눌러서 그룹명 변경함수 실행ㄴ
   const handleGroupLongPress = (group) => {
     setSelectedGroup(group);
     setIsEditGroupModalVisible(true);
   };
 
   const handleEditGroupName = (newName) => {
-    // TODO: 그룹 이름 수정 로직 구현
-    console.log("Edit group name:", selectedGroup.id, newName);
+    editGroupName(selectedGroup.id, newName);
     setIsEditGroupModalVisible(false);
   };
 
@@ -67,13 +71,13 @@ const FeedGroupSelectScreen = () => {
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
-              {GROUPS.find((g) => g.id === currentGroupId)?.name || "전체"}
+              {groups.find((g) => g.id === currentGroupId)?.name || "전체"}
             </Text>
           </View>
         </View>
 
         <View style={styles.groupsContainer}>
-          {GROUPS.map((group) => (
+          {groups.map((group) => (
             <TouchableOpacity
               key={group.id}
               style={[
