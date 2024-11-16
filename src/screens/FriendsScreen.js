@@ -54,7 +54,7 @@ const FriendsScreen = () => {
       <View style={styles.container}>
         <MainHeader
           selectedGroup={selectedGroup}
-          onPressCategory={() => navigation.navigate("GroupSelect")}
+          onPressCategory={() => navigation.navigate("FriendsGroupSelect")}
           onPressNotification={() => console.log("notification")}
         />
         <FlatList
