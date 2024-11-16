@@ -5,22 +5,39 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Image, // Image import 추가
+  Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
-
 import Colors from "../constants/colors";
 import { GROUPS } from "../constants/dummydata";
 
 const GroupSelectScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
   const handleSelectGroup = (groupId) => {
-    navigation.navigate("친구", {
-      screen: "FriendsList",
-      params: { selectedGroup: groupId },
-    });
+    console.log(
+      "Selected group:",
+      groupId,
+      "From screen:",
+      route.params?.fromScreen
+    );
+
+    if (route.params?.fromScreen === "WritingScreen") {
+      // WritingScreen으로 직접 네비게이트
+      navigation.navigate("WritingScreen", {
+        selectedGroupId: groupId,
+        currentSelected: groupId, // 이 부분 추가
+        fromGroupSelect: true, // 이 부분 추가
+      });
+    } else {
+      // 메인 피드로 네비게이트
+      navigation.navigate("MainTab", {
+        screen: "피드",
+        params: { selectedGroupId: groupId },
+      });
+    }
   };
 
   return (
@@ -44,14 +61,26 @@ const GroupSelectScreen = () => {
           {GROUPS.map((group) => (
             <TouchableOpacity
               key={group.id}
-              style={styles.groupItem}
+              style={[
+                styles.groupItem,
+                route.params?.currentSelected === group.id &&
+                  styles.selectedGroup,
+              ]}
               onPress={() => handleSelectGroup(group.id)}
             >
               <Image
                 source={require("../../assets/images/Heart.png")}
                 style={styles.heartIcon}
               />
-              <Text style={styles.groupName}>{group.name}</Text>
+              <Text
+                style={[
+                  styles.groupName,
+                  route.params?.currentSelected === group.id &&
+                    styles.selectedGroupText,
+                ]}
+              >
+                {group.name}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -101,6 +130,11 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: "center",
     marginBottom: 20,
+    borderRadius: 12,
+    padding: 8,
+  },
+  selectedGroup: {
+    backgroundColor: Colors.lightBeige,
   },
   heartIcon: {
     width: 80,
@@ -112,6 +146,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: Colors.darkRed20,
+  },
+  selectedGroupText: {
+    color: Colors.red20,
   },
 });
 

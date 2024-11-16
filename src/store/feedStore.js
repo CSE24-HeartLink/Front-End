@@ -1,21 +1,16 @@
 import { create } from "zustand";
 import { initialFeeds } from "../constants/dummydata";
 
-const useFeedStore = create((set, get) => ({
+const useFeedStore = create((set) => ({
   feeds: [],
   filteredFeeds: [],
   selectedGroup: "all",
   selectedReactions: {},
-  comments: {}, // feedId를 key로 하는 댓글 객체 추가
-  isLoading: false, // 로딩 상태 추가
 
   loadInitialData: () => {
-    set({ isLoading: true });
     set({
       feeds: initialFeeds,
       filteredFeeds: initialFeeds,
-      isLoading: false,
-      comments: {}, // 댓글 초기화
     });
   },
 
@@ -31,20 +26,7 @@ const useFeedStore = create((set, get) => ({
 
   addFeed: (newFeed) => {
     set((state) => {
-      const feedWithDefaults = {
-        ...newFeed,
-        id: Date.now().toString(),
-        createdAt: new Date(),
-        reactions: [
-          { type: "like", count: 0, users: [] },
-          { type: "heart", count: 0, users: [] },
-          { type: "smile", count: 0, users: [] },
-        ],
-        userId: "user1",
-        nickname: "다연이",
-      };
-
-      const updatedFeeds = [feedWithDefaults, ...state.feeds];
+      const updatedFeeds = [newFeed, ...state.feeds];
       return {
         feeds: updatedFeeds,
         filteredFeeds:
@@ -57,11 +39,72 @@ const useFeedStore = create((set, get) => ({
 
   updateFeed: (feedId, updatedContent) => {
     set((state) => {
-      const updatedFeeds = state.feeds.map((feed) =>
-        feed.id === feedId
-          ? { ...feed, ...updatedContent, updatedAt: new Date() }
-          : feed
-      );
+      // 1. 기존 피드 찾기
+      const oldFeed = state.feeds.find((feed) => feed.id === feedId);
+      if (!oldFeed) return state;
+
+      // 2. 그룹 변경 여부 확인
+      const isGroupChanged = oldFeed.group !== updatedContent.group;
+
+      // console.log("UpdateFeed:", {
+      //   feedId,
+      //   oldGroup: oldFeed?.group,
+      //   newGroup: updatedContent.group,
+      //   isGroupChanged,
+      //   updatedContent,
+      // });
+
+      if (isGroupChanged) {
+        // 그룹이 변경된 경우
+        const remainingFeeds = state.feeds.filter((feed) => feed.id !== feedId);
+        const newFeed = {
+          ...oldFeed, // 기존 정보 유지 (userId, nickname 등)
+          content: updatedContent.content,
+          image: updatedContent.image,
+          group: updatedContent.group,
+          updatedAt: new Date(),
+        };
+
+        const updatedFeeds = [newFeed, ...remainingFeeds];
+        return {
+          feeds: updatedFeeds,
+          filteredFeeds:
+            state.selectedGroup === "all"
+              ? updatedFeeds
+              : updatedFeeds.filter(
+                  (feed) => feed.group === state.selectedGroup
+                ),
+        };
+      } else {
+        // 같은 그룹 내에서의 수정
+        const updatedFeeds = state.feeds.map((feed) =>
+          feed.id === feedId
+            ? {
+                ...feed,
+                content: updatedContent.content,
+                image: updatedContent.image,
+                updatedAt: new Date(),
+              }
+            : feed
+        );
+
+        return {
+          feeds: updatedFeeds,
+          filteredFeeds:
+            state.selectedGroup === "all"
+              ? updatedFeeds
+              : updatedFeeds.filter(
+                  (feed) => feed.group === state.selectedGroup
+                ),
+        };
+      }
+    });
+  },
+
+  // 피드 삭제 기능
+  deleteFeed: (feedId) => {
+    set((state) => {
+      const updatedFeeds = state.feeds.filter((feed) => feed.id !== feedId);
       return {
         feeds: updatedFeeds,
         filteredFeeds:
@@ -72,11 +115,12 @@ const useFeedStore = create((set, get) => ({
     });
   },
 
-  deleteFeed: (feedId) => {
+  // 사용자의 모든 피드 그룹 업데이트
+  updateFeedsByUserGroup: (nickname, newGroup) => {
     set((state) => {
-      const updatedFeeds = state.feeds.filter((feed) => feed.id !== feedId);
-      const { [feedId]: deletedComments, ...remainingComments } =
-        state.comments;
+      const updatedFeeds = state.feeds.map((feed) =>
+        feed.nickname === nickname ? { ...feed, group: newGroup } : feed
+      );
 
       return {
         feeds: updatedFeeds,
@@ -84,14 +128,14 @@ const useFeedStore = create((set, get) => ({
           state.selectedGroup === "all"
             ? updatedFeeds
             : updatedFeeds.filter((feed) => feed.group === state.selectedGroup),
-        comments: remainingComments, // 피드 삭제시 해당 댓글도 함께 삭제
       };
     });
   },
 
   toggleReaction: (feedId, reactionType) => {
     set((state) => {
-      const currentUserId = "user1";
+      const currentUserId = "user1"; // 현재 로그인한 사용자 ID
+
       const updatedFeeds = state.feeds.map((feed) => {
         if (feed.id === feedId) {
           const updatedReactions = feed.reactions.map((reaction) => {
@@ -122,73 +166,6 @@ const useFeedStore = create((set, get) => ({
       };
     });
   },
-
-  // 댓글 관련 기능 추가
-  addComment: (feedId, text) => {
-    set((state) => ({
-      comments: {
-        ...state.comments,
-        [feedId]: [
-          ...(state.comments[feedId] || []),
-          {
-            id: Date.now().toString(),
-            text,
-            author: "다연이",
-            userId: "user1",
-            createdAt: new Date(),
-          },
-        ],
-      },
-    }));
-  },
-
-  deleteComment: (feedId, commentId) => {
-    set((state) => ({
-      comments: {
-        ...state.comments,
-        [feedId]: (state.comments[feedId] || []).filter(
-          (comment) => comment.id !== commentId
-        ),
-      },
-    }));
-  },
-
-  // // 검색 기능 추가
-  // searchFeeds: (searchTerm) => {
-  //   set((state) => {
-  //     if (!searchTerm.trim()) {
-  //       return {
-  //         filteredFeeds: state.selectedGroup === "all"
-  //           ? state.feeds
-  //           : state.feeds.filter((feed) => feed.group === state.selectedGroup),
-  //       };
-  //     }
-
-  //     const searchLower = searchTerm.toLowerCase();
-  //     const filtered = state.feeds.filter((feed) => {
-  //       const contentMatch = feed.content.toLowerCase().includes(searchLower);
-  //       const nicknameMatch = feed.nickname.toLowerCase().includes(searchLower);
-  //       return contentMatch || nicknameMatch;
-  //     });
-
-  //     return { filteredFeeds: filtered };
-  //   });
-  // },
-
-  // // 좋아요, 댓글 수 등의 통계 가져오기
-  // getFeedStats: (feedId) => {
-  //   const state = get();
-  //   const feed = state.feeds.find(f => f.id === feedId);
-  //   if (!feed) return null;
-
-  //   return {
-  //     commentCount: (state.comments[feedId] || []).length,
-  //     reactionCounts: feed.reactions.reduce((acc, reaction) => {
-  //       acc[reaction.type] = reaction.count;
-  //       return acc;
-  //     }, {}),
-  //   };
-  // },
 }));
 
 export default useFeedStore;

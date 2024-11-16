@@ -1,4 +1,3 @@
-// RenameModal.js
 import React, { useState } from "react";
 import {
   View,
@@ -11,15 +10,23 @@ import {
 import Colors from "../../constants/colors";
 import useMyPageStore from "../../store/MypageStore";
 
+// 이름 변경을 위한 모달 컴포넌트
+// props:
+// - visible: 모달 표시 여부
+// - onClose: 모달 닫기 함수
+// - onConfirm: 이름 변경 확인 시 실행할 함수
 const RenameModal = ({ visible, onClose, onConfirm }) => {
+  // 새로 입력된 이름을 관리하는 상태
   const [newName, setNewName] = useState("");
 
+  // 이름 변경 확인 처리 함수
   const handleConfirm = () => {
+    // 입력된 이름이 공백이 아닌 경우에만 처리
     if (newName.trim()) {
-      onConfirm(newName);
-      setNewName("");
+      onConfirm(newName); // 새 이름으로 변경
+      setNewName(""); // 입력 필드 초기화
     }
-    onClose();
+    onClose(); // 모달 닫기
   };
 
   return (
@@ -29,10 +36,14 @@ const RenameModal = ({ visible, onClose, onConfirm }) => {
       animationType="fade"
       onRequestClose={onClose}
     >
+      {/* 반투명 오버레이 */}
       <View style={styles.overlay}>
+        {/* 모달 컨테이너 */}
         <View style={styles.modalContainer}>
+          {/* 모달 제목 */}
           <Text style={styles.title}>새 이름 입력</Text>
 
+          {/* 이름 입력 필드 컨테이너 */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -43,11 +54,14 @@ const RenameModal = ({ visible, onClose, onConfirm }) => {
             />
           </View>
 
+          {/* 버튼 컨테이너 */}
           <View style={styles.buttonContainer}>
+            {/* 취소 버튼 */}
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.buttonText}>취소</Text>
             </TouchableOpacity>
 
+            {/* 변경 확인 버튼 */}
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={handleConfirm}
@@ -61,19 +75,23 @@ const RenameModal = ({ visible, onClose, onConfirm }) => {
   );
 };
 
+// 스타일 정의
 const styles = StyleSheet.create({
+  // 모달 오버레이 스타일
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(166, 166, 166, 0.5)",
+    backgroundColor: "rgba(166, 166, 166, 0.5)", // 반투명 배경
     justifyContent: "center",
     alignItems: "center",
   },
+  // 모달 컨테이너 스타일
   modalContainer: {
     width: 353,
     height: 184,
     backgroundColor: Colors.lightBeige,
     borderRadius: 16,
   },
+  // 모달 제목 스타일
   title: {
     position: "absolute",
     top: "13.04%",
@@ -86,6 +104,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.gray50,
   },
+  // 입력 필드 컨테이너 스타일
   inputContainer: {
     position: "absolute",
     left: "12.46%",
@@ -97,12 +116,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 12,
   },
+  // 입력 필드 스타일
   input: {
     fontFamily: "Pretendard",
     fontSize: 16,
     fontWeight: "400",
     color: Colors.gray50,
   },
+  // 버튼 컨테이너 스타일
   buttonContainer: {
     position: "absolute",
     flexDirection: "row",
@@ -112,6 +133,7 @@ const styles = StyleSheet.create({
     bottom: "13.04%",
     justifyContent: "space-between",
   },
+  // 취소 버튼 스타일
   cancelButton: {
     flex: 1,
     height: "100%",
@@ -121,6 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  // 확인 버튼 스타일
   confirmButton: {
     flex: 1,
     height: "100%",
@@ -130,6 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  // 버튼 텍스트 스타일
   buttonText: {
     fontFamily: "Pretendard",
     fontSize: 16,
