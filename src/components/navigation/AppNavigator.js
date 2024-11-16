@@ -21,6 +21,7 @@ import RenameModal from "../modals/RenameModal.js";
 
 import BottomTabNavigator from "./BottomTabNavigator";
 import CreatePost from "../../screens/CreatePost";
+import FriendsGroupSelectScreen from "../../screens/FriendsGroupSelectScreen.js";
 
 const Stack = createStackNavigator();
 
@@ -61,6 +62,11 @@ const AppNavigator = () => {
       <Stack.Screen
         name="WritingGroupSelect"
         component={WritingGroupSelectScreen}
+      />
+      <Stack.Screen
+        name="FriendsGroupSelect"
+        component={FriendsGroupSelectScreen}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen name="RenameModal" component={RenameModal} />
