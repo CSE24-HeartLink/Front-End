@@ -1,11 +1,10 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import Colors from "../../constants/colors";
-
-const TopFilterButton = ({ getGroupName, onPress }) => {
+const TopFilterButton = ({ getGroupName, onPress, selectedGroup }) => {
   return (
     <TouchableOpacity style={styles.categoryButton} onPress={onPress}>
-      <Text style={styles.categoryText}>{getGroupName()}</Text>
+      <Text style={styles.categoryText}>{getGroupName(selectedGroup)}</Text>
     </TouchableOpacity>
   );
 };

@@ -25,17 +25,25 @@ const WritingGroupSelectScreen = () => {
 
   // 현재 선택된 그룹 정보 받아오기
   useEffect(() => {
+    console.log("Current selected from route:", route.params?.currentSelected);
     if (route.params?.currentSelected) {
       setCurrentSelected(route.params.currentSelected);
     }
   }, [route.params?.currentSelected]);
 
   const handleSelectGroup = (groupId, groupName) => {
-    // WritingScreen으로 돌아가면서 선택된 그룹 정보 전달
-    navigation.navigate("WritingScreen", {
-      selectedGroupId: groupId,
-      selectedGroupName: groupName,
-    });
+    if (route.params?.fromScreen === "WritingScreen") {
+      // WritingScreen으로 돌아가기 전에 새로운 그룹 ID를 파라미터로 전달
+      navigation.navigate("WritingScreen", {
+        selectedGroupId: groupId,
+        selectedGroupName: groupName,
+      });
+    } else {
+      navigation.navigate("MainTab", {
+        screen: "피드",
+        params: { selectedGroupId: groupId },
+      });
+    }
   };
 
   const handleAddGroup = (groupName) => {
@@ -56,6 +64,7 @@ const WritingGroupSelectScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* 헤더 */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -68,6 +77,7 @@ const WritingGroupSelectScreen = () => {
           </View>
         </View>
 
+        {/* 그룹 목록 */}
         <View style={styles.groupsContainer}>
           {GROUPS.map((group) => (
             <TouchableOpacity
@@ -81,7 +91,10 @@ const WritingGroupSelectScreen = () => {
             >
               <Image
                 source={require("../../assets/images/Heart.png")}
-                style={styles.heartIcon}
+                style={[
+                  styles.heartIcon,
+                  currentSelected === group.id && styles.selectedHeartIcon,
+                ]}
               />
               <Text
                 style={[
@@ -95,6 +108,7 @@ const WritingGroupSelectScreen = () => {
           ))}
         </View>
 
+        {/* 그룹 추가 버튼 */}
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setIsAddGroupModalVisible(true)}
@@ -105,6 +119,7 @@ const WritingGroupSelectScreen = () => {
           />
         </TouchableOpacity>
 
+        {/* 모달들 */}
         <AddGroupModal
           visible={isAddGroupModalVisible}
           onClose={() => setIsAddGroupModalVisible(false)}
@@ -163,11 +178,19 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: "center",
     marginBottom: 20,
+    padding: 8,
+    borderRadius: 12,
+  },
+  selectedGroupItem: {
+    // backgroundColor: Colors.lightBeige,
   },
   heartIcon: {
     width: 80,
     height: 80,
     marginBottom: 8,
+  },
+  selectedHeartIcon: {
+    opacity: 0.8,
   },
   groupName: {
     fontFamily: "Pretendard",
@@ -175,13 +198,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.darkRed20,
   },
-  selectedGroupItem: {
-    opacity: 0.8,
-    // 선택된 그룹 스타일 추가
-  },
   selectedGroupName: {
     color: Colors.red20,
-    // 선택된 그룹 이름 스타일 추가
   },
   addButton: {
     position: "absolute",

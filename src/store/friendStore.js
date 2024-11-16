@@ -1,6 +1,7 @@
+// friendStore.js
 import { create } from "zustand";
-
 import { DUMMY_FRIENDS } from "../constants/dummydata";
+import useFeedStore from "../store/feedStore"; // useFeedStore로 수정
 
 const useFriendStore = create((set, get) => ({
   friends: DUMMY_FRIENDS,
@@ -18,12 +19,25 @@ const useFriendStore = create((set, get) => ({
     })),
 
   // 친구 그룹 변경
-  updateFriendGroup: (friendId, newGroup) =>
-    set((state) => ({
-      friends: state.friends.map((friend) =>
+  updateFriendGroup: (friendId, newGroup) => {
+    set((state) => {
+      // 친구 정보 업데이트
+      const updatedFriends = state.friends.map((friend) =>
         friend.id === friendId ? { ...friend, group: newGroup } : friend
-      ),
-    })),
+      );
+
+      // feedStore의 updateFeedsByUserGroup 호출
+      const friend = state.friends.find((f) => f.id === friendId);
+      if (friend) {
+        const feedStore = useFeedStore.getState();
+        feedStore.updateFeedsByUserGroup(friend.nickname, newGroup);
+      }
+
+      return {
+        friends: updatedFriends,
+      };
+    });
+  },
 
   // 특정 그룹의 친구들 가져오기
   getFriendsByGroup: (group) => {
