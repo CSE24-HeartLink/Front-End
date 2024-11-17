@@ -3,7 +3,6 @@
     "name": "heartlink",
     "slug": "fe",
     "version": "1.0.0",
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -24,6 +23,14 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "apiUrl": {
+        "development": "http://192.168.0.8:3000",
+        "yongdab": "http://192.168.45.177:3000",
+        "production": "https://your-production-api.com",
+        "school": "http://172.16.164.97:3000"
+      }
+    }
   }
 }

@@ -7,12 +7,13 @@ import {
   StatusBar,
   StyleSheet,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../components/Logo";
 import Colors from "../constants/colors";
 
-const windowWidth = Dimensions.get('window').width;
+const windowWidth = Dimensions.get("window").width;
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const WelcomeScreen = () => {
         </View>
 
         <View style={styles.subtitleContainer}>
-          <Text style={styles.subtitleText}>AI 기반{'\n'}일상 연결 플랫폼</Text>
+          <Text style={styles.subtitleText}>AI 기반{"\n"}일상 연결 플랫폼</Text>
         </View>
 
         <View style={styles.buttonSection}>
@@ -49,7 +50,14 @@ const WelcomeScreen = () => {
 
           <TouchableOpacity
             style={styles.forgotPasswordContainer}
-            onPress={() => navigation.navigate("ForgotPassword")}
+            //onPress={() => navigation.navigate("ForgotPassword")}
+            onPress={() =>
+              Alert.alert(
+                "🤔흠...",
+                '열심히 생각해보시면 분명히 기억날 거예요!',
+                [{ text: "더 생각해볼게요", style: "default" }]
+              )
+            }
           >
             <Text style={styles.forgotPasswordText}>비밀번호 찾기</Text>
           </TouchableOpacity>
@@ -66,37 +74,37 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   logoSection: {
-    position: 'absolute',
+    position: "absolute",
     width: 333,
     height: 160,
     left: 20,
     top: 191,
   },
   logo: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   subtitleContainer: {
-    position: 'absolute',
+    position: "absolute",
     width: 209,
     height: 76,
     left: 144,
     top: 351,
   },
   subtitleText: {
-    fontFamily: 'Pretendard',
+    fontFamily: "Pretendard",
     fontSize: 32,
-    fontWeight: '600',
+    fontWeight: "600",
     lineHeight: 38,
-    textAlign: 'right',
+    textAlign: "right",
     color: Colors.pink40,
   },
   buttonSection: {
-    position: 'absolute',
-    width: '100%',
+    position: "absolute",
+    width: "100%",
     top: 483,
   },
   loginButton: {
@@ -105,23 +113,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 40,
     backgroundColor: Colors.pink30,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 24,
   },
   loginButtonText: {
-    fontFamily: 'Pretendard',
+    fontFamily: "Pretendard",
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     lineHeight: 29,
     color: Colors.lightBeige,
-    textAlign: 'center',
+    textAlign: "center",
   },
   linkSection: {
-    position: 'absolute',
-    width: '100%',
+    position: "absolute",
+    width: "100%",
     top: 576,
-    alignItems: 'center',
+    alignItems: "center",
   },
   signupContainer: {
     width: 123,
@@ -129,11 +137,11 @@ const styles = StyleSheet.create({
     marginBottom: 8, // 비밀번호 찾기와의 간격
   },
   signupText: {
-    fontFamily: 'Pretendard',
+    fontFamily: "Pretendard",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     lineHeight: 19,
-    textAlign: 'center',
+    textAlign: "center",
     color: Colors.pink40,
   },
   forgotPasswordContainer: {
@@ -142,11 +150,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   forgotPasswordText: {
-    fontFamily: 'Pretendard',
+    fontFamily: "Pretendard",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     lineHeight: 19,
-    textAlign: 'center',
+    textAlign: "center",
     color: Colors.pink40,
   },
 });

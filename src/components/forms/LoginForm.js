@@ -5,21 +5,47 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../../constants/colors";
+import useAuthStore from "../../store/authStore";
+import authApi from "../../api/authApi";
 
 const LoginForm = () => {
   const navigation = useNavigation();
+  const signIn = useAuthStore((state) => state.signIn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // TODO: 실제 로그인 로직 구현
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "MainTab" }],
-    });
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("오류", "이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await authApi.login(email, password);
+
+      // Zustand store를 통해 토큰 저장
+      await signIn(response.token);
+
+      // 로그인 성공 시 메인 화면으로 이동
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainTab" }],
+      });
+    } catch (error) {
+      console.error("Login failed:", error);
+      Alert.alert(
+        "로그인 실패",
+        error.message || "로그인 중 오류가 발생했습니다."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,8 +69,14 @@ const LoginForm = () => {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>로그인</Text>
+      <TouchableOpacity
+        style={[styles.loginButton, loading && styles.disabledButton]}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        <Text style={styles.loginButtonText}>
+          {loading ? "로그인 중..." : "로그인"}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.linkSection}>
@@ -54,10 +86,16 @@ const LoginForm = () => {
         >
           <Text style={styles.signupText}>회원이 아니신가요?</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.forgotPasswordContainer}
-          onPress={() => navigation.navigate("ForgotPassword")}
+          //onPress={() => navigation.navigate("ForgotPassword")}
+          onPress={() =>
+            Alert.alert(
+              "😏💫",
+              "비밀번호는 본인만 알 수 있습니다.\n열심히 생각해보세요!",
+              [{ text: "더 생각해볼게요", style: "default" }]
+            )
+          }
         >
           <Text style={styles.forgotPasswordText}>비밀번호 찾기</Text>
         </TouchableOpacity>
