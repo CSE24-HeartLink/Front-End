@@ -22,7 +22,20 @@ export const authApi = {
       console.log("Signup response:", data);
 
       if (!response.ok) throw new Error(data.message || "회원가입 실패");
-      return data;
+
+      // 응답 데이터 구조 확인 및 반환
+      if (!data.token || !data.user) {
+        throw new Error("Invalid response format");
+      }
+
+      return {
+        token: data.token,
+        user: {
+          email: data.user.email,
+          nickname: data.user.nickname,
+          // 필요한 다른 사용자 정보들...
+        },
+      };
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -58,7 +71,19 @@ export const authApi = {
         throw new Error(data.message || "로그인 실패");
       }
 
-      return data;
+      // 응답 데이터 구조 확인 및 반환
+      if (!data.token || !data.user) {
+        throw new Error("Invalid response format");
+      }
+
+      return {
+        token: data.token,
+        user: {
+          email: data.user.email,
+          nickname: data.user.nickname,
+          // 필요한 다른 사용자 정보들...
+        },
+      };
     } catch (error) {
       console.error("Login error:", error);
       throw error;

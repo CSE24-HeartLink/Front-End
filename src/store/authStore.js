@@ -2,28 +2,32 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   userToken: null,
   isLoading: true,
+  user: null, // 사용자 정보 추가
 
   // 초기 상태 로드
   initAuth: async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
-      set({ userToken: token, isLoading: false });
+      const userStr = await AsyncStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      set({ userToken: token, user, isLoading: false });
     } catch (e) {
-      console.error("Failed to load token:", e);
+      console.error("Failed to load auth data:", e);
       set({ isLoading: false });
     }
   },
 
   // 로그인
-  signIn: async (token) => {
+  signIn: async (token, userData) => {
     try {
       await AsyncStorage.setItem("userToken", token);
-      set({ userToken: token });
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+      set({ userToken: token, user: userData });
     } catch (e) {
-      console.error("Failed to save token:", e);
+      console.error("Failed to save auth data:", e);
     }
   },
 
@@ -31,9 +35,21 @@ const useAuthStore = create((set) => ({
   signOut: async () => {
     try {
       await AsyncStorage.removeItem("userToken");
-      set({ userToken: null });
+      await AsyncStorage.removeItem("user");
+      set({ userToken: null, user: null });
     } catch (e) {
-      console.error("Failed to remove token:", e);
+      console.error("Failed to remove auth data:", e);
+    }
+  },
+
+  // 사용자 정보 업데이트
+  updateUser: async (userData) => {
+    try {
+      const updatedUser = { ...get().user, ...userData };
+      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+      set({ user: updatedUser });
+    } catch (e) {
+      console.error("Failed to update user data:", e);
     }
   },
 }));
