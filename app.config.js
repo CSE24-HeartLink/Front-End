@@ -1,16 +1,29 @@
 // app.config.js
 
-// 개발 환경 기본 설정
-const developmentConfig = {
-  apiUrl: "http://localhost:3000", // 백엔드 포트번호
-  apiTimeout: "10000",
+const getEnvPath = () => {
+  if (process.env.NODE_ENV === "production") {
+    return ".env.production";
+  }
+  return ".env.development";
+};
+
+// dotenv로 환경변수 불러오기
+require("dotenv").config({ path: getEnvPath() });
+
+// iOS 시뮬레이터를 위한 API URL 설정
+const getApiUrl = () => {
+  if (process.env.API_URL) {
+    // iOS 시뮬레이터에서는 localhost 대신 127.0.0.1 사용
+    return process.env.API_URL.replace("localhost", "127.0.0.1");
+  }
+  return "http://127.0.0.1:3000"; // 기본값
 };
 
 // 기본 설정
 const config = {
-  name: "heartlink",
+  name: process.env.APP_NAME || "heartlink",
   slug: "fe",
-  version: "1.0.0",
+  version: process.env.APP_VERSION || "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
@@ -33,15 +46,13 @@ const config = {
   },
   newArchEnabled: true,
   extra: {
-    ...developmentConfig,
+    apiUrl: getApiUrl(),
+    apiTimeout: process.env.API_TIMEOUT || "10000",
+    debug: process.env.DEBUG === "true",
+    defaultLanguage: process.env.DEFAULT_LANGUAGE || "ko",
   },
 };
 
 export default {
   expo: config,
 };
-
-// 추후 배포과정에서 추가해야됨
-// productionConfig의 apiUrl은 실제 배포할 서버 주소로
-// owner 부분은 본인의 Expo 계정 사용자명으로
-// projectId는 EAS(Expo Application Services) 사용시 해당 프로젝트 ID로
