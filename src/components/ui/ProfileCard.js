@@ -3,15 +3,17 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
 import useMyPageStore from "../../store/MypageStore";
+import useAuthStore from "../../store/authStore";
 
 const ProfileCard = ({ onPress }) => {
   const { userProfile } = useMyPageStore();
+  const { user } = useAuthStore(); // AuthStore에서 사용자 정보 가져오기
 
   return (
     <TouchableOpacity style={styles.profileCard} onPress={onPress}>
       <View style={styles.headerRow}>
         <Image source={userProfile.profileImage} style={styles.profileImage} />
-        <Text style={styles.nameText}>{userProfile.nickname}</Text>
+        <Text style={styles.nameText}>{user?.nickname || "사용자"}</Text>
         <Icon name="chevron-right" size={24} color={Colors.Gray40} />
       </View>
       <View style={styles.textContainer}>
@@ -26,7 +28,6 @@ const ProfileCard = ({ onPress }) => {
     </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   profileCard: {
     backgroundColor: Colors.lightBeige,

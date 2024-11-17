@@ -14,7 +14,7 @@ import authApi from "../../api/authApi";
 
 const LoginForm = () => {
   const navigation = useNavigation();
-  const signIn = useAuthStore((state) => state.signIn);
+  const signIn = useAuthStore((state) => state.signIn); // signIn 함수 가져오기
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,9 +28,10 @@ const LoginForm = () => {
     try {
       setLoading(true);
       const response = await authApi.login(email, password);
+      console.log("Login response:", response); // 응답 확인용 로그
 
-      // Zustand store를 통해 토큰 저장
-      await signIn(response.token);
+      // Zustand store를 통해 토큰과 사용자 정보 저장
+      await signIn(response.token, response.user); // user 정보도 함께 저장
 
       // 로그인 성공 시 메인 화면으로 이동
       navigation.reset({
@@ -48,6 +49,7 @@ const LoginForm = () => {
     }
   };
 
+  // 나머지 JSX 및 스타일은 그대로 유지
   return (
     <View style={styles.container}>
       <TextInput
@@ -88,7 +90,6 @@ const LoginForm = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.forgotPasswordContainer}
-          //onPress={() => navigation.navigate("ForgotPassword")}
           onPress={() =>
             Alert.alert(
               "😏💫",
@@ -103,6 +104,8 @@ const LoginForm = () => {
     </View>
   );
 };
+
+// styles는 그대로 유지
 
 const styles = StyleSheet.create({
   container: {
