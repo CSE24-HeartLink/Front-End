@@ -87,42 +87,4 @@ export const feedApi = {
       throw error;
     }
   },
-
-  // 댓글 조회
-  getComments: async (feedId) => {
-    try {
-      const response = await client.get(ENDPOINTS.FEEDS.COMMENTS.GET(feedId));
-      return response;
-    } catch (error) {
-      console.error("댓글 조회 실패:", error);
-      throw error;
-    }
-  },
-
-  // 댓글 작성
-  createComment: async (feedId, commentData) => {
-    try {
-      const response = await client.post(
-        ENDPOINTS.FEEDS.COMMENTS.CREATE(feedId),
-        commentData
-      );
-      return response;
-    } catch (error) {
-      console.error("댓글 작성 실패:", error);
-      throw error;
-    }
-  },
-
-  // 댓글 삭제
-  deleteComment: async (feedId, commentId) => {
-    try {
-      const response = await client.delete(
-        ENDPOINTS.FEEDS.COMMENTS.DELETE(feedId, commentId)
-      );
-      return response;
-    } catch (error) {
-      console.error("댓글 삭제 실패:", error);
-      throw error;
-    }
-  },
 };
