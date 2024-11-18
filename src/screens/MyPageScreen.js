@@ -1,12 +1,18 @@
-// MyPageScreen.js
-import React from "react";
-import { View, StyleSheet, Text, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, Text, SafeAreaView, Alert } from "react-native";
 import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
-import Colors from "../constants/colors";
+
 import ProfileCard from "../components/ui/ProfileCard";
+import LogoutModal from "../components/modals/LogoutModal";
 import RenameModal from "../components/modals/RenameModal";
+
+import Colors from "../constants/colors";
 import useMyPageStore from "../store/MypageStore";
+import useAuthStore from "../store/authStore";
+import authApi from "../api/authApi";
+
 const ToMeButton = ({ title, onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
@@ -17,8 +23,11 @@ const ToMeButton = ({ title, onPress }) => {
 };
 
 const MyPageScreen = () => {
+  const navigation = useNavigation();
   const { isRenameModalVisible, setRenameModalVisible, handleRename } =
     useMyPageStore();
+  const { userToken, signOut } = useAuthStore();
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const handleProfilePress = () => {
     setRenameModalVisible(true);
@@ -26,6 +35,22 @@ const MyPageScreen = () => {
 
   const handleRenameClose = () => {
     setRenameModalVisible(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      console.log("Logout attempt with token:", userToken); // 토큰 확인
+      await authApi.logout(userToken);
+      await signOut();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Welcome" }],
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLogoutModalVisible(false);
+      Alert.alert("알림", "로그아웃에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -43,10 +68,23 @@ const MyPageScreen = () => {
           />
         </View>
 
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => setLogoutModalVisible(true)}
+        >
+          <Text style={styles.logoutButtonText}>로그아웃</Text>
+        </TouchableOpacity>
+
         <RenameModal
           visible={isRenameModalVisible}
           onClose={handleRenameClose}
           onConfirm={handleRename}
+        />
+
+        <LogoutModal
+          visible={isLogoutModalVisible}
+          onClose={() => setLogoutModalVisible(false)}
+          onConfirm={handleLogout}
         />
       </View>
     </SafeAreaView>
@@ -78,6 +116,20 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
+    color: Colors.gray50,
+    fontFamily: "Pretendard",
+    fontWeight: "500",
+  },
+  logoutButton: {
+    backgroundColor: Colors.gray20,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: "auto",
+    marginBottom: 32,
+    alignItems: "center",
+  },
+  logoutButtonText: {
+    fontSize: 16,
     color: Colors.gray50,
     fontFamily: "Pretendard",
     fontWeight: "500",
