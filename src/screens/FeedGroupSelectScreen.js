@@ -1,12 +1,13 @@
-// FeedGroupSelectScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet, // StyleSheet import 추가
+  StyleSheet,
   SafeAreaView,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
@@ -17,7 +18,7 @@ import AddGroupModal from "../components/modals/AddGroupModal";
 import EditGroupNameModal from "../components/modals/EditGroupNameModal";
 
 import Colors from "../constants/colors";
-import { GROUPS } from "../constants/dummydata";
+//import { GROUPS } from "../constants/dummydata";
 
 const FeedGroupSelectScreen = () => {
   const navigation = useNavigation();
@@ -27,8 +28,13 @@ const FeedGroupSelectScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentGroupId, setCurrentGroupId] = useState("all");
 
-  // Zustand store에서 상태와 액션들을 가져옴
-  const { groups, addGroup, editGroupName } = useGroupStore();
+  const { groups, isLoading, error, fetchGroups, addGroup, editGroupName } =
+    useGroupStore();
+
+  // 컴포넌트 마운트 시 그룹 목록 조회
+  useEffect(() => {
+    fetchGroups();
+  }, []);
 
   useEffect(() => {
     if (route.params?.currentGroupId) {
@@ -36,9 +42,13 @@ const FeedGroupSelectScreen = () => {
     }
   }, [route.params?.currentGroupId]);
 
-  const handleAddGroup = (groupName) => {
-    addGroup(groupName);
-    setIsAddGroupModalVisible(false);
+  const handleAddGroup = async (groupName) => {
+    try {
+      await addGroup(groupName);
+      setIsAddGroupModalVisible(false);
+    } catch (error) {
+      Alert.alert("오류", "그룹 추가에 실패했습니다.");
+    }
   };
 
   const handleGroupLongPress = (group) => {
@@ -46,18 +56,37 @@ const FeedGroupSelectScreen = () => {
     setIsEditGroupModalVisible(true);
   };
 
-  const handleEditGroupName = (newName) => {
-    editGroupName(selectedGroup.id, newName);
-    setIsEditGroupModalVisible(false);
+  const handleEditGroupName = async (newName) => {
+    try {
+      await editGroupName(selectedGroup.id, newName);
+      setIsEditGroupModalVisible(false);
+    } catch (error) {
+      Alert.alert("오류", "그룹명 수정에 실패했습니다.");
+    }
   };
 
   const handleSelectGroup = (groupId) => {
+    setCurrentGroupId(groupId);
     navigation.navigate("MainTab", {
       screen: "피드",
       params: { selectedGroupId: groupId },
       initial: false,
     });
   };
+
+  //에러시
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchGroups}>
+            <Text style={styles.retryButtonText}>다시 시도</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -77,30 +106,36 @@ const FeedGroupSelectScreen = () => {
         </View>
 
         <View style={styles.groupsContainer}>
-          {groups.map((group) => (
-            <TouchableOpacity
-              key={group.id}
-              style={[
-                styles.groupItem,
-                currentGroupId === group.id && styles.selectedGroupItem,
-              ]}
-              onPress={() => handleSelectGroup(group.id)}
-              onLongPress={() => handleGroupLongPress(group)}
-            >
-              <Image
-                source={require("../../assets/images/Heart.png")}
-                style={styles.heartIcon}
-              />
-              <Text
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={Colors.darkRed20} />
+            </View>
+          ) : (
+            groups.map((group) => (
+              <TouchableOpacity
+                key={group.id}
                 style={[
-                  styles.groupName,
-                  currentGroupId === group.id && styles.selectedGroupName,
+                  styles.groupItem,
+                  currentGroupId === group.id && styles.selectedGroupItem,
                 ]}
+                onPress={() => handleSelectGroup(group.id)}
+                onLongPress={() => handleGroupLongPress(group)}
               >
-                {group.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Image
+                  source={require("../../assets/images/Heart.png")}
+                  style={styles.heartIcon}
+                />
+                <Text
+                  style={[
+                    styles.groupName,
+                    currentGroupId === group.id && styles.selectedGroupName,
+                  ]}
+                >
+                  {group.name}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
         <TouchableOpacity
@@ -194,6 +229,35 @@ const styles = StyleSheet.create({
   addButtonImage: {
     width: "100%",
     height: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontFamily: "Pretendard",
+    fontSize: 16,
+    color: Colors.darkRed20,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: Colors.darkRed20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontFamily: "Pretendard",
+    fontSize: 14,
+    color: Colors.white,
   },
 });
 

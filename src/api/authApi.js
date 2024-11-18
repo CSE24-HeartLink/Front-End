@@ -93,6 +93,8 @@ export const authApi = {
   // 로그아웃
   logout: async (token) => {
     try {
+      console.log("Sending logout request with token:", token); // 토큰 확인
+  
       const response = await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
         headers: {
@@ -101,12 +103,15 @@ export const authApi = {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
+      console.log("Logout response status:", response.status); // 응답 상태 확인
       const data = await response.json();
+      console.log("Logout response data:", data); // 응답 데이터 확인
+  
       if (!response.ok) throw new Error(data.message || "로그아웃 실패");
       return data;
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error details:", error); // 에러 상세 확인
       throw error;
     }
   },
