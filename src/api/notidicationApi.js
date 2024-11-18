@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 
-const API_URL = Constants.expoConfig.extra.apiUrl.yongdab;
+const API_URL = Constants.expoConfig.extra.apiUrl.development;
 
 export const notificationApi = {
   // 알림 목록 조회

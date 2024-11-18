@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 
-const API_URL = Constants.expoConfig.extra.apiUrl.yongdab;
+const API_URL = Constants.expoConfig.extra.apiUrl.development;
 
 export const friendApi = {
   // 친구 요청 보내기

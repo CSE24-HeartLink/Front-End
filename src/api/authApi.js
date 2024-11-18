@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 
 // development 환경의 URL을 기본값으로 사용
-const API_URL = Constants.expoConfig.extra.apiUrl.yongdab;
+const API_URL = Constants.expoConfig.extra.apiUrl.development;
 
 export const authApi = {
   // 회원가입
