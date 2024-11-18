@@ -12,7 +12,7 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const handleGroupChange = (newGroup) => {
-    onMoveGroup(friend.id, newGroup);
+    onMoveGroup(friend._id, newGroup);
     setIsModalVisible(false);
   };
 
@@ -21,7 +21,7 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
   };
 
   const handleConfirmDelete = () => {
-    onDelete(friend.id);
+    onDelete(friend._id);
     setIsDeleteModalVisible(false);
   };
 
@@ -30,8 +30,8 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
       <View style={styles.profileContainer}>
         <Image source={friend.profileImage} style={styles.profileImage} />
         <View style={styles.infoContainer}>
-          <Text style={styles.nickname}>{friend.nickname}</Text>
-          <Text style={styles.groupText}>{friend.group}</Text>
+          <Text style={styles.nickname}>{friend.friendId.nickname}</Text>
+          <Text style={styles.groupText}>{friend.group || "전체"}</Text>
         </View>
       </View>
       <View style={styles.buttonContainer}>
