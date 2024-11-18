@@ -1,11 +1,19 @@
-// src/store/authStore.js
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { parseJwt } from "../utils/authUtils";
 
 const useAuthStore = create((set, get) => ({
   userToken: null,
   isLoading: true,
   user: null, // 사용자 정보 추가
+
+  getUserId: () => {
+    const token = get().userToken;
+    if (!token) return null;
+
+    const decoded = parseJwt(token);
+    return decoded?.userId;
+  },
 
   // 초기 상태 로드
   initAuth: async () => {
@@ -13,6 +21,17 @@ const useAuthStore = create((set, get) => ({
       const token = await AsyncStorage.getItem("userToken");
       const userStr = await AsyncStorage.getItem("user");
       const user = userStr ? JSON.parse(userStr) : null;
+
+      // 토큰 유효성 검증 추가
+      if (token) {
+        const decoded = parseJwt(token);
+        if (!decoded || !decoded.userId) {
+          // 토큰이 유효하지 않으면 로그아웃
+          await get().signOut();
+          return;
+        }
+      }
+
       set({ userToken: token, user, isLoading: false });
     } catch (e) {
       console.error("Failed to load auth data:", e);

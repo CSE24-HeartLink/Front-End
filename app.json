@@ -24,10 +24,19 @@
       "favicon": "./assets/favicon.png"
     },
     "newArchEnabled": true,
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff"
+        }
+      ]
+    ],
     "extra": {
       "apiUrl": {
         "development": "http://192.168.0.8:3000",
-        "yongdab": "http://192.168.45.244:3000",
+        "yongdab": "http://172.16.97.196:3000",
         "production": "https://your-production-api.com",
         "school": "http://172.16.164.97:3000"
       }
