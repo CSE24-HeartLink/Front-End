@@ -1,5 +1,4 @@
-// screens/notification/NotificationScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,26 +8,76 @@ import {
   SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
+import Toast from "react-native-toast-message";
 
+import { toastConfig } from "../../components/ui/ToastConfig";
 import Colors from "../../constants/colors";
-import { NOTIFICATIONS } from "../../constants/dummydata";
-
 import NotificationItem from "./components/NotificationItem";
 import AddFriendGroupModal from "./components/AddFriendGroupModal";
+import LoadingScreen from "../LoadingScreen";
+import useNotificationStore from "../../store/notificationStore";
 
 const NotificationScreen = ({ navigation }) => {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
+
+  const {
+    notifications,
+    loading,
+    error,
+    fetchNotifications,
+    handleFriendRequest,
+    markAsRead,
+    markAllAsRead,
+  } = useNotificationStore();
+
+  // 화면 진입 시 알림 목록 로드
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  // 화면 진입 시 모든 알림 읽음 처리
+  useEffect(() => {
+    markAllAsRead();
+  }, []);
 
   const handleAccept = (id) => {
     setSelectedNotificationId(id);
     setIsModalVisible(true);
   };
 
-  const handleReject = (id) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  const handleReject = async (id) => {
+    try {
+      const success = await handleFriendRequest(id, false);
+      if (success) {
+        Toast.show({
+          type: "success",
+          text1: "친구 신청을 거절했습니다",
+          visibilityTime: 2000,
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "친구 신청 거절 실패",
+          text2: "잠시 후 다시 시도해주세요",
+          visibilityTime: 3000,
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "오류 발생",
+        text2: "잠시 후 다시 시도해주세요",
+        visibilityTime: 3000,
+        position: "bottom",
+        bottomOffset: 100,
+      });
+    }
   };
 
   const handleModalClose = () => {
@@ -37,18 +86,48 @@ const NotificationScreen = ({ navigation }) => {
     setSelectedGroup(null);
   };
 
-  const handleModalConfirm = (groupId) => {
-    // 여기서 선택된 그룹으로 친구 추가 로직 구현
-    console.log(`Adding user to group: ${groupId}`);
-
-    // 알림 목록에서 해당 알림 제거
-    setNotifications((prev) =>
-      prev.filter((notif) => notif.id !== selectedNotificationId)
-    );
-
-    // 모달 닫기
-    handleModalClose();
+  const handleModalConfirm = async (groupId) => {
+    try {
+      const success = await handleFriendRequest(
+        selectedNotificationId,
+        true,
+        groupId
+      );
+      if (success) {
+        Toast.show({
+          type: "success",
+          text1: "친구 신청을 수락했습니다",
+          visibilityTime: 2000,
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "친구 신청 수락 실패",
+          text2: "잠시 후 다시 시도해주세요",
+          visibilityTime: 3000,
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "오류 발생",
+        text2: "잠시 후 다시 시도해주세요",
+        visibilityTime: 3000,
+        position: "bottom",
+        bottomOffset: 100,
+      });
+    } finally {
+      handleModalClose();
+    }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -65,18 +144,26 @@ const NotificationScreen = ({ navigation }) => {
           </View>
           <View style={styles.rightPlaceholder} />
         </View>
-        <FlatList
-          data={notifications}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <NotificationItem
-              item={item}
-              onAccept={handleAccept}
-              onReject={handleReject}
-            />
-          )}
-          style={styles.list}
-        />
+
+        {notifications.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>알림이 없습니다</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={notifications}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <NotificationItem
+                item={item}
+                onAccept={handleAccept}
+                onReject={handleReject}
+                onPress={() => markAsRead(item._id)}
+              />
+            )}
+            style={styles.list}
+          />
+        )}
 
         <AddFriendGroupModal
           visible={isModalVisible}
@@ -85,6 +172,7 @@ const NotificationScreen = ({ navigation }) => {
           selectedGroup={selectedGroup}
         />
       </View>
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 };
@@ -129,6 +217,15 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: Colors.gray50,
   },
 });
 

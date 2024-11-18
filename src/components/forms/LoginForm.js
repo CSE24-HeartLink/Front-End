@@ -14,7 +14,7 @@ import authApi from "../../api/authApi";
 
 const LoginForm = () => {
   const navigation = useNavigation();
-  const signIn = useAuthStore((state) => state.signIn); // signIn 함수 가져오기
+  const signIn = useAuthStore((state) => state.signIn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,18 +28,39 @@ const LoginForm = () => {
     try {
       setLoading(true);
       const response = await authApi.login(email, password);
-      console.log("Login response:", response); // 응답 확인용 로그
+      console.log("[Debug] Raw login response:", response);
 
-      // Zustand store를 통해 토큰과 사용자 정보 저장
-      await signIn(response.token, response.user); // user 정보도 함께 저장
+      // 응답 구조 확인
+      const userInfo = response.user;
+      console.log("[Debug] User info from login:", {
+        id: userInfo?.id,
+        _id: userInfo?._id,
+        userId: userInfo?.userId,
+        email: userInfo?.email,
+        fullUserObject: userInfo,
+      });
 
-      // 로그인 성공 시 메인 화면으로 이동
+      // Zustand store에 저장
+      await signIn(response.token, userInfo);
+
+      // 저장 후 auth 상태 확인
+      const authState = useAuthStore.getState();
+      console.log("[Debug] Auth state after login:", {
+        token: authState.userToken ? "exists" : "missing",
+        user: authState.user,
+        userId: authState.user?._id || authState.user?.id,
+      });
+
       navigation.reset({
         index: 0,
         routes: [{ name: "MainTab" }],
       });
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("[Debug] Login error details:", {
+        message: error.message,
+        stack: error.stack,
+        fullError: error,
+      });
       Alert.alert(
         "로그인 실패",
         error.message || "로그인 중 오류가 발생했습니다."
@@ -49,7 +70,6 @@ const LoginForm = () => {
     }
   };
 
-  // 나머지 JSX 및 스타일은 그대로 유지
   return (
     <View style={styles.container}>
       <TextInput

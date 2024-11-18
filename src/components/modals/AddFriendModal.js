@@ -6,18 +6,35 @@ import {
   Modal,
   StyleSheet,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Colors from "../../constants/colors";
+//import useFriendStore from "../../store/friendStore";
 
-const AddFriendModal = ({ visible, onClose, onConfirm }) => {
-  const [email, setEmail] = useState("");
+const AddFriendModal = ({ visible, onClose, onSubmit, error, loading }) => {
+  const [nickname, setNickname] = useState("");
+  //const { clearError } = useFriendStore();
+
+  const handleSubmit = async () => {
+    if (!nickname.trim()) {
+      return;
+    }
+    // 직접 addFriend 호출하는 대신 onSubmit prop 사용
+    await onSubmit(nickname);
+  };
+
+  const handleClose = () => {
+    setNickname("");
+    //clearError();
+    onClose();
+  };
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
@@ -26,25 +43,36 @@ const AddFriendModal = ({ visible, onClose, onConfirm }) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="이메일을 입력해주세요."
+              placeholder="닉네임을 입력해주세요."
               placeholderTextColor={Colors.gray30}
-              value={email}
-              onChangeText={setEmail}
+              value={nickname}
+              onChangeText={setNickname}
               autoCapitalize="none"
-              keyboardType="email-address"
+              editable={!loading}
             />
           </View>
 
+          {/* {error && <Text style={styles.errorText}>{error}</Text>} */}
+
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleClose}
+              disabled={loading}
+            >
               <Text style={styles.buttonText}>취소</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={() => onConfirm(email)}
+              style={[styles.confirmButton, loading && styles.disabledButton]}
+              onPress={handleSubmit}
+              disabled={loading || !nickname.trim()}
             >
-              <Text style={styles.buttonText}>요청</Text>
+              {loading ? (
+                <ActivityIndicator color={Colors.gray50} />
+              ) : (
+                <Text style={styles.buttonText}>요청</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -121,6 +149,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  disabledButton: {
+    backgroundColor: Colors.gray30,
+  },
   buttonText: {
     fontFamily: "Pretendard",
     fontSize: 16,
@@ -128,6 +159,15 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textAlign: "center",
     color: Colors.gray50,
+  },
+  errorText: {
+    position: "absolute",
+    top: "53%",
+    left: "12.46%",
+    right: "9.92%",
+    color: "red",
+    fontSize: 12,
+    fontFamily: "Pretendard",
   },
 });
 
