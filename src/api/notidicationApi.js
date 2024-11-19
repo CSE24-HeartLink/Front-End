@@ -6,16 +6,17 @@ export const notificationApi = {
   // 알림 목록 조회
   getNotifications: async (userId) => {
     try {
-      const response = await fetch(`${API_URL}/api/notifications/${userId}`);
+      const url = `${API_URL}/api/notify/${userId}`;
+      console.log("Fetching URL:", url); // API URL 확인
+      console.log("userId:", userId); // userId 값 확인
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-
+      const response = await fetch(url);
       const data = await response.json();
-      return { success: true, data };
+      console.log("API Response:", data); // 응답 데이터 확인
+
+      return data;
     } catch (error) {
-      console.error("[NotificationApi] Get notifications error:", error);
+      console.error("Fetch error:", error);
       return { success: false, error: error.message };
     }
   },
@@ -23,9 +24,7 @@ export const notificationApi = {
   // 읽지 않은 알림 개수 조회
   getUnreadCount: async (userId) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/notifications/unread/${userId}`
-      );
+      const response = await fetch(`${API_URL}/api/notify/unread/${userId}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch unread count");
@@ -43,7 +42,7 @@ export const notificationApi = {
   markAsRead: async (notificationId) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/notifications/read/${notificationId}`,
+        `${API_URL}/api/notify/read/${notificationId}`,
         {
           method: "PATCH",
         }
@@ -64,12 +63,9 @@ export const notificationApi = {
   // 모든 알림 읽음 처리
   markAllAsRead: async (userId) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/notifications/read-all/${userId}`,
-        {
-          method: "PATCH",
-        }
-      );
+      const response = await fetch(`${API_URL}/api/notify/read-all/${userId}`, {
+        method: "PATCH",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to mark all notifications as read");
@@ -85,18 +81,29 @@ export const notificationApi = {
   // 친구 요청 수락
   acceptFriendRequest: async (notificationId, groupId) => {
     try {
+      console.log("Accepting friend request:", {
+        notificationId,
+        groupId,
+        url: `${API_URL}/api/friend/requests/${notificationId}/response`, // friend로 수정
+      });
+
       const response = await fetch(
-        `${API_URL}/api/friend/requests/${notificationId}/accept`,
+        `${API_URL}/api/friend/requests/${notificationId}/response`, // friend로 수정
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ groupId }),
+          body: JSON.stringify({
+            response: "accepted",
+            groupId,
+          }),
         }
       );
 
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Server response:", errorData);
         throw new Error("Failed to accept friend request");
       }
 
@@ -113,15 +120,19 @@ export const notificationApi = {
       const response = await fetch(
         `${API_URL}/api/friend/requests/${notificationId}/reject`,
         {
-          method: "POST",
+          method: "PUT",
         }
       );
+      console.log("Reject response status:", response.status);
 
-      if (!response.ok) {
-        throw new Error("Failed to reject friend request");
-      }
+      const data = await response.json();
 
-      return { success: true };
+      // 알림도 함께 삭제
+      await fetch(`${API_URL}/api/notifications/${notificationId}`, {
+        method: "DELETE",
+      });
+
+      return { success: true, data };
     } catch (error) {
       console.error("[NotificationApi] Reject friend request error:", error);
       return { success: false, error: error.message };

@@ -80,16 +80,18 @@ const MainFeedScreen = () => {
     }
   }, [route.params?.selectedGroupId]);
 
+  // 카테고리(그룹) 선택 화면으로 이동
   const handleCategoryPress = () => {
     navigation.navigate("FeedGroupSelectScreen", {
       currentGroupId: currentGroupId,
     });
   };
 
-  // 추가 버튼 클릭 핸들러 추가
+  // 새 게시글 작성 화면으로 이동
   const handleAddFeedPress = () => {
     navigation.navigate("CreatePost", {
-      currentGroupId: currentGroupId,
+      currentGroupId: currentGroupId, // 현재 선택된 그룹 ID를 전달
+      selectedGroupId: currentGroupId,
     });
   };
 

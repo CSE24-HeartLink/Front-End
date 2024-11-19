@@ -60,23 +60,25 @@ const useFriendStore = create((set, get) => ({
   },
 
   deleteFriend: async (friendId) => {
+    set({ loading: true });
     try {
-      const userId = useAuthStore.getState().user?._id;
+      const userId = useAuthStore.getState().getUserId();
       if (!userId) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
+        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.");
       }
 
       const result = await friendApi.deleteFriend(userId, friendId);
       if (result.success) {
         set((state) => ({
-          friends: state.friends.filter((friend) => friend.id !== friendId),
+          friends: state.friends.filter((friend) => friend._id !== friendId),
         }));
       }
       return result;
     } catch (error) {
       console.error("[Debug] Delete friend error:", error);
-      set({ error: error.message });
       return { success: false, error: error.message };
+    } finally {
+      set({ loading: false });
     }
   },
 

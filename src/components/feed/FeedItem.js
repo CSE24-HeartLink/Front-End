@@ -4,12 +4,13 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
 import useFeedStore from "../../store/feedStore";
+import Colors from "../../constants/colors";
+
 import AccountInfo from "./AccountInfo";
 import PostContent from "./PostContent";
 import ReactionButtons from "./ReactionButtons";
 import CommentModal from "./CommentModal";
 import CommentListModal from "./CommentListModal";
-import Colors from "../../constants/colors";
 
 const FeedItem = ({ feedId }) => {
   const navigation = useNavigation();

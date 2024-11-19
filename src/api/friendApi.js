@@ -6,10 +6,7 @@ export const friendApi = {
   // 친구 요청 보내기
   sendFriendRequest: async (fromId, nickname) => {
     try {
-      const url = `${API_URL}/api/friend/requests`; // URL 경로 수정
-      console.log("[Debug] Sending friend request to URL:", url);
-      console.log("[Debug] Request payload:", { fromId, nickname });
-
+      const url = `${API_URL}/api/friend/requests`;
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -18,20 +15,12 @@ export const friendApi = {
         body: JSON.stringify({ fromId, nickname }),
       });
 
-      console.log("[Debug] Response status:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("[Debug] Error response body:", errorText);
-        throw new Error(errorText || "친구 요청 보내기에 실패했습니다.");
-      }
-
       const data = await response.json();
-      console.log("[Debug] Response data:", data);
-
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data));
+      }
       return { success: true, data };
     } catch (error) {
-      console.error("[Debug] Send friend request error:", error);
       return { success: false, error: error.message };
     }
   },
@@ -80,7 +69,7 @@ export const friendApi = {
   deleteFriend: async (userId, friendId) => {
     try {
       const url = `${API_URL}/api/friend/${friendId}`;
-      console.log("[Debug] Deleting friend at URL:", url);
+      console.log("[Debug] Deleting friend. URL:", url, "UserId:", userId);
 
       const response = await fetch(url, {
         method: "DELETE",
@@ -90,8 +79,11 @@ export const friendApi = {
         body: JSON.stringify({ userId }),
       });
 
+      console.log("[Debug] Delete response status:", response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("[Debug] Delete error response:", errorText);
         throw new Error(errorText || "친구 삭제에 실패했습니다.");
       }
 

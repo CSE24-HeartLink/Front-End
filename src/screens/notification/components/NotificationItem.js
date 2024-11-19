@@ -4,7 +4,6 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Colors from "../../../constants/colors";
 
 const NotificationItem = ({ item, onAccept, onReject }) => {
-
   const formattedTime = (timestamp) => {
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, "0");
@@ -14,25 +13,21 @@ const NotificationItem = ({ item, onAccept, onReject }) => {
 
   return (
     <View style={styles.notificationItem}>
-      <View style={styles.userInfo}>
-        <Image source={item.profileImage} style={styles.profileImage} />
-        <View style={styles.textContainer}>
-          <Text style={styles.username}>{item.username}</Text>
-          <Text style={styles.timestamp}>{formattedTime(item.timestamp)}</Text>
-        </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.content}>{item.message}</Text>
+        <Text style={styles.timestamp}>{formattedTime(item.createdAt)}</Text>
       </View>
-      <Text style={styles.content}>{item.content}</Text>
-      {item.type === "request" && (
+      {item.type === "friend_request" && (
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={[styles.actionButton, styles.acceptButton]}
-            onPress={() => onAccept(item.id)}
+            onPress={() => onAccept(item._id)}
           >
             <Text style={styles.buttonText}>수락</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, styles.rejectButton]}
-            onPress={() => onReject(item.id)}
+            onPress={() => onReject(item._id)}
           >
             <Text style={styles.buttonText}>거절</Text>
           </TouchableOpacity>
