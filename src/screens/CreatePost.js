@@ -6,15 +6,21 @@ import Colors from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons"; // 아이콘 사용을 위한 임포트
 
-const CreatePost = () => {
+const CreatePost = ({ route }) => {
   const navigation = useNavigation();
+
+  // 현재 그룹 ID 가져오기
+  const currentGroupId = route.params?.currentGroupId;
 
   const handleVoiceRecording = () => {
     navigation.navigate("RecordScreen"); // RecordScreen으로 이동
   };
 
   const handleTextWriting = () => {
-    navigation.navigate("WritingScreen"); // WritingScreen으로 이동
+    navigation.navigate("WritingScreen", {
+      currentGroupId: currentGroupId, // 현재 그룹 ID 전달
+      selectedGroupId: currentGroupId, // TopFilterButton 표시용
+    });
   };
 
   return (

@@ -10,10 +10,12 @@ import {
 import Icon from "react-native-vector-icons/Feather";
 import Toast from "react-native-toast-message";
 
-import { toastConfig } from "../../components/ui/ToastConfig";
 import Colors from "../../constants/colors";
+
+import { toastConfig } from "../../components/ui/ToastConfig";
 import NotificationItem from "./components/NotificationItem";
 import AddFriendGroupModal from "./components/AddFriendGroupModal";
+
 import LoadingScreen from "../LoadingScreen";
 import useNotificationStore from "../../store/notificationStore";
 
@@ -34,146 +36,154 @@ const NotificationScreen = ({ navigation }) => {
 
   // 화면 진입 시 알림 목록 로드
   useEffect(() => {
-    fetchNotifications();
+    const loadData = async () => {
+      await fetchNotifications();
+    };
+    loadData();
   }, []);
 
-  // 화면 진입 시 모든 알림 읽음 처리
+  // 모든 알림 읽음 처리는 notifications가 있을 때만
   useEffect(() => {
-    markAllAsRead();
-  }, []);
+    if (notifications.length > 0) {
+      markAllAsRead();
+    }
+  }, [notifications]);
 
-  const handleAccept = (id) => {
-    setSelectedNotificationId(id);
-    setIsModalVisible(true);
-  };
+  // 핸들러 함수들을 하나의 객체로 그룹화
+  const handlers = {
+    accept: (id) => {
+      setSelectedNotificationId(id);
+      setIsModalVisible(true);
+    },
 
-  const handleReject = async (id) => {
-    try {
-      const success = await handleFriendRequest(id, false);
-      if (success) {
+    reject: async (id) => {
+      try {
+        const success = await handleFriendRequest(id, false);
         Toast.show({
-          type: "success",
-          text1: "친구 신청을 거절했습니다",
-          visibilityTime: 2000,
+          type: success ? "success" : "error",
+          text1: success ? "친구 신청을 거절했습니다" : "친구 신청 거절 실패",
+          text2: !success && "잠시 후 다시 시도해주세요",
+          visibilityTime: success ? 2000 : 3000,
           position: "bottom",
           bottomOffset: 100,
         });
-      } else {
+      } catch (error) {
         Toast.show({
           type: "error",
-          text1: "친구 신청 거절 실패",
+          text1: "오류 발생",
           text2: "잠시 후 다시 시도해주세요",
           visibilityTime: 3000,
           position: "bottom",
           bottomOffset: 100,
         });
       }
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "오류 발생",
-        text2: "잠시 후 다시 시도해주세요",
-        visibilityTime: 3000,
-        position: "bottom",
-        bottomOffset: 100,
-      });
-    }
-  };
+    },
 
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setSelectedNotificationId(null);
-    setSelectedGroup(null);
-  };
+    modalClose: () => {
+      setIsModalVisible(false);
+      setSelectedNotificationId(null);
+      setSelectedGroup(null);
+    },
 
-  const handleModalConfirm = async (groupId) => {
-    try {
-      const success = await handleFriendRequest(
-        selectedNotificationId,
-        true,
-        groupId
-      );
-      if (success) {
+    modalConfirm: async (groupId) => {
+      try {
+        const success = await handleFriendRequest(
+          selectedNotificationId,
+          true,
+          groupId
+        );
         Toast.show({
-          type: "success",
-          text1: "친구 신청을 수락했습니다",
-          visibilityTime: 2000,
+          type: success ? "success" : "error",
+          text1: success ? "친구 신청을 수락했습니다" : "친구 신청 수락 실패",
+          text2: !success && "잠시 후 다시 시도해주세요",
+          visibilityTime: success ? 2000 : 3000,
           position: "bottom",
           bottomOffset: 100,
         });
-      } else {
+      } catch (error) {
         Toast.show({
           type: "error",
-          text1: "친구 신청 수락 실패",
+          text1: "오류 발생",
           text2: "잠시 후 다시 시도해주세요",
           visibilityTime: 3000,
           position: "bottom",
           bottomOffset: 100,
         });
+      } finally {
+        handlers.modalClose();
       }
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "오류 발생",
-        text2: "잠시 후 다시 시도해주세요",
-        visibilityTime: 3000,
-        position: "bottom",
-        bottomOffset: 100,
-      });
-    } finally {
-      handleModalClose();
-    }
+    },
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
-          </TouchableOpacity>
-          <View style={styles.titleContainer}>
-            <Text style={styles.headerTitle}>알림함</Text>
-          </View>
-          <View style={styles.rightPlaceholder} />
-        </View>
-
-        {notifications.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>알림이 없습니다</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={notifications}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <NotificationItem
-                item={item}
-                onAccept={handleAccept}
-                onReject={handleReject}
-                onPress={() => markAsRead(item._id)}
-              />
-            )}
-            style={styles.list}
-          />
-        )}
-
+        <Header navigation={navigation} />
+        <NotificationList
+          notifications={notifications}
+          onAccept={handlers.accept}
+          onReject={handlers.reject}
+          onMarkAsRead={markAsRead}
+        />
         <AddFriendGroupModal
           visible={isModalVisible}
-          onClose={handleModalClose}
-          onConfirm={handleModalConfirm}
+          onClose={handlers.modalClose}
+          onConfirm={handlers.modalConfirm}
           selectedGroup={selectedGroup}
         />
       </View>
       <Toast config={toastConfig} />
     </SafeAreaView>
+  );
+};
+
+// Header 컴포넌트 분리
+const Header = ({ navigation }) => (
+  <View style={styles.header}>
+    <TouchableOpacity
+      style={styles.backButton}
+      onPress={() => navigation.goBack()}
+    >
+      <Icon name="chevron-left" size={24} color={Colors.darkRed20} />
+    </TouchableOpacity>
+    <View style={styles.titleContainer}>
+      <Text style={styles.headerTitle}>알림함</Text>
+    </View>
+    <View style={styles.rightPlaceholder} />
+  </View>
+);
+
+// NotificationList 컴포넌트 분리
+const NotificationList = ({
+  notifications,
+  onAccept,
+  onReject,
+  onMarkAsRead,
+}) => {
+  if (notifications.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>알림이 없습니다</Text>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={notifications}
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => (
+        <NotificationItem
+          item={item}
+          onAccept={onAccept}
+          onReject={onReject}
+          onPress={() => onMarkAsRead(item._id)}
+        />
+      )}
+      style={styles.list}
+    />
   );
 };
 

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 
 import Colors from "../../../constants/colors";
-import { GROUPS } from "../../../constants/dummydata";
+import useGroupStore from "../../../store/groupStore";
 
 const AddFriendGroupModal = ({
   visible,
@@ -13,8 +13,17 @@ const AddFriendGroupModal = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [newGroup, setNewGroup] = useState(selectedGroup);
 
+  const groups = useGroupStore((state) => state.groups);
+  const fetchGroups = useGroupStore((state) => state.fetchGroups);
+
+  useEffect(() => {
+    if (visible) {
+      fetchGroups();
+    }
+  }, [visible]);
+
   const selectedGroupName =
-    GROUPS.find((group) => group.id === newGroup)?.name || "동기들";
+    groups.find((group) => group.id === newGroup)?.name || "전체";
 
   const handleSelectGroup = (groupId) => {
     setNewGroup(groupId);
@@ -32,7 +41,6 @@ const AddFriendGroupModal = ({
         <View style={styles.modalContainer}>
           <Text style={styles.title}>추가 그룹 선택</Text>
 
-          {/* 드롭다운 헤더 */}
           <TouchableOpacity
             style={styles.groupSelectContainer}
             onPress={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -40,10 +48,9 @@ const AddFriendGroupModal = ({
             <Text style={styles.selectedGroupText}>{selectedGroupName}</Text>
           </TouchableOpacity>
 
-          {/* 드롭다운 목록 */}
           {isDropdownOpen && (
             <View style={styles.dropdownList}>
-              {GROUPS.map((group) => (
+              {groups.map((group) => (
                 <TouchableOpacity
                   key={group.id}
                   style={[

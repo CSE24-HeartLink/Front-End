@@ -13,12 +13,10 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
 import useGroupStore from "../store/groupStore";
+import Colors from "../constants/colors";
 
 import AddGroupModal from "../components/modals/AddGroupModal";
 import EditGroupNameModal from "../components/modals/EditGroupNameModal";
-
-import Colors from "../constants/colors";
-//import { GROUPS } from "../constants/dummydata";
 
 const FeedGroupSelectScreen = () => {
   const navigation = useNavigation();
@@ -31,7 +29,6 @@ const FeedGroupSelectScreen = () => {
   const { groups, isLoading, error, fetchGroups, addGroup, editGroupName } =
     useGroupStore();
 
-  // 컴포넌트 마운트 시 그룹 목록 조회
   useEffect(() => {
     fetchGroups();
   }, []);
@@ -41,6 +38,9 @@ const FeedGroupSelectScreen = () => {
       setCurrentGroupId(route.params.currentGroupId);
     }
   }, [route.params?.currentGroupId]);
+
+  // 전체 옵션을 포함한 그룹 리스트
+  const allGroups = [{ id: "all", name: "전체" }, ...groups];
 
   const handleAddGroup = async (groupName) => {
     try {
@@ -52,6 +52,7 @@ const FeedGroupSelectScreen = () => {
   };
 
   const handleGroupLongPress = (group) => {
+    if (group.id === "all") return; // 전체는 수정 불가
     setSelectedGroup(group);
     setIsEditGroupModalVisible(true);
   };
@@ -74,7 +75,6 @@ const FeedGroupSelectScreen = () => {
     });
   };
 
-  //에러시
   if (error) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -100,7 +100,7 @@ const FeedGroupSelectScreen = () => {
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
-              {groups.find((g) => g.id === currentGroupId)?.name || "전체"}
+              {allGroups.find((g) => g.id === currentGroupId)?.name || "전체"}
             </Text>
           </View>
         </View>
@@ -111,7 +111,7 @@ const FeedGroupSelectScreen = () => {
               <ActivityIndicator size="large" color={Colors.darkRed20} />
             </View>
           ) : (
-            groups.map((group) => (
+            allGroups.map((group) => (
               <TouchableOpacity
                 key={group.id}
                 style={[
@@ -205,7 +205,11 @@ const styles = StyleSheet.create({
     width: "30%",
     aspectRatio: 1,
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
+  },
+  selectedGroupItem: {
+    opacity: 0.7,
   },
   heartIcon: {
     width: 80,
@@ -217,6 +221,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: Colors.darkRed20,
+    textAlign: "center",
+  },
+  selectedGroupName: {
+    color: Colors.darkRed10,
   },
   addButton: {
     position: "absolute",

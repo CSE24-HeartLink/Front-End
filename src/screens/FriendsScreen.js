@@ -154,22 +154,19 @@ const FriendsScreen = () => {
                 onDelete={handleDelete}
               />
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             contentContainerStyle={styles.listContainer}
           />
         )}
-
-        {!route.params?.selectedGroup && (
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setIsAddFriendModalVisible(true)}
-          >
-            <Image
-              source={require("../../assets/images/AddGroup.png")}
-              style={styles.addButtonImage}
-            />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setIsAddFriendModalVisible(true)}
+        >
+          <Image
+            source={require("../../assets/images/AddGroup.png")}
+            style={styles.addButtonImage}
+          />
+        </TouchableOpacity>
 
         <AddFriendModal
           visible={isAddFriendModalVisible}

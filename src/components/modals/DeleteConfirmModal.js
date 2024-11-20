@@ -1,37 +1,57 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import Colors from "../../constants/colors";
 
-const DeleteConfirmModal = ({ visible, onClose, onConfirm, friendName }) => {
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.title}>알림</Text>
-
-          <Text style={styles.message}>
-            정말 '{friendName}'님을 친구에서 삭제하시겠습니까?
-          </Text>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.buttonText}>취소</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
+const DeleteConfirmModal = ({
+  visible,
+  onClose,
+  onConfirm,
+  friendName,
+  loading,
+}) => (
+  <Modal
+    visible={visible}
+    transparent
+    animationType="fade"
+    onRequestClose={onClose}
+  >
+    <View style={styles.overlay}>
+      <View style={styles.modalContainer}>
+        <Text style={styles.title}>알림</Text>
+        <Text style={styles.message}>
+          정말 '{friendName}'님을 친구에서 삭제하시겠습니까?
+        </Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={onClose}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>취소</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={onConfirm}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color={Colors.lightBeige} size="small" />
+            ) : (
               <Text style={[styles.buttonText, styles.deleteText]}>삭제</Text>
-            </TouchableOpacity>
-          </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
-    </Modal>
-  );
-};
+    </View>
+  </Modal>
+);
 
 const styles = StyleSheet.create({
   overlay: {

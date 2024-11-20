@@ -6,6 +6,7 @@ const useAuthStore = create((set, get) => ({
   userToken: null,
   isLoading: true,
   user: null, // 사용자 정보 추가
+  getAccessToken: () => get().userToken,
 
   getUserId: () => {
     const token = get().userToken;

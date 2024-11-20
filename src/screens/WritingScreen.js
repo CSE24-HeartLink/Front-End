@@ -1,311 +1,3 @@
-// // screens/WritingScreen.js
-// import React, { useState, useEffect } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   TouchableOpacity,
-//   StyleSheet,
-//   SafeAreaView,
-//   ScrollView,
-//   Image,
-//   Platform,
-//   Alert,
-//   Dimensions,
-// } from "react-native";
-// import { useNavigation, useRoute } from "@react-navigation/native";
-// import Icon from "react-native-vector-icons/Ionicons";
-// import * as ImagePicker from "expo-image-picker";
-// import TopFilterButton from "../components/ui/TopFilterButton";
-// import AIImageIcon from "../../assets/images/icons/AIImageIcon.svg";
-// import CameraIcon from "../../assets/images/icons/CameraIcon.svg";
-// import MiddleCircleBackground from "../components/ui/MiddleCircleBackground";
-// import AIdummy from "../../assets/images/AIdummy.png";
-// import Colors from "../constants/colors";
-// import useFeedStore from "../store/feedStore";
-// import { GROUPS } from "../constants/dummydata";
-
-// const screenWidth = Dimensions.get("window").width;
-// const imageContainerWidth = screenWidth - 32; // 양쪽 마진 16씩 제외
-// const imageContainerHeight = 200; // 고정된 높이
-
-// const WritingScreen = () => {
-//   const navigation = useNavigation();
-//   const route = useRoute();
-//   const [selectedGroup, setSelectedGroup] = useState("all");
-//   const [textInputValue, setTextInputValue] = useState("");
-//   const [selectedImage, setSelectedImage] = useState(null);
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   const addFeed = useFeedStore((state) => state.addFeed);
-
-//   // MainFeedScreen에서 선택된 그룹 정보 받아오기
-//   useEffect(() => {
-//     // WritingGroupSelect에서 선택된 그룹 정보 받기
-//     if (route.params?.selectedGroupId) {
-//       setSelectedGroup(route.params.selectedGroupId);
-//     }
-//     // MainFeedScreen에서 전달된 그룹 정보 받기
-//     else if (route.params?.currentGroupId) {
-//       setSelectedGroup(route.params.currentGroupId);
-//     }
-//   }, [route.params?.selectedGroupId, route.params?.currentGroupId]);
-
-//   useEffect(() => {
-//     (async () => {
-//       if (Platform.OS !== "web") {
-//         const { status } =
-//           await ImagePicker.requestMediaLibraryPermissionsAsync();
-//         if (status !== "granted") {
-//           Alert.alert("권한 필요", "갤러리 접근 권한이 필요합니다.");
-//         }
-//       }
-//     })();
-//   }, []);
-
-//   const handleGroupSelect = () => {
-//     navigation.navigate("WritingGroupSelect", {
-//       fromScreen: "WritingScreen",
-//       currentSelected: selectedGroup,
-//     });
-//   };
-
-//   // AI 이미지 생성 (더미 데이터)
-//   const handleAIImageGenerate = async () => {
-//     try {
-//       setIsLoading(true);
-//       setTimeout(() => {
-//         setSelectedImage(require("../../assets/images/AIdummy.png"));
-//         setIsLoading(false);
-//       }, 1500);
-//     } catch (error) {
-//       Alert.alert("오류", "AI 이미지 생성에 실패했습니다.");
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const handleGallerySelect = async () => {
-//     try {
-//       const result = await ImagePicker.launchImageLibraryAsync({
-//         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//         allowsEditing: true,
-//         aspect: [1, 1], // 정사각형으로 크롭
-//         quality: 1,
-//       });
-
-//       if (!result.canceled) {
-//         setSelectedImage(result.assets[0].uri);
-//       }
-//     } catch (error) {
-//       Alert.alert("오류", "이미지를 선택하는 중 오류가 발생했습니다.");
-//     }
-//   };
-
-//   const handleSendPost = () => {
-//     if (!textInputValue.trim() && !selectedImage) {
-//       Alert.alert("알림", "텍스트나 이미지를 입력해주세요.");
-//       return;
-//     }
-
-//     try {
-//       const newFeed = {
-//         id: Date.now().toString(),
-//         userId: "user1", //추후 수정
-//         nickname: "다연이", //추후 수정
-//         profileImage: require("../../assets/images/Smile.png"),
-//         content: textInputValue,
-//         image: selectedImage,
-//         group: selectedGroup, // 선택된 그룹 ID 사용
-//         createdAt: new Date(),
-//         reactions: [
-//           { type: "grinning", count: 0, users: [] },
-//           { type: "heart-eyes", count: 0, users: [] },
-//           { type: "crying", count: 0, users: [] },
-//           { type: "scream", count: 0, users: [] },
-//           { type: "party", count: 0, users: [] },
-//           { type: "angry", count: 0, users: [] },
-//         ],
-//         isMyPost: true,
-//       };
-
-//       console.log("Sending post with group:", selectedGroup); // 디버깅용
-//       addFeed(newFeed);
-
-//       navigation.navigate("MainTab", {
-//         screen: "피드",
-//         params: { selectedGroupId: selectedGroup },
-//       });
-//     } catch (error) {
-//       console.error("Error sending post:", error); // 디버깅용
-//       Alert.alert("오류", "게시글 업로드에 실패했습니다.");
-//     }
-//   };
-
-//   const handleTextChange = (text) => {
-//     if (text.length <= 500) {
-//       setTextInputValue(text);
-//     }
-//   };
-
-//   const getGroupName = () => {
-//     const group = GROUPS.find((g) => g.id === selectedGroup);
-//     console.log("Current selected group:", selectedGroup); // 디버깅용
-//     console.log("Found group:", group); // 디버깅용
-//     return group ? group.name : "전체";
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <View style={styles.header}>
-//         <TouchableOpacity
-//           style={styles.backButton}
-//           onPress={() => navigation.goBack()}
-//         >
-//           <Icon name="chevron-back" size={24} color={Colors.darkRed20} />
-//         </TouchableOpacity>
-//         <TopFilterButton
-//           getGroupName={getGroupName}
-//           onPress={handleGroupSelect}
-//         />
-//         <TouchableOpacity onPress={handleSendPost} style={styles.sendButton}>
-//           <Icon name="send" size={24} color={Colors.red20} />
-//         </TouchableOpacity>
-//       </View>
-
-//       <ScrollView style={styles.scrollView}>
-//         <View style={styles.textInputContainer}>
-//           <TextInput
-//             style={styles.textInput}
-//             placeholder="글을 작성해주세요 :)"
-//             placeholderTextColor={Colors.gray45}
-//             multiline
-//             value={textInputValue}
-//             onChangeText={handleTextChange}
-//             maxLength={500}
-//           />
-//         </View>
-
-//         {selectedImage && (
-//           <View
-//             style={[styles.imagePreviewContainer, styles.textInputContainer]}
-//           >
-//             <View style={styles.imageWrapper}>
-//               <Image
-//                 source={
-//                   typeof selectedImage === "string"
-//                     ? { uri: selectedImage }
-//                     : selectedImage
-//                 }
-//                 style={styles.imagePreview}
-//               />
-//             </View>
-//             <TouchableOpacity
-//               style={styles.removeImageButton}
-//               onPress={() => setSelectedImage(null)}
-//             >
-//               <Icon name="close-circle" size={24} color={Colors.darkRed20} />
-//             </TouchableOpacity>
-//           </View>
-//         )}
-//       </ScrollView>
-
-//       <View style={styles.circleButtonsContainer}>
-//         <TouchableOpacity onPress={handleAIImageGenerate} disabled={isLoading}>
-//           <MiddleCircleBackground>
-//             <AIImageIcon width={60} height={60} />
-//             <Text style={styles.circleButtonText}>
-//               {isLoading ? "생성 중..." : "AI 이미지"}
-//             </Text>
-//           </MiddleCircleBackground>
-//         </TouchableOpacity>
-//         <TouchableOpacity onPress={handleGallerySelect}>
-//           <MiddleCircleBackground>
-//             <CameraIcon width={60} height={60} />
-//             <Text style={styles.circleButtonText}>갤러리</Text>
-//           </MiddleCircleBackground>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: Colors.primaryBeige,
-//   },
-//   header: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     paddingHorizontal: 16,
-//     paddingTop: 16,
-//     paddingBottom: 8,
-//   },
-//   backButton: {
-//     padding: 8,
-//   },
-//   sendButton: {
-//     padding: 8,
-//   },
-//   scrollView: {
-//     flex: 1,
-//   },
-//   textInputContainer: {
-//     margin: 16,
-//     padding: 12,
-//     borderRadius: 8,
-//     backgroundColor: Colors.lightBeige,
-//     minHeight: 200,
-//   },
-//   textInput: {
-//     fontSize: 16,
-//     color: Colors.darkRed20,
-//     fontFamily: "Pretendard",
-//     textAlignVertical: "top",
-//   },
-//   imagePreviewContainer: {
-//     margin: 16,
-//     height: imageContainerHeight,
-//     backgroundColor: Colors.lightBeige,
-//     borderRadius: 8,
-//     overflow: "hidden",
-//     position: "relative",
-//   },
-//   imageWrapper: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   imagePreview: {
-//     width: imageContainerHeight, // 정사각형 유지
-//     height: imageContainerHeight,
-//     resizeMode: "cover",
-//   },
-//   removeImageButton: {
-//     position: "absolute",
-//     top: 8,
-//     right: 8,
-//     backgroundColor: Colors.lightBeige,
-//     borderRadius: 12,
-//   },
-//   circleButtonsContainer: {
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     marginVertical: 16,
-//     gap: 40,
-//   },
-//   circleButtonText: {
-//     textAlign: "center",
-//     marginTop: 8,
-//     fontFamily: "Pretendard",
-//     fontSize: 14,
-//     color: Colors.gray45,
-//   },
-// });
-
-// export default WritingScreen;
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -319,17 +11,22 @@ import {
   Platform,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import TopFilterButton from "../components/ui/TopFilterButton";
+
 import AIImageIcon from "../../assets/images/icons/AIImageIcon.svg";
 import CameraIcon from "../../assets/images/icons/CameraIcon.svg";
+import TopFilterButton from "../components/ui/TopFilterButton";
 import MiddleCircleBackground from "../components/ui/MiddleCircleBackground";
 import Colors from "../constants/colors";
+
 import useFeedStore from "../store/feedStore";
-import { GROUPS } from "../constants/dummydata";
+import useGroupStore from "../store/groupStore";
+import useAuthStore from "../store/authStore";
+//import { GROUPS } from "../constants/dummydata";
 
 const screenWidth = Dimensions.get("window").width;
 const imageContainerWidth = screenWidth - 32;
@@ -341,37 +38,49 @@ const WritingScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState("all");
   const [textInputValue, setTextInputValue] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const addFeed = useFeedStore((state) => state.addFeed);
   const updateFeed = useFeedStore((state) => state.updateFeed);
+  const { groups } = useGroupStore();
+  const token = useAuthStore((state) => state.userToken);
 
-  // 수정 모드 확인
-  const isEditMode = route.params?.feedId !== undefined;
-  const feedId = route.params?.feedId;
-  const initialContent = route.params?.initialContent;
-  const initialGroup = route.params?.selectedGroup;
-  const initialImage = route.params?.image; // 이미지가 있는 경우를 위해 추가
+  // 수정 모드 상태
+  const [editMode, setEditMode] = useState({
+    isEdit: false,
+    feedId: null,
+  });
 
-  // 초기값 설정
+  // 초기 마운트 시 수정 모드 체크 및 데이터 설정
   useEffect(() => {
-    if (isEditMode) {
-      if (initialContent) setTextInputValue(initialContent);
-      if (initialGroup) setSelectedGroup(initialGroup);
-      if (initialImage) setSelectedImage(initialImage);
-    }
-    // MainFeedScreen에서 전달된 그룹 정보 받기
-    else if (route.params?.currentGroupId) {
-      setSelectedGroup(route.params.currentGroupId);
-    }
-  }, [
-    isEditMode,
-    initialContent,
-    initialGroup,
-    initialImage,
-    route.params?.currentGroupId,
-  ]);
+    if (route.params?.feedId) {
+      setEditMode({
+        isEdit: true,
+        feedId: route.params.feedId,
+      });
 
+      if (route.params.initialContent)
+        setTextInputValue(route.params.initialContent);
+      if (route.params.selectedGroup)
+        setSelectedGroup(route.params.selectedGroup);
+      if (route.params.image) setSelectedImage(route.params.image);
+    } else {
+      if (route.params?.selectedGroupId)
+        setSelectedGroup(route.params.selectedGroupId);
+      else if (route.params?.currentGroupId)
+        setSelectedGroup(route.params.currentGroupId);
+    }
+  }, []);
+
+  // 그룹 선택 후 업데이트
+  useEffect(() => {
+    if (route.params?.selectedGroupId) {
+      setSelectedGroup(route.params.selectedGroupId);
+    }
+  }, [route.params?.selectedGroupId]);
+
+  // 갤러리 권한 요청
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -384,13 +93,20 @@ const WritingScreen = () => {
     })();
   }, []);
 
+  // 그룹 선택 화면으로 이동
   const handleGroupSelect = () => {
     navigation.navigate("WritingGroupSelect", {
       fromScreen: "WritingScreen",
       currentSelected: selectedGroup,
+      feedId: editMode.feedId,
+      isEditMode: editMode.isEdit,
+      initialContent: textInputValue,
+      image: selectedImage,
+      ...route.params,
     });
   };
 
+  // AI 이미지 생성 처리
   const handleAIImageGenerate = async () => {
     try {
       setIsLoading(true);
@@ -404,6 +120,7 @@ const WritingScreen = () => {
     }
   };
 
+  // 갤러리에서 이미지 선택
   const handleGallerySelect = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -421,71 +138,89 @@ const WritingScreen = () => {
     }
   };
 
-  const handleSendPost = () => {
+  // 게시글 작성/수정 처리
+  const handleSendPost = async () => {
+    setIsSubmitting(true);
     if (!textInputValue.trim() && !selectedImage) {
       Alert.alert("알림", "텍스트나 이미지를 입력해주세요.");
+      setIsSubmitting(false);
       return;
     }
-
+  
+    if (!token) {
+      Alert.alert("알림", "로그인이 필요합니다.");
+      setIsSubmitting(false);
+      return;
+    }
+  
     try {
-      if (isEditMode) {
-        // 수정 모드일 경우
-        updateFeed(feedId, {
+      if (editMode.isEdit) {
+        // 수정 모드일 때
+        const updateData = {
           content: textInputValue,
-          image: selectedImage,
-          group: selectedGroup,
-        });
-        Alert.alert("알림", "게시글이 수정되었습니다.");
-      } else {
-        // 새 게시물 작성
-        const newFeed = {
-          id: Date.now().toString(),
-          userId: "user1",
-          nickname: "다연이",
-          profileImage: require("../../assets/images/Smile.png"),
-          content: textInputValue,
-          image: selectedImage,
-          group: selectedGroup,
-          createdAt: new Date(),
-          reactions: [
-            { type: "grinning", count: 0, users: [] },
-            { type: "heart-eyes", count: 0, users: [] },
-            { type: "crying", count: 0, users: [] },
-            { type: "scream", count: 0, users: [] },
-            { type: "party", count: 0, users: [] },
-            { type: "angry", count: 0, users: [] },
-          ],
-          isMyPost: true,
+          emotion: "happy", // 기존 감정 유지 또는 변경
         };
-        addFeed(newFeed);
+  
+        const result = await updateFeed(editMode.feedId, updateData);
+        
+        if (result.success) {
+          Alert.alert("성공", "게시글이 수정되었습니다.");
+          navigation.navigate("MainTab", {
+            screen: "피드",
+            params: {
+              selectedGroupId: selectedGroup,
+              selectedFeedId: editMode.feedId,
+            },
+          });
+        } else {
+          throw new Error(result.error || "게시글 수정에 실패했습니다.");
+        }
+      } else {
+        // 새 게시글 작성
+        const feedData = {
+          content: textInputValue,
+          image: selectedImage,
+          groupId: selectedGroup === "all" ? null : selectedGroup,
+          emotion: "happy",
+        };
+        await addFeed(feedData);
+        Alert.alert("성공", "게시글이 작성되었습니다.");
+        navigation.navigate("MainTab", {
+          screen: "피드",
+          params: {
+            selectedGroupId: selectedGroup,
+          },
+        });
       }
-
-      navigation.navigate("MainTab", {
-        screen: "피드",
-        params: {
-          selectedGroupId: selectedGroup,
-          selectedFeedId: isEditMode ? feedId : undefined,
-        },
-      });
     } catch (error) {
-      console.error("Error sending post:", error);
-      Alert.alert("오류", "게시글 업로드에 실패했습니다.");
+      console.error("Upload/Update error:", error);
+      Alert.alert("오류", error.message || "게시글 처리 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // 텍스트 입력 처리
   const handleTextChange = (text) => {
     if (text.length <= 500) {
       setTextInputValue(text);
     }
   };
 
+  // 선택된 그룹 이름 가져오기
   const getGroupName = () => {
-    const group = GROUPS.find((g) => g.id === selectedGroup);
+    const group = groups.find((g) => g.id === selectedGroup);
     return group ? group.name : "전체";
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {isSubmitting && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={Colors.red20} />
+          <Text style={styles.loadingText}>게시글 업로드 중...</Text>
+        </View>
+      )}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -496,9 +231,14 @@ const WritingScreen = () => {
         <TopFilterButton
           getGroupName={getGroupName}
           onPress={handleGroupSelect}
+          selectedGroup={selectedGroup}
         />
         <TouchableOpacity onPress={handleSendPost} style={styles.sendButton}>
-          <Icon name="send" size={24} color={Colors.red20} />
+          {editMode.isEdit ? (
+            <Text style={styles.completeButtonText}>완료</Text>
+          ) : (
+            <Icon name="send" size={24} color={Colors.red20} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -577,6 +317,12 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     padding: 8,
+  },
+  completeButtonText: {
+    color: Colors.red20,
+    fontSize: 16,
+    fontFamily: "Pretendard",
+    fontWeight: "600",
   },
   scrollView: {
     flex: 1,

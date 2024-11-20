@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { notificationApi } from "../api/notidicationApi";
+import { notificationApi } from "../api/notificationApi";
 import useAuthStore from "./authStore";
 
 const useNotificationStore = create((set, get) => ({
@@ -12,10 +12,16 @@ const useNotificationStore = create((set, get) => ({
   fetchNotifications: async () => {
     set({ loading: true, error: null });
     try {
-      const { user } = useAuthStore.getState();
-      if (!user?._id) throw new Error("User not found");
+      const userId = useAuthStore.getState().getUserId();
+      console.log("Fetching notifications for userId:", userId);
 
-      const response = await notificationApi.getNotifications(user._id);
+      if (!userId) {
+        throw new Error("User not found");
+      }
+
+      const response = await notificationApi.getNotifications(userId);
+      console.log("Notifications response:", response);
+
       if (response.success) {
         set({
           notifications: response.data,
@@ -25,6 +31,7 @@ const useNotificationStore = create((set, get) => ({
         set({ error: response.error });
       }
     } catch (error) {
+      console.error("Fetch notifications error:", error);
       set({ error: error.message });
     } finally {
       set({ loading: false });

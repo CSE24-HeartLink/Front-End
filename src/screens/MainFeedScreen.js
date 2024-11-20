@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
+  Alert,
 } from "react-native";
 import {
   useNavigation,
@@ -13,6 +14,7 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 
+import useAuthStore from "../store/authStore";
 import useFeedStore from "../store/feedStore";
 import FeedItem from "../components/feed/FeedItem";
 import Colors from "../constants/colors";
@@ -21,123 +23,134 @@ import AddFeedIcon from "../../assets/images/AddFeed.png";
 
 const MainFeedScreen = () => {
   const flatListRef = useRef(null);
-  const feeds = useFeedStore((state) => state.feeds);
-  const filteredFeeds = useFeedStore((state) => state.filteredFeeds);
-  const setSelectedGroup = useFeedStore((state) => state.setSelectedGroup);
-  const loadInitialData = useFeedStore((state) => state.loadInitialData);
+  const { feeds, filteredFeeds, setSelectedGroup, error, isLoading } =
+    useFeedStore();
+  const getAccessToken = useAuthStore((state) => state.getAccessToken);
   const navigation = useNavigation();
   const route = useRoute();
   const [currentGroupId, setCurrentGroupId] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    loadInitialData();
-  }, []);
+  // 피드 로딩 함수
+  const loadFeeds = useCallback(
+    async (groupId = "all") => {
+      try {
+        console.log("[MainFeedScreen] Loading feeds for group:", groupId);
+        const token = getAccessToken();
+        if (!token) {
+          console.log("[MainFeedScreen] No token found, navigating to login");
+          navigation.navigate("Login");
+          return;
+        }
+        await setSelectedGroup(groupId);
+        console.log("[MainFeedScreen] Feeds loaded successfully");
+      } catch (error) {
+        console.error("[MainFeedScreen] Feed loading error:", error);
+        Alert.alert("오류", "피드를 불러오는데 실패했습니다.");
+      }
+    },
+    [getAccessToken, navigation, setSelectedGroup]
+  );
 
-  // 화면 포커스될 때마다 데이터 새로고침
+  // 초기 로딩
+  useEffect(() => {
+    console.log("[MainFeedScreen] Initial feed loading");
+    loadFeeds("all");
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
+
+  // 화면에 포커스될 때마다 실행
   useFocusEffect(
     useCallback(() => {
-      const groupId = route.params?.selectedGroupId || currentGroupId;
-      setSelectedGroup(groupId);
-      setCurrentGroupId(groupId);
+      console.log("[MainFeedScreen] Screen focused");
+      const newGroupId = route.params?.selectedGroupId || currentGroupId;
 
-      // 선택된 피드가 있다면 해당 위치로 스크롤
-      if (
-        route.params?.selectedFeedId &&
-        flatListRef.current &&
-        filteredFeeds.length > 0
-      ) {
+      if (newGroupId !== currentGroupId) {
+        console.log("[MainFeedScreen] Group changed, loading new feeds");
+        setCurrentGroupId(newGroupId);
+        loadFeeds(newGroupId);
+      }
+
+      // 선택된 피드가 있으면 스크롤
+      if (route.params?.selectedFeedId && filteredFeeds.length > 0) {
         const selectedIndex = filteredFeeds.findIndex(
-          (feed) => feed.id === route.params.selectedFeedId
+          (feed) => feed.feedId === route.params.selectedFeedId
         );
 
         if (selectedIndex !== -1) {
-          const timer = setTimeout(() => {
+          setTimeout(() => {
             flatListRef.current?.scrollToIndex({
               index: selectedIndex,
               animated: true,
               viewPosition: 0,
             });
-          }, 1000);
-
-          return () => clearTimeout(timer);
+          }, 500);
         }
       }
-    }, [
-      route.params?.selectedGroupId,
-      route.params?.selectedFeedId,
-      currentGroupId,
-    ])
+    }, [route.params, currentGroupId, loadFeeds])
   );
 
-  // 그룹 변경 시 데이터 업데이트
-  useEffect(() => {
-    if (route.params?.selectedGroupId) {
-      const groupId = route.params.selectedGroupId;
-      setSelectedGroup(groupId);
-      setCurrentGroupId(groupId);
-    }
-  }, [route.params?.selectedGroupId]);
-
-  const handleCategoryPress = () => {
-    navigation.navigate("FeedGroupSelectScreen", {
-      currentGroupId: currentGroupId,
-    });
-  };
-
-  // 추가 버튼 클릭 핸들러 추가
-  const handleAddFeedPress = () => {
-    navigation.navigate("CreatePost", {
-      currentGroupId: currentGroupId,
-    });
-  };
-
-  // 당겨서 새로고침
-  const onRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
+    console.log("[MainFeedScreen] Manual refresh triggered");
     setRefreshing(true);
-    loadInitialData();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
+    await loadFeeds(currentGroupId);
+    setRefreshing(false);
+  }, [currentGroupId, loadFeeds]);
 
-  const renderItem = ({ item }) => <FeedItem feedId={item.id} />;
+  const renderItem = useCallback(
+    ({ item }) => {
+      if (!item?.feedId) {
+        console.log("[MainFeedScreen] Invalid feed item:", item);
+        return null;
+      }
+      return (
+        <FeedItem
+          feed={item}
+          onDeleteSuccess={() => {
+            console.log("[MainFeedScreen] Feed deleted, refreshing list");
+            loadFeeds(currentGroupId);
+          }}
+        />
+      );
+    },
+    [currentGroupId, loadFeeds]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <MainHeader
         selectedGroup={currentGroupId}
-        onPressCategory={handleCategoryPress}
-        onPressNotification={() => console.log("notification")}
-      />
-      <FlatList
-        ref={flatListRef}
-        data={filteredFeeds}
-        renderItem={renderItem}
-        keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.listContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Colors.red20}
-            colors={[Colors.red20]}
-          />
-        }
-        onScrollToIndexFailed={(info) => {
-          const wait = new Promise((resolve) => setTimeout(resolve, 500));
-          wait.then(() => {
-            flatListRef.current?.scrollToIndex({
-              index: info.index,
-              animated: true,
-            });
+        onPressCategory={() => {
+          navigation.navigate("FeedGroupSelectScreen", {
+            currentGroupId: currentGroupId,
           });
         }}
+        onPressNotification={() => console.log("notification")}
       />
+      {filteredFeeds && filteredFeeds.length > 0 ? (
+        <FlatList
+          ref={flatListRef}
+          data={filteredFeeds}
+          keyExtractor={(item) => String(item?.feedId || Math.random())}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={Colors.red20}
+              colors={[Colors.red20]}
+            />
+          }
+        />
+      ) : null}
       <TouchableOpacity
         style={styles.addFeedButton}
-        onPress={handleAddFeedPress}
+        onPress={() => {
+          navigation.navigate("CreatePost", {
+            currentGroupId: currentGroupId,
+            selectedGroupId: currentGroupId,
+          });
+        }}
       >
         <Image source={AddFeedIcon} style={styles.addFeedIcon} />
       </TouchableOpacity>

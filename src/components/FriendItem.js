@@ -10,9 +10,10 @@ import Colors from "../constants/colors";
 const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleGroupChange = (newGroup) => {
-    onMoveGroup(friend.id, newGroup);
+    onMoveGroup(friend._id, newGroup);
     setIsModalVisible(false);
   };
 
@@ -20,9 +21,31 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
     setIsDeleteModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
-    onDelete(friend.id);
-    setIsDeleteModalVisible(false);
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await onDelete(friend._id);
+      if (!result?.success) {
+        Toast.show({
+          type: "error",
+          text1: "친구 삭제 실패",
+          text2: result?.error || "잠시 후 다시 시도해주세요",
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "오류 발생",
+        text2: "잠시 후 다시 시도해주세요",
+        position: "bottom",
+        bottomOffset: 100,
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalVisible(false);
+    }
   };
 
   return (
@@ -30,8 +53,8 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
       <View style={styles.profileContainer}>
         <Image source={friend.profileImage} style={styles.profileImage} />
         <View style={styles.infoContainer}>
-          <Text style={styles.nickname}>{friend.nickname}</Text>
-          <Text style={styles.groupText}>{friend.group}</Text>
+          <Text style={styles.nickname}>{friend.friendId.nickname}</Text>
+          <Text style={styles.groupText}>{friend.group || "전체"}</Text>
         </View>
       </View>
       <View style={styles.buttonContainer}>
@@ -60,7 +83,8 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
           visible={isDeleteModalVisible}
           onClose={() => setIsDeleteModalVisible(false)}
           onConfirm={handleConfirmDelete}
-          friendName={friend.nickname}
+          friendName={friend.friendId.nickname}
+          loading={isDeleting}
         />
       </View>
     </View>
