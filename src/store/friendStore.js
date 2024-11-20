@@ -1,5 +1,4 @@
 import { create } from "zustand";
-
 import { friendApi } from "../api/friendApi";
 import useAuthStore from "./authStore";
 
@@ -41,7 +40,6 @@ const useFriendStore = create((set, get) => ({
       }
 
       const result = await friendApi.getFriends(userId);
-      //친구목록 응답 데이터 구조 확인
       console.log("Friends API response:", result);
       if (result.success) {
         set({ friends: result.data?.friends || [] });
@@ -66,27 +64,47 @@ const useFriendStore = create((set, get) => ({
       if (!userId) {
         throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.");
       }
-
+  
+      // 삭제하려는 친구 ID 확인
+      console.log("Attempting to delete friend with data:", {
+        friendToDelete: friendId,
+        currentFriends: get().friends.map(friend => ({
+          id: friend._id,
+          friendId: friend.friendId,
+          status: friend.status
+        }))
+      });
+  
       const result = await friendApi.deleteFriend(userId, friendId);
+      
       if (result.success) {
         set((state) => ({
-          friends: state.friends.filter((friend) => friend._id !== friendId),
+          friends: state.friends.filter(
+            (friend) => friend.friendId._id !== friendId
+          ),
         }));
+        return { success: true };
       }
-      return result;
+      
+      throw new Error(result.error);
     } catch (error) {
-      console.error("[Debug] Delete friend error:", error);
-      return { success: false, error: error.message };
+      console.error("[FriendStore] Delete friend error:", error);
+      return {
+        success: false,
+        error: error.message || "친구 삭제에 실패했습니다.",
+      };
     } finally {
       set({ loading: false });
     }
   },
 
-  // 기존 로컬 기능들은 그대로 유지
+  // 중복된 updateFriendGroup 하나로 통합
   updateFriendGroup: (friendId, newGroup) =>
     set((state) => ({
       friends: state.friends.map((friend) =>
-        friend.id === friendId ? { ...friend, group: newGroup } : friend
+        friend.friendId._id === friendId
+          ? { ...friend, group: newGroup }
+          : friend
       ),
     })),
 

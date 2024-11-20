@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import Colors from "../../constants/colors";
-import useMyPageStore from "../../store/MypageStore";
+import useMyPageStore from "../../store/profileStore";
 
 const RenameModal = ({ visible, onClose, onConfirm }) => {
   const [newName, setNewName] = useState("");
