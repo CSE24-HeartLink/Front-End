@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { notificationApi } from "../api/notidicationApi";
+import { notificationApi } from "../api/notificationApi";
 import useAuthStore from "./authStore";
 
 const useNotificationStore = create((set, get) => ({

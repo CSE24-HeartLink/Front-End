@@ -6,14 +6,18 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
+import useAuthStore from "../store/authStore";
+import useGroupStore from "../store/groupStore";
+
 import AddGroupModal from "../components/modals/AddGroupModal";
 import EditGroupNameModal from "../components/modals/EditGroupNameModal";
 import Colors from "../constants/colors";
-import { GROUPS } from "../constants/dummydata";
 
 const WritingGroupSelectScreen = () => {
   const navigation = useNavigation();
@@ -23,9 +27,19 @@ const WritingGroupSelectScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentSelected, setCurrentSelected] = useState("all");
 
-  // 현재 선택된 그룹 정보 받아오기
+  const { groups, fetchGroups, addGroup, editGroupName, isLoading } = useGroupStore();
+  const token = useAuthStore((state) => state.userToken);
+
+  // 전체 옵션을 포함한 그룹 리스트
+  const allGroups = [{ id: "all", name: "전체" }, ...groups];
+
   useEffect(() => {
-    console.log("Current selected from route:", route.params?.currentSelected);
+    if (token) {
+      fetchGroups();
+    }
+  }, [token]);
+
+  useEffect(() => {
     if (route.params?.currentSelected) {
       setCurrentSelected(route.params.currentSelected);
     }
@@ -33,10 +47,9 @@ const WritingGroupSelectScreen = () => {
 
   const handleSelectGroup = (groupId, groupName) => {
     if (route.params?.fromScreen === "WritingScreen") {
-      // WritingScreen으로 돌아가기 전에 새로운 그룹 ID를 파라미터로 전달
       navigation.navigate("WritingScreen", {
         selectedGroupId: groupId,
-        selectedGroupName: groupName,
+        selectedGroupName: groupId === "all" ? "전체" : groupName,
       });
     } else {
       navigation.navigate("MainTab", {
@@ -46,25 +59,35 @@ const WritingGroupSelectScreen = () => {
     }
   };
 
-  const handleAddGroup = (groupName) => {
-    console.log("Add group:", groupName);
-    setIsAddGroupModalVisible(false);
-  };
-
   const handleGroupLongPress = (group) => {
+    if (group.id === "all") return; // 전체는 수정 불가
     setSelectedGroup(group);
     setIsEditGroupModalVisible(true);
   };
 
-  const handleEditGroupName = (newName) => {
-    console.log("Edit group name:", selectedGroup.id, newName);
-    setIsEditGroupModalVisible(false);
+  const handleAddGroup = async (groupName) => {
+    try {
+      await addGroup(groupName);
+      setIsAddGroupModalVisible(false);
+    } catch (error) {
+      console.error("Add group error:", error);
+      Alert.alert("오류", "그룹 추가에 실패했습니다.");
+    }
+  };
+
+  const handleEditGroupName = async (newName) => {
+    try {
+      await editGroupName(selectedGroup.id, newName);
+      setIsEditGroupModalVisible(false);
+    } catch (error) {
+      console.error("Edit group error:", error);
+      Alert.alert("오류", "그룹명 수정에 실패했습니다.");
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* 헤더 */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -77,38 +100,40 @@ const WritingGroupSelectScreen = () => {
           </View>
         </View>
 
-        {/* 그룹 목록 */}
-        <View style={styles.groupsContainer}>
-          {GROUPS.map((group) => (
-            <TouchableOpacity
-              key={group.id}
-              style={[
-                styles.groupItem,
-                currentSelected === group.id && styles.selectedGroupItem,
-              ]}
-              onPress={() => handleSelectGroup(group.id, group.name)}
-              onLongPress={() => handleGroupLongPress(group)}
-            >
-              <Image
-                source={require("../../assets/images/Heart.png")}
+        {isLoading ? (
+          <ActivityIndicator color={Colors.red20} style={styles.loader} />
+        ) : (
+          <View style={styles.groupsContainer}>
+            {allGroups.map((group) => (
+              <TouchableOpacity
+                key={group.id}
                 style={[
-                  styles.heartIcon,
-                  currentSelected === group.id && styles.selectedHeartIcon,
+                  styles.groupItem,
+                  currentSelected === group.id && styles.selectedGroupItem,
                 ]}
-              />
-              <Text
-                style={[
-                  styles.groupName,
-                  currentSelected === group.id && styles.selectedGroupName,
-                ]}
+                onPress={() => handleSelectGroup(group.id, group.name)}
+                onLongPress={() => handleGroupLongPress(group)}
               >
-                {group.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                <Image
+                  source={require("../../assets/images/Heart.png")}
+                  style={[
+                    styles.heartIcon,
+                    currentSelected === group.id && styles.selectedHeartIcon,
+                  ]}
+                />
+                <Text
+                  style={[
+                    styles.groupName,
+                    currentSelected === group.id && styles.selectedGroupName,
+                  ]}
+                >
+                  {group.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-        {/* 그룹 추가 버튼 */}
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setIsAddGroupModalVisible(true)}
@@ -119,7 +144,6 @@ const WritingGroupSelectScreen = () => {
           />
         </TouchableOpacity>
 
-        {/* 모달들 */}
         <AddGroupModal
           visible={isAddGroupModalVisible}
           onClose={() => setIsAddGroupModalVisible(false)}

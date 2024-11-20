@@ -11,17 +11,22 @@ import {
   Platform,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import TopFilterButton from "../components/ui/TopFilterButton";
+
 import AIImageIcon from "../../assets/images/icons/AIImageIcon.svg";
 import CameraIcon from "../../assets/images/icons/CameraIcon.svg";
+import TopFilterButton from "../components/ui/TopFilterButton";
 import MiddleCircleBackground from "../components/ui/MiddleCircleBackground";
 import Colors from "../constants/colors";
+
 import useFeedStore from "../store/feedStore";
-import { GROUPS } from "../constants/dummydata";
+import useGroupStore from "../store/groupStore";
+import useAuthStore from "../store/authStore";
+//import { GROUPS } from "../constants/dummydata";
 
 const screenWidth = Dimensions.get("window").width;
 const imageContainerWidth = screenWidth - 32;
@@ -33,54 +38,43 @@ const WritingScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState("all");
   const [textInputValue, setTextInputValue] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const addFeed = useFeedStore((state) => state.addFeed);
   const updateFeed = useFeedStore((state) => state.updateFeed);
+  const { groups } = useGroupStore();
+  const token = useAuthStore((state) => state.userToken);
 
-  // 수정 모드 정보를 상태로 관리
+  // 수정 모드 상태
   const [editMode, setEditMode] = useState({
     isEdit: false,
     feedId: null,
   });
 
-  // 초기 마운트 시 수정 모드 체크
+  // 초기 마운트 시 수정 모드 체크 및 데이터 설정
   useEffect(() => {
-    console.log("WritingScreen initial mount:", route.params);
-
     if (route.params?.feedId) {
       setEditMode({
         isEdit: true,
         feedId: route.params.feedId,
       });
 
-      if (route.params.initialContent) {
+      if (route.params.initialContent)
         setTextInputValue(route.params.initialContent);
-      }
-      if (route.params.selectedGroup) {
+      if (route.params.selectedGroup)
         setSelectedGroup(route.params.selectedGroup);
-      }
-      if (route.params.image) {
-        setSelectedImage(route.params.image);
-      }
+      if (route.params.image) setSelectedImage(route.params.image);
     } else {
-      // 새 글 작성 모드
-      if (route.params?.selectedGroupId) {
+      if (route.params?.selectedGroupId)
         setSelectedGroup(route.params.selectedGroupId);
-      } else if (route.params?.currentGroupId) {
+      else if (route.params?.currentGroupId)
         setSelectedGroup(route.params.currentGroupId);
-      }
     }
-  }, []); // 마운트 시에만 실행
+  }, []);
 
-  // 그룹 선택 후 돌아올 때 업데이트
+  // 그룹 선택 후 업데이트
   useEffect(() => {
-    console.log("Group selection update:", {
-      selectedGroupId: route.params?.selectedGroupId,
-      currentParams: route.params,
-      editMode,
-    });
-
     if (route.params?.selectedGroupId) {
       setSelectedGroup(route.params.selectedGroupId);
     }
@@ -99,26 +93,20 @@ const WritingScreen = () => {
     })();
   }, []);
 
+  // 그룹 선택 화면으로 이동
   const handleGroupSelect = () => {
-    console.log("Navigating to group select:", {
-      currentSelected: selectedGroup,
-      editMode,
-      routeParams: route.params,
-    });
-
     navigation.navigate("WritingGroupSelect", {
       fromScreen: "WritingScreen",
       currentSelected: selectedGroup,
-      // 수정 모드일 때의 정보 유지
       feedId: editMode.feedId,
       isEditMode: editMode.isEdit,
       initialContent: textInputValue,
       image: selectedImage,
-      // 원래의 route.params도 전달
       ...route.params,
     });
   };
 
+  // AI 이미지 생성 처리
   const handleAIImageGenerate = async () => {
     try {
       setIsLoading(true);
@@ -132,6 +120,7 @@ const WritingScreen = () => {
     }
   };
 
+  // 갤러리에서 이미지 선택
   const handleGallerySelect = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -149,77 +138,89 @@ const WritingScreen = () => {
     }
   };
 
-  const handleSendPost = () => {
-    console.log("WritingScreen - handleSendPost:", {
-      editMode,
-      selectedGroup,
-      textInputValue,
-    });
-
+  // 게시글 작성/수정 처리
+  const handleSendPost = async () => {
+    setIsSubmitting(true);
     if (!textInputValue.trim() && !selectedImage) {
       Alert.alert("알림", "텍스트나 이미지를 입력해주세요.");
+      setIsSubmitting(false);
       return;
     }
-
+  
+    if (!token) {
+      Alert.alert("알림", "로그인이 필요합니다.");
+      setIsSubmitting(false);
+      return;
+    }
+  
     try {
       if (editMode.isEdit) {
-        // 수정 모드
-        updateFeed(editMode.feedId, {
+        // 수정 모드일 때
+        const updateData = {
           content: textInputValue,
-          image: selectedImage,
-          group: selectedGroup,
-        });
-        Alert.alert("알림", "게시글이 수정되었습니다.");
-      } else {
-        // 새 글 작성
-        const newFeed = {
-          id: Date.now().toString(),
-          userId: "user1",
-          nickname: "다연이",
-          profileImage: require("../../assets/images/Smile.png"),
-          content: textInputValue,
-          image: selectedImage,
-          group: selectedGroup,
-          createdAt: new Date(),
-          reactions: [
-            { type: "grinning", count: 0, users: [] },
-            { type: "heart-eyes", count: 0, users: [] },
-            { type: "crying", count: 0, users: [] },
-            { type: "scream", count: 0, users: [] },
-            { type: "party", count: 0, users: [] },
-            { type: "angry", count: 0, users: [] },
-          ],
-          isMyPost: true,
+          emotion: "happy", // 기존 감정 유지 또는 변경
         };
-        addFeed(newFeed);
+  
+        const result = await updateFeed(editMode.feedId, updateData);
+        
+        if (result.success) {
+          Alert.alert("성공", "게시글이 수정되었습니다.");
+          navigation.navigate("MainTab", {
+            screen: "피드",
+            params: {
+              selectedGroupId: selectedGroup,
+              selectedFeedId: editMode.feedId,
+            },
+          });
+        } else {
+          throw new Error(result.error || "게시글 수정에 실패했습니다.");
+        }
+      } else {
+        // 새 게시글 작성
+        const feedData = {
+          content: textInputValue,
+          image: selectedImage,
+          groupId: selectedGroup === "all" ? null : selectedGroup,
+          emotion: "happy",
+        };
+        await addFeed(feedData);
+        Alert.alert("성공", "게시글이 작성되었습니다.");
+        navigation.navigate("MainTab", {
+          screen: "피드",
+          params: {
+            selectedGroupId: selectedGroup,
+          },
+        });
       }
-
-      navigation.navigate("MainTab", {
-        screen: "피드",
-        params: {
-          selectedGroupId: selectedGroup,
-          selectedFeedId: editMode.isEdit ? editMode.feedId : undefined,
-        },
-      });
     } catch (error) {
-      console.error("Error sending post:", error);
-      Alert.alert("오류", "게시글 업로드에 실패했습니다.");
+      console.error("Upload/Update error:", error);
+      Alert.alert("오류", error.message || "게시글 처리 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // 텍스트 입력 처리
   const handleTextChange = (text) => {
     if (text.length <= 500) {
       setTextInputValue(text);
     }
   };
 
+  // 선택된 그룹 이름 가져오기
   const getGroupName = () => {
-    const group = GROUPS.find((g) => g.id === selectedGroup);
+    const group = groups.find((g) => g.id === selectedGroup);
     return group ? group.name : "전체";
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {isSubmitting && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={Colors.red20} />
+          <Text style={styles.loadingText}>게시글 업로드 중...</Text>
+        </View>
+      )}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}

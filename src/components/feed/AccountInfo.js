@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import FeedDeleteModal from "../modals/FeedDeleteModal";
 import Colors from "../../constants/colors";
-import useFeedStore from "../../store/feedStore";
+import useAuthStore from "../../store/authStore";
 
 const AccountInfo = ({
   feedId,
@@ -11,50 +10,67 @@ const AccountInfo = ({
   nickname,
   createdAt,
   userId,
-  onEdit, // onEdit prop으로 받기
-  onDelete, // onDelete prop으로 받기
+  onEdit,
+  onDelete,
 }) => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const currentUserId = useAuthStore((state) => state.getUserId());
+  // 현재 로그인한 사용자와 게시글 작성자 ID 비교
+  const isOwner = currentUserId === userId;
 
-  // 현재 사용자가 게시글 작성자인지 확인 (다연이의 ID가 user1)
-  const isOwner = userId === "user1" || nickname === "다연이";
+  // 삭제 버튼 클릭 핸들러
+  const handleDelete = () => {
+    console.log("[AccountInfo] Delete button pressed for feedId:", feedId);
+    onDelete?.();
+  };
 
   const formatDate = (date) => {
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    if (!date) return "날짜 없음";
 
-    if (diffDays === 0) return "오늘";
-    if (diffDays === 1) return "어제";
-    if (diffDays === 2) return "그저께";
+    try {
+      const parsedDate = new Date(date);
+      const now = new Date();
+      const diffTime = Math.abs(now - parsedDate);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}.${month}.${day}`;
+      if (diffDays === 0) return "오늘";
+      if (diffDays === 1) return "어제";
+      if (diffDays === 2) return "그저께";
+
+      const year = parsedDate.getFullYear();
+      const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+      const day = String(parsedDate.getDate()).padStart(2, "0");
+      return `${year}.${month}.${day}`;
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "날짜 없음";
+    }
   };
 
   const formatTime = (date) => {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${hours}:${minutes}`;
-  };
+    if (!date) return "";
 
-  const handleDeleteClick = () => {
-    setIsDeleteModalVisible(true);
-  };
-
-  const handleConfirmDelete = () => {
-    onDelete();
-    setIsDeleteModalVisible(false);
+    try {
+      const parsedDate = new Date(date);
+      const hours = String(parsedDate.getHours()).padStart(2, "0");
+      const minutes = String(parsedDate.getMinutes()).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    } catch (error) {
+      console.error("Time formatting error:", error);
+      return "";
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image source={profileImage} style={styles.profileImage} />
+        {profileImage ? (
+          <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        ) : (
+          <View style={[styles.profileImage, styles.profileImagePlaceholder]} />
+        )}
         <View style={styles.userInfo}>
-          <Text style={styles.nickname}>{nickname}</Text>
+          <Text style={styles.nickname}>{nickname || "Unknown User"}</Text>
           <Text style={styles.time}>
             {formatDate(createdAt)} {formatTime(createdAt)}
           </Text>
@@ -65,20 +81,11 @@ const AccountInfo = ({
           <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
             <Feather name="edit-2" size={20} color={Colors.gray30} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleDeleteClick}
-            style={styles.actionButton}
-          >
+          <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
             <Feather name="trash-2" size={20} color={Colors.gray30} />
           </TouchableOpacity>
         </View>
       )}
-
-      <FeedDeleteModal
-        visible={isDeleteModalVisible}
-        onClose={() => setIsDeleteModalVisible(false)}
-        onConfirm={handleConfirmDelete}
-      />
     </View>
   );
 };
@@ -98,6 +105,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
+  },
+  profileImagePlaceholder: {
+    backgroundColor: Colors.gray20,
   },
   userInfo: {
     marginLeft: 12,
