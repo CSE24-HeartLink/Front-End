@@ -9,6 +9,7 @@ const useFeedStore = create((set, get) => ({
   isLoading: false,
   error: null,
   selectedReactions: {}, // 초기화 추가
+  comments: {}, // Organized by feedId
 
   addFeed: async (feedData) => {
     const userId = useAuthStore.getState().getUserId();
@@ -153,6 +154,77 @@ const useFeedStore = create((set, get) => ({
         feeds: [],
         filteredFeeds: [],
       });
+    }
+  },
+
+  // Load comments for a feed
+  loadComments: async (feedId) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await feedApi.getComments(feedId);
+
+      set((state) => ({
+        comments: {
+          ...state.comments,
+          [feedId]: response.comments,
+        },
+        isLoading: false,
+      }));
+
+      return response.comments;
+    } catch (error) {
+      set({ error: "댓글을 불러오는데 실패했습니다.", isLoading: false });
+      throw error;
+    }
+  },
+  // Add a new comment
+  addComment: async (feedId, content) => {
+    const userId = useAuthStore.getState().getUserId();
+    if (!userId) throw new Error("인증 정보가 없습니다.");
+
+    try {
+      const response = await feedApi.addComment(feedId, {
+        userId,
+        content, // 단순 text만 전달
+      });
+
+      set((state) => ({
+        comments: {
+          ...state.comments,
+          [feedId]: [...(state.comments[feedId] || []), response.comment],
+        },
+      }));
+
+      return response.comment;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Delete a comment
+  deleteComment: async (feedId, commentId) => {
+    try {
+      set({ isLoading: true, error: null });
+
+      console.log("Delete comment 시도:", { feedId, commentId });
+      await feedApi.deleteComment(feedId, commentId);
+
+      set((state) => ({
+        comments: {
+          ...state.comments,
+          [feedId]:
+            state.comments[feedId]?.filter(
+              (comment) => comment.commentId !== commentId // _id 대신 commentId 사용
+            ) || [],
+        },
+        isLoading: false,
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Delete comment 실패:", error);
+      set({ error: "댓글 삭제에 실패했습니다.", isLoading: false });
+      throw error;
     }
   },
 

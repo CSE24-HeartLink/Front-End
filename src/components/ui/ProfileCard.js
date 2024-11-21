@@ -2,11 +2,12 @@ import React from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
-import useMyPageStore from "../../store/MypageStore";
+
+import useProfileStore from "../../store/profileStore";
 import useAuthStore from "../../store/authStore";
 
 const ProfileCard = ({ onPress }) => {
-  const { userProfile } = useMyPageStore();
+  const { userProfile } = useProfileStore();
   const { user } = useAuthStore(); // AuthStore에서 사용자 정보 가져오기
 
   return (

@@ -7,8 +7,8 @@ import AlbumScreen from "../../screens/album/AlbumScreen";
 import MainFeedScreen from "../../screens/MainFeedScreen";
 import MyPageScreen from "../../screens/MyPageScreen";
 
-import FriendsStackNavigator from "./FriendsStackNavigator";
 import CustomBottomTabBar from "./CustomBottomTabBar";
+import FriendsScreen from "../../screens/FriendsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -24,7 +24,7 @@ export default function BottomTabNavigator() {
       <Tab.Screen name="피드" component={MainFeedScreen} />
       <Tab.Screen
         name="친구"
-        component={FriendsStackNavigator}
+        component={FriendsScreen}
         options={{
           headerShown: false,
         }}

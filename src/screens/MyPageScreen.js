@@ -9,7 +9,7 @@ import LogoutModal from "../components/modals/LogoutModal";
 import RenameModal from "../components/modals/RenameModal";
 
 import Colors from "../constants/colors";
-import useMyPageStore from "../store/MypageStore";
+import useMyPageStore from "../store/profileStore";
 import useAuthStore from "../store/authStore";
 import authApi from "../api/authApi";
 

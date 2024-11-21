@@ -1,21 +1,16 @@
 // screens/notification/NotificationItem.js
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+
+import { formatDateTime } from "../../../utils/dateUtils";
 import Colors from "../../../constants/colors";
 
 const NotificationItem = ({ item, onAccept, onReject }) => {
-  const formattedTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `오늘 ${hours}:${minutes}`;
-  };
-
   return (
     <View style={styles.notificationItem}>
       <View style={styles.textContainer}>
         <Text style={styles.content}>{item.message}</Text>
-        <Text style={styles.timestamp}>{formattedTime(item.createdAt)}</Text>
+        <Text style={styles.timestamp}>{formatDateTime(item.createdAt)}</Text>
       </View>
       {item.type === "friend_request" && (
         <View style={styles.actionButtons}>

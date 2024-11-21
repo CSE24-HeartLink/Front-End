@@ -9,17 +9,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  Alert,
 } from "react-native";
 import Colors from "../../constants/colors";
 
-const CommentModal = ({ visible, onClose, onSubmit }) => {
+const CommentModal = ({ visible, onClose, onSubmit, feedId, userId }) => {
   const [comment, setComment] = useState("");
 
   const handleSubmit = () => {
     if (comment.trim()) {
-      onSubmit(comment);
-      setComment("");
-      onClose();
+      onSubmit(comment.trim()); // content만 전달
     }
   };
 
@@ -33,16 +32,12 @@ const CommentModal = ({ visible, onClose, onSubmit }) => {
       <Pressable
         style={styles.overlay}
         onPress={(e) => {
-          // 모달의 배경을 눌렀을 때만 닫히도록
-          if (e.target === e.currentTarget) {
-            onClose();
-          }
+          if (e.target === e.currentTarget) onClose();
         }}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardView}
-          keyboardShouldPersistTaps="handled"
         >
           <Pressable style={styles.container}>
             <View style={styles.inputContainer}>

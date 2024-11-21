@@ -21,6 +21,7 @@ import RenameModal from "../modals/RenameModal.js";
 
 import BottomTabNavigator from "./BottomTabNavigator";
 import CreatePost from "../../screens/CreatePost";
+import GroupSelectScreen from "../../screens/GroupSelectScreen.js";
 
 const Stack = createStackNavigator();
 
@@ -40,6 +41,7 @@ const AppNavigator = () => {
       <Stack.Screen name="MainTab" component={BottomTabNavigator} />
       <Stack.Screen name="MainFeedScreen" component={MainFeedScreen} />
       <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
+      <Stack.Screen name="GroupSelectScreen" component={GroupSelectScreen} />
       <Stack.Screen
         name="FeedGroupSelectScreen"
         component={FeedGroupSelectScreen}

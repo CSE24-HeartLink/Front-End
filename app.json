@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -35,7 +35,7 @@
     ],
     "extra": {
       "apiUrl": {
-        "development": "http://172.16.70.72:3000",
+        "development": "http://192.168.0.8:3000",
         "production": "https://your-production-api.com"
       }
     }

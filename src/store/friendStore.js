@@ -1,5 +1,4 @@
 import { create } from "zustand";
-
 import { friendApi } from "../api/friendApi";
 import useAuthStore from "./authStore";
 
@@ -41,7 +40,6 @@ const useFriendStore = create((set, get) => ({
       }
 
       const result = await friendApi.getFriends(userId);
-      //친구목록 응답 데이터 구조 확인
       console.log("Friends API response:", result);
       if (result.success) {
         set({ friends: result.data?.friends || [] });
@@ -63,30 +61,46 @@ const useFriendStore = create((set, get) => ({
     set({ loading: true });
     try {
       const userId = useAuthStore.getState().getUserId();
-      if (!userId) {
-        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.");
+      
+      // 삭제할 친구 찾기
+      const friendToDelete = get().friends.find(f => f._id === friendId);
+      if (!friendToDelete) {
+        throw new Error('친구를 찾을 수 없습니다');
       }
-
-      const result = await friendApi.deleteFriend(userId, friendId);
+      
+      // 실제 User ID 추출
+      const targetUserId = friendToDelete.friendId._id;
+      
+      console.log('삭제 시도:', {
+        userId,
+        friendRelationId: friendId,
+        targetUserId
+      });
+      
+      const result = await friendApi.deleteFriend(userId, targetUserId);
+      
       if (result.success) {
-        set((state) => ({
-          friends: state.friends.filter((friend) => friend._id !== friendId),
+        set(state => ({
+          friends: state.friends.filter(f => f._id !== friendId)
         }));
+        return { success: true };
       }
-      return result;
+      
+      throw new Error(result.data?.error || '친구 삭제 실패');
     } catch (error) {
-      console.error("[Debug] Delete friend error:", error);
+      console.error('친구 삭제 실패:', error);
       return { success: false, error: error.message };
     } finally {
       set({ loading: false });
     }
   },
 
-  // 기존 로컬 기능들은 그대로 유지
   updateFriendGroup: (friendId, newGroup) =>
     set((state) => ({
       friends: state.friends.map((friend) =>
-        friend.id === friendId ? { ...friend, group: newGroup } : friend
+        friend.friendId._id === friendId
+          ? { ...friend, group: newGroup }
+          : friend
       ),
     })),
 
