@@ -138,7 +138,7 @@ const FriendsScreen = () => {
       <View style={styles.container}>
         <MainHeader
           selectedGroup={selectedGroup}
-          onPressCategory={() => navigation.navigate("GroupSelect")}
+          onPressCategory={() => navigation.navigate("GroupSelectScreen")}
           onPressNotification={() => console.log("notification")}
         />
 

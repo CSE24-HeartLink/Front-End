@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
+import { formatDateTime } from "../../utils/dateUtils";
+
 import useAuthStore from "../../store/authStore";
 import useFeedStore from "../../store/feedStore";
 import Colors from "../../constants/colors";
@@ -52,58 +54,6 @@ const CommentListModal = ({ visible, feedId, onClose }) => {
     }
   };
 
-  // 날짜 포맷팅 함수
-  const formatDate = (date) => {
-    if (!date) return "날짜 없음";
-
-    try {
-      const parsedDate = new Date(date);
-      const now = new Date();
-
-      // 날짜만 비교하기 위해 시간을 제거
-      const dateOnly = new Date(
-        parsedDate.getFullYear(),
-        parsedDate.getMonth(),
-        parsedDate.getDate()
-      );
-      const nowDateOnly = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-      );
-
-      const diffTime = nowDateOnly - dateOnly;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 0) return "오늘";
-      if (diffDays === 1) return "어제";
-      if (diffDays === 2) return "그저께";
-
-      const year = dateOnly.getFullYear();
-      const month = String(dateOnly.getMonth() + 1).padStart(2, "0");
-      const day = String(dateOnly.getDate()).padStart(2, "0");
-      return `${year}.${month}.${day}`;
-    } catch (error) {
-      console.error("Date formatting error:", error);
-      return "날짜 없음";
-    }
-  };
-
-  // 시간 포맷팅 함수
-  const formatTime = (date) => {
-    if (!date) return "";
-
-    try {
-      const parsedDate = new Date(date);
-      const hours = String(parsedDate.getHours()).padStart(2, "0");
-      const minutes = String(parsedDate.getMinutes()).padStart(2, "0");
-      return `${hours}:${minutes}`;
-    } catch (error) {
-      console.error("Time formatting error:", error);
-      return "";
-    }
-  };
-
   // 개별 댓글 렌더링
   const renderComment = ({ item }) => (
     <View style={styles.commentItem}>
@@ -112,9 +62,7 @@ const CommentListModal = ({ visible, feedId, onClose }) => {
           {item.userId?.nickname || "익명"}
         </Text>
         <Text style={styles.commentText}>{item.content}</Text>
-        <Text style={styles.commentDate}>
-          {`${formatDate(item.createdAt)} ${formatTime(item.createdAt)}`}
-        </Text>
+        <Text style={styles.commentDate}>{formatDateTime(item.createdAt)}</Text>
       </View>
       {currentUserId === item.userId?._id && (
         <TouchableOpacity
