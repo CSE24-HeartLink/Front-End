@@ -6,24 +6,35 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
-
+import useGroupStore from "../../store/groupStore";
 import Colors from "../../constants/colors";
-import { GROUPS } from "../../constants/dummydata";
 
 const AlbumGroupSelectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [currentGroupId, setCurrentGroupId] = useState("all");
+  const { groups, isLoading, error, fetchGroups } = useGroupStore();
 
+  // 초기 데이터 로드
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  // 현재 선택된 그룹 ID 설정
   useEffect(() => {
     if (route.params?.currentGroupId) {
       setCurrentGroupId(route.params.currentGroupId);
     }
   }, [route.params?.currentGroupId]);
 
+  // 전체 포함한 그룹 리스트
+  const allGroups = [{ id: "all", name: "전체" }, ...groups];
+
+  // 그룹 선택 처리
   const handleSelectGroup = (groupId) => {
     navigation.navigate("MainTab", {
       screen: "앨범",
@@ -31,6 +42,20 @@ const AlbumGroupSelectScreen = () => {
       initial: false,
     });
   };
+
+  // 에러 발생시 표시
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchGroups}>
+            <Text style={styles.retryButtonText}>다시 시도</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -44,37 +69,43 @@ const AlbumGroupSelectScreen = () => {
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
-              {GROUPS.find((g) => g.id === currentGroupId)?.name || "전체"}
+              {allGroups.find((g) => g.id === currentGroupId)?.name || "전체"}
             </Text>
           </View>
         </View>
 
         <View style={styles.groupsContainer}>
-          {/* 그룹 목록 */}
-          {GROUPS.map((group) => (
-            <TouchableOpacity
-              key={group.id}
-              style={[
-                styles.groupItem,
-                currentGroupId === group.id && styles.selectedGroupItem,
-              ]}
-              onPress={() => handleSelectGroup(group.id)}
-            >
-              <Image
-                source={require("../../../assets/images/Heart.png")}
-                style={styles.heartIcon}
-              />
-              <Text
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={Colors.darkRed20} />
+            </View>
+          ) : (
+            allGroups.map((group) => (
+              <TouchableOpacity
+                key={group.id}
                 style={[
-                  styles.groupName,
-                  currentGroupId === group.id && styles.selectedGroupName,
+                  styles.groupItem,
+                  currentGroupId === group.id && styles.selectedGroupItem,
                 ]}
+                onPress={() => handleSelectGroup(group.id)}
               >
-                {group.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Image
+                  source={require("../../../assets/images/Heart.png")}
+                  style={styles.heartIcon}
+                />
+                <Text
+                  style={[
+                    styles.groupName,
+                    currentGroupId === group.id && styles.selectedGroupName,
+                  ]}
+                >
+                  {group.name}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
+
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => console.log("hi")}

@@ -61,44 +61,40 @@ const useFriendStore = create((set, get) => ({
     set({ loading: true });
     try {
       const userId = useAuthStore.getState().getUserId();
-      if (!userId) {
-        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.");
+      
+      // 삭제할 친구 찾기
+      const friendToDelete = get().friends.find(f => f._id === friendId);
+      if (!friendToDelete) {
+        throw new Error('친구를 찾을 수 없습니다');
       }
-  
-      // 삭제하려는 친구 ID 확인
-      console.log("Attempting to delete friend with data:", {
-        friendToDelete: friendId,
-        currentFriends: get().friends.map(friend => ({
-          id: friend._id,
-          friendId: friend.friendId,
-          status: friend.status
-        }))
+      
+      // 실제 User ID 추출
+      const targetUserId = friendToDelete.friendId._id;
+      
+      console.log('삭제 시도:', {
+        userId,
+        friendRelationId: friendId,
+        targetUserId
       });
-  
-      const result = await friendApi.deleteFriend(userId, friendId);
+      
+      const result = await friendApi.deleteFriend(userId, targetUserId);
       
       if (result.success) {
-        set((state) => ({
-          friends: state.friends.filter(
-            (friend) => friend.friendId._id !== friendId
-          ),
+        set(state => ({
+          friends: state.friends.filter(f => f._id !== friendId)
         }));
         return { success: true };
       }
       
-      throw new Error(result.error);
+      throw new Error(result.data?.error || '친구 삭제 실패');
     } catch (error) {
-      console.error("[FriendStore] Delete friend error:", error);
-      return {
-        success: false,
-        error: error.message || "친구 삭제에 실패했습니다.",
-      };
+      console.error('친구 삭제 실패:', error);
+      return { success: false, error: error.message };
     } finally {
       set({ loading: false });
     }
   },
 
-  // 중복된 updateFriendGroup 하나로 통합
   updateFriendGroup: (friendId, newGroup) =>
     set((state) => ({
       friends: state.friends.map((friend) =>

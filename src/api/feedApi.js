@@ -13,7 +13,7 @@ export const feedApi = {
           "Content-Type": "multipart/form-data",
         },
       });
-      
+
       console.log("Server response for create feed:", response.data);
       return response.data;
     } catch (error) {
@@ -26,8 +26,11 @@ export const feedApi = {
   updateFeed: async (feedId, updateData) => {
     try {
       console.log("[FeedApi] Updating feed:", feedId, updateData);
-      
-      const response = await axios.put(`${API_URL}/api/feed/${feedId}`, updateData);
+
+      const response = await axios.put(
+        `${API_URL}/api/feed/${feedId}`,
+        updateData
+      );
       console.log("[FeedApi] Update response:", response.data);
       return response.data;
     } catch (error) {
@@ -40,12 +43,15 @@ export const feedApi = {
   deleteFeed: async (feedId) => {
     try {
       console.log("[FeedApi] Deleting feed:", feedId);
-      
+
       await axios.delete(`${API_URL}/api/feed/${feedId}`);
       return { success: true };
     } catch (error) {
       console.error("[FeedApi] Delete feed error:", error);
-      return { success: false, error: error.response?.data?.error || error.message };
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message,
+      };
     }
   },
 
@@ -84,5 +90,35 @@ export const feedApi = {
       console.error("[Debug] Get all feeds error:", error);
       throw error.response?.data || error.message;
     }
+  },
+
+  getComments: async (feedId) => {
+    console.log("API 호출 - 댓글 목록 조회:", feedId);
+    const response = await axios.get(`${API_URL}/api/feed/${feedId}/comments`);
+    console.log("API 응답 - 댓글 목록:", response.data);
+    return response.data;
+  },
+
+  addComment: async (feedId, commentData) => {
+    console.log("API URL:", `${API_URL}/api/feed/${feedId}/comment`);
+    console.log("전체 요청 정보:", {
+      feedId,
+      url: `${API_URL}/api/feed/${feedId}/comment`,
+      data: commentData,
+    });
+    const response = await axios.post(
+      `${API_URL}/api/feed/${feedId}/comment`,
+      commentData // {userId, content} 형태
+    );
+    return response.data;
+  },
+
+  deleteComment: async (feedId, commentId) => {
+    console.log("API 호출 - 댓글 삭제:", { feedId, commentId });
+    const response = await axios.delete(
+      `${API_URL}/api/feed/${feedId}/comment/${commentId}`
+    );
+    console.log("API 응답 - 댓글 삭제:", response.data);
+    return response.data;
   },
 };

@@ -1,4 +1,3 @@
-// RenameModal.js
 import React, { useState } from "react";
 import {
   View,
@@ -7,17 +6,33 @@ import {
   Modal,
   StyleSheet,
   TextInput,
+  Alert,
 } from "react-native";
 import Colors from "../../constants/colors";
-import useMyPageStore from "../../store/profileStore";
+
+import { profileApi } from "../../api/profileApi";
+import useAuthStore from "../../store/authStore";
 
 const RenameModal = ({ visible, onClose, onConfirm }) => {
   const [newName, setNewName] = useState("");
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    const { userToken, getUserId, updateUser } = useAuthStore.getState();
+    const userId = getUserId();
+
     if (newName.trim()) {
-      onConfirm(newName);
-      setNewName("");
+      try {
+        const response = await profileApi.updateProfile(
+          userId,
+          newName,
+          userToken
+        );
+        await updateUser({ nickname: response.profile.nickname });
+        onConfirm(newName);
+        setNewName("");
+      } catch (error) {
+        Alert.alert("오류", "닉네임 변경에 실패했습니다.");
+      }
     }
     onClose();
   };

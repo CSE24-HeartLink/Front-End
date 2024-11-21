@@ -1,5 +1,4 @@
-// src/components/feed/CommentListModal.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,13 +9,43 @@ import {
   Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import useFeedStore from "../../store/feedStore";
 import Colors from "../../constants/colors";
 
-const CommentListModal = ({ visible, comments, onClose }) => {
+const CommentListModal = ({ visible, feedId, onClose }) => {
+  const [localComments, setLocalComments] = useState([]);
+  const loadComments = useFeedStore((state) => state.loadComments);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchComments = async () => {
+      try {
+        console.log("댓글 로딩 시도:", feedId);
+        const result = await loadComments(feedId);
+        if (isMounted) {
+          setLocalComments(result || []);
+        }
+      } catch (error) {
+        console.error("댓글 로딩 실패:", error);
+      }
+    };
+
+    if (visible && feedId) {
+      fetchComments();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [visible, feedId]);
+
   const renderComment = ({ item }) => (
     <View style={styles.commentItem}>
-      <Text style={styles.commentAuthor}>{item.author}</Text>
-      <Text style={styles.commentText}>{item.text}</Text>
+      <Text style={styles.commentAuthor}>
+        {item.userId?.nickname || "익명"}
+      </Text>
+      <Text style={styles.commentText}>{item.content}</Text>
     </View>
   );
 
@@ -44,9 +73,9 @@ const CommentListModal = ({ visible, comments, onClose }) => {
           </View>
 
           <FlatList
-            data={comments}
+            data={localComments}
             renderItem={renderComment}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             contentContainerStyle={styles.commentList}
           />
         </View>
