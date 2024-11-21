@@ -48,7 +48,9 @@ const AlbumScreen = () => {
   // 선택된 그룹에 따라 피드 필터링
   const handleFilterFeeds = (groupId) => {
     if (groupId && groupId !== "all") {
-      setFilteredFeeds(albumDummyData.filter((feed) => feed.groupId === groupId));
+      setFilteredFeeds(
+        albumDummyData.filter((feed) => feed.groupId === groupId)
+      );
     } else {
       setFilteredFeeds(albumDummyData);
     }
@@ -127,7 +129,7 @@ const AlbumScreen = () => {
         >
           <View style={styles.grid}>
             {filteredFeeds.map((feed) => (
-              <View key={feed.id} style={styles.cardContainer}>
+              <View key={feed.feedId} style={styles.cardContainer}>
                 {renderCard(feed)}
               </View>
             ))}

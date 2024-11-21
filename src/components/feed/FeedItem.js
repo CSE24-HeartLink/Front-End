@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
+
 import useFeedStore from "../../store/feedStore";
 import Colors from "../../constants/colors";
+
 import AccountInfo from "./AccountInfo";
 import PostContent from "./PostContent";
 import ReactionButtons from "./ReactionButtons";
+
 import FeedDeleteModal from "../modals/FeedDeleteModal";
 import CommentModal from "./CommentModal";
 import CommentListModal from "./CommentListModal";
@@ -18,7 +21,7 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
   const [isCommentListVisible, setIsCommentListVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [comments, setComments] = useState([]);
+  //const [comments, setComments] = useState([]);
 
   // Store에서 필요한 함수들 가져오기
   const addComment = useFeedStore((state) => state.addComment);
@@ -63,7 +66,7 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
 
   // 댓글 버튼 클릭 처리
   const handleCommentPress = () => {
-    setIsCommentListVisible(true); // 댓글이 있던 없던 목록 모달을 보여주도록 수정
+    setIsCommentListVisible(true);
   };
 
   // 삭제 처리
