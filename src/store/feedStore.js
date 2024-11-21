@@ -206,20 +206,23 @@ const useFeedStore = create((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
+      console.log("Delete comment 시도:", { feedId, commentId });
       await feedApi.deleteComment(feedId, commentId);
 
       set((state) => ({
         comments: {
           ...state.comments,
-          [feedId]: state.comments[feedId].filter(
-            (comment) => comment._id !== commentId
-          ),
+          [feedId]:
+            state.comments[feedId]?.filter(
+              (comment) => comment.commentId !== commentId // _id 대신 commentId 사용
+            ) || [],
         },
         isLoading: false,
       }));
 
       return true;
     } catch (error) {
+      console.error("Delete comment 실패:", error);
       set({ error: "댓글 삭제에 실패했습니다.", isLoading: false });
       throw error;
     }

@@ -63,7 +63,7 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
 
   // 댓글 버튼 클릭 처리
   const handleCommentPress = () => {
-    comments.length > 0 ? handleOpenCommentList() : handleOpenCommentModal();
+    setIsCommentListVisible(true); // 댓글이 있던 없던 목록 모달을 보여주도록 수정
   };
 
   // 삭제 처리
@@ -133,7 +133,9 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
           </TouchableOpacity>
           <TouchableOpacity onPress={handleCommentPress}>
             <Text style={styles.commentCount}>
-              {comments.length > 0 ? `댓글 ${comments.length}개` : "댓글 작성"}
+              {feed.commentCount > 0
+                ? `댓글 ${feed.commentCount}개`
+                : "댓글 작성"}
             </Text>
           </TouchableOpacity>
         </View>
