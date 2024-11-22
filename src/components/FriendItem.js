@@ -1,20 +1,42 @@
-// FriendsItem.js
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
+
+import useGroupStore from "../store/groupStore";
 
 import EditGroupModal from "./modals/EditGroupModal";
 import DeleteConfirmModal from "./modals/DeleteConfirmModal";
 import Colors from "../constants/colors";
 
 const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
+  console.log("Friend 전체 데이터:", friend); // 전체 friend 객체 확인
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const groups = useGroupStore((state) => state.groups); // 그룹 목록 가져오기
 
-  const handleGroupChange = (newGroup) => {
-    onMoveGroup(friend._id, newGroup);
-    setIsModalVisible(false);
+  //친구 그룹 추가
+  const handleGroupChange = async (newGroupId) => {
+    try {
+      console.log("선택된 groupId:", newGroupId); // 디버깅
+      await onMoveGroup(friend.friendId._id, newGroupId);
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error("그룹 변경 실패:", error);
+    }
+  };
+
+  // groupId로 그룹 이름 찾기
+  const getGroupName = (groupId) => {
+    console.log("groups:", groups);
+    console.log("찾는 groupId:", groupId);
+
+    if (!groupId || groupId === "null" || groupId === null) {
+      return "전체";
+    }
+
+    const group = groups.find((g) => g.id === groupId);
+    return group ? group.name : "전체";
   };
 
   const handleDeleteClick = () => {
@@ -54,7 +76,7 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
         <Image source={friend.profileImage} style={styles.profileImage} />
         <View style={styles.infoContainer}>
           <Text style={styles.nickname}>{friend.friendId.nickname}</Text>
-          <Text style={styles.groupText}>{friend.group || "전체"}</Text>
+          <Text style={styles.groupText}>{getGroupName(friend.group)}</Text>
         </View>
       </View>
       <View style={styles.buttonContainer}>
@@ -75,8 +97,8 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
           onConfirm={handleGroupChange}
-          selectedGroup={friend.group}
-          friendName={friend.nickname}
+          selectedFriendId={friend.friendId._id}
+          friendName={friend.friendId.nickname}
         />
 
         <DeleteConfirmModal

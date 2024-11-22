@@ -83,4 +83,39 @@ export const groupApi = {
       throw error;
     }
   },
+
+  // 그룹에 멤버 추가
+  addGroupMember: async (groupId, friendId, requesterId) => {
+    try {
+      console.log('Sending request:', { groupId, friendId, requesterId });
+      const response = await fetch(`${API_URL}/api/group/${groupId}/members`, {
+        // URL 경로 수정
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          friendId,
+          requesterId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "멤버 추가에 실패했습니다.");
+      }
+
+      return {
+        success: true,
+        data: data.group,
+      };
+    } catch (error) {
+      console.error("API Error:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
 };

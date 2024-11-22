@@ -1,20 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
-
-import { GROUPS } from "../../constants/dummydata";
 import Colors from "../../constants/colors";
+import useGroupStore from "../../store/groupStore";
 
-const EditGroupModal = ({ visible, onClose, onConfirm, selectedGroup }) => {
+const EditGroupModal = ({ visible, onClose, onConfirm, selectedFriendId }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [newGroup, setNewGroup] = useState(selectedGroup);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
 
-  const selectedGroupName =
-    GROUPS.find((group) => group.id === newGroup)?.name || "전체";
+  // 그룹 스토어에서 데이터 가져오기
+  const { groups, fetchGroups, addGroupMember, isLoading } = useGroupStore();
+
+  // 모달이 열릴 때 그룹 목록 가져오기
+  useEffect(() => {
+    if (visible) {
+      fetchGroups();
+    }
+  }, [visible]);
 
   const handleSelectGroup = (groupId) => {
-    setNewGroup(groupId);
+    setSelectedGroupId(groupId);
     setIsDropdownOpen(false);
   };
+
+  const handleConfirm = async () => {
+    if (!selectedGroupId) return;
+
+    try {
+      const result = await addGroupMember(selectedGroupId, selectedFriendId);
+      if (result.success) {
+        onConfirm(selectedGroupId);
+        // 성공 메시지 표시 (옵션)
+        Toast.show({
+          type: "success",
+          text1: "그룹에 친구가 추가되었습니다.",
+          position: "bottom",
+        });
+      }
+    } catch (error) {
+      if (error.message.includes("이미 그룹 멤버입니다")) {
+        // 이미 멤버인 경우 처리
+        Toast.show({
+          type: "info",
+          text1: "이미 그룹에 속한 친구입니다.",
+          position: "bottom",
+        });
+      } else {
+        // 기타 에러 처리
+        Toast.show({
+          type: "error",
+          text1: "친구 추가 실패",
+          text2: error.message,
+          position: "bottom",
+        });
+      }
+    }
+  };
+
+  const selectedGroupName =
+    groups.find((group) => group.id === selectedGroupId)?.name || "그룹 선택";
 
   return (
     <Modal
@@ -27,7 +70,6 @@ const EditGroupModal = ({ visible, onClose, onConfirm, selectedGroup }) => {
         <View style={styles.modalContainer}>
           <Text style={styles.title}>변경 그룹 선택</Text>
 
-          {/* 드롭다운 헤더 */}
           <TouchableOpacity
             style={styles.groupSelectContainer}
             onPress={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -35,22 +77,22 @@ const EditGroupModal = ({ visible, onClose, onConfirm, selectedGroup }) => {
             <Text style={styles.selectedGroupText}>{selectedGroupName}</Text>
           </TouchableOpacity>
 
-          {/* 드롭다운 목록 */}
           {isDropdownOpen && (
             <View style={styles.dropdownList}>
-              {GROUPS.map((group) => (
+              {groups.map((group) => (
                 <TouchableOpacity
                   key={group.id}
                   style={[
                     styles.dropdownItem,
-                    newGroup === group.id && styles.dropdownItemSelected,
+                    selectedGroupId === group.id && styles.dropdownItemSelected,
                   ]}
                   onPress={() => handleSelectGroup(group.id)}
                 >
                   <Text
                     style={[
                       styles.dropdownItemText,
-                      newGroup === group.id && styles.dropdownItemTextSelected,
+                      selectedGroupId === group.id &&
+                        styles.dropdownItemTextSelected,
                     ]}
                   >
                     {group.name}
@@ -67,9 +109,12 @@ const EditGroupModal = ({ visible, onClose, onConfirm, selectedGroup }) => {
 
             <TouchableOpacity
               style={styles.confirmButton}
-              onPress={() => onConfirm(newGroup)}
+              onPress={handleConfirm}
+              disabled={!selectedGroupId || isLoading}
             >
-              <Text style={styles.buttonText}>변경</Text>
+              <Text style={styles.buttonText}>
+                {isLoading ? "처리중..." : "변경"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
