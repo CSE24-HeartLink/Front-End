@@ -125,32 +125,29 @@ const useFeedStore = create((set, get) => ({
   setSelectedGroup: async (groupId) => {
     try {
       set({ isLoading: true, error: null });
-      console.log("[FeedStore] Setting group:", groupId);
-  
+      const currentUserId = useAuthStore.getState().getUserId();
+
       let feedsData;
       if (groupId === "all") {
-        // 전체 피드 로딩
-        const response = await feedApi.getAllFeeds();
+        // 전체 피드 로딩 (친구 피드만)
+        const response = await feedApi.getAllFeeds(currentUserId);
         feedsData = Array.isArray(response) ? response : response.feeds || [];
       } else if (groupId === "my") {
         // 내가 작성한 피드만 로딩
-        const userId = useAuthStore.getState().getUserId();
-        console.log("[FeedStore] Loading feeds for user:", userId);
-        const response = await feedApi.getUserFeeds(userId);
-        console.log("[FeedStore] User feeds response:", response);
+        const response = await feedApi.getUserFeeds(
+          currentUserId,
+          currentUserId
+        );
         feedsData = response.feeds || [];
       } else {
         // 특정 그룹 피드 로딩
         const response = await feedApi.getGroupFeeds(groupId);
         feedsData = response.feeds || [];
       }
-  
-      console.log("[FeedStore] Loaded feeds:", feedsData);
-  
+
       // 활성 상태인 피드만 필터링
       const activeFeeds = feedsData.filter((feed) => feed.status === "active");
-      console.log("[FeedStore] Active feeds:", activeFeeds);
-  
+
       set({
         selectedGroup: groupId,
         feeds: activeFeeds,
@@ -158,7 +155,7 @@ const useFeedStore = create((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error("[FeedStore] Feed loading error:", error);
+      console.error("Feed loading error:", error);
       set({
         error: "피드 목록을 불러오는데 실패했습니다.",
         isLoading: false,
