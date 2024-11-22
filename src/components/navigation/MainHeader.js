@@ -19,6 +19,8 @@ const MainHeader = ({ onPressCategory, selectedGroup }) => {
   }, []);
 
   const getGroupName = () => {
+    if (selectedGroup === "all") return "전체";
+    if (selectedGroup === "my") return "나";
     const group = groups.find((g) => g.id === selectedGroup);
     return group ? group.name : "전체";
   };

@@ -92,6 +92,24 @@ export const feedApi = {
     }
   },
 
+  // 사용자의 피드 조회
+  getUserFeeds: async (userId) => {
+    try {
+      console.log("[FeedApi] Fetching user feeds for userId:", userId);
+      const url = `${API_URL}/api/feed/user/${userId}`;
+      console.log("[FeedApi] Request URL:", url);
+
+      const response = await axios.get(url);
+      console.log("[FeedApi] User feeds response:", response.data);
+      console.log("[FeedApi] Feeds array:", response.data.feeds); // 데이터 구조 확인
+      return response.data;
+    } catch (error) {
+      console.error("[FeedApi] Get user feeds error:", error);
+      console.error("[FeedApi] Error response:", error.response?.data);
+      throw error.response?.data || error.message;
+    }
+  },
+
   getComments: async (feedId) => {
     console.log("API 호출 - 댓글 목록 조회:", feedId);
     const response = await axios.get(`${API_URL}/api/feed/${feedId}/comments`);

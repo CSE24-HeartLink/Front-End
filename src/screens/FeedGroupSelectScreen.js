@@ -12,6 +12,7 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 
+import useAuthStore from "../store/authStore";
 import useGroupStore from "../store/groupStore";
 import Colors from "../constants/colors";
 
@@ -40,8 +41,13 @@ const FeedGroupSelectScreen = () => {
   }, [route.params?.currentGroupId]);
 
   // 전체 옵션을 포함한 그룹 리스트
-  const allGroups = [{ id: "all", name: "전체" }, ...groups];
+  const allGroups = [
+    { id: "all", name: "전체" },
+    ...groups,
+    { id: "my", name: "나" },
+  ];
 
+  //그룹추가
   const handleAddGroup = async (groupName) => {
     try {
       await addGroup(groupName);
@@ -52,11 +58,12 @@ const FeedGroupSelectScreen = () => {
   };
 
   const handleGroupLongPress = (group) => {
-    if (group.id === "all") return; // 전체는 수정 불가
+    if (group.id === "all" || group.id === "my") return; // 전체와 나는 수정 불가
     setSelectedGroup(group);
     setIsEditGroupModalVisible(true);
   };
 
+  //그룹이름수정
   const handleEditGroupName = async (newName) => {
     try {
       await editGroupName(selectedGroup.id, newName);
@@ -66,13 +73,23 @@ const FeedGroupSelectScreen = () => {
     }
   };
 
+  //선택그룹 필터링
   const handleSelectGroup = (groupId) => {
+    if (groupId === "my") {
+      const userId = useAuthStore.getState().getUserId();
+      navigation.navigate("MainTab", {
+        screen: "피드",
+        params: { selectedGroupId: groupId, userId: userId },
+        initial: false,
+      });
+    } else {
+      navigation.navigate("MainTab", {
+        screen: "피드",
+        params: { selectedGroupId: groupId },
+        initial: false,
+      });
+    }
     setCurrentGroupId(groupId);
-    navigation.navigate("MainTab", {
-      screen: "피드",
-      params: { selectedGroupId: groupId },
-      initial: false,
-    });
   };
 
   if (error) {
