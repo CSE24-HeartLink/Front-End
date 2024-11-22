@@ -3,8 +3,8 @@ import Constants from "expo-constants";
 const API_URL = Constants.expoConfig.extra.apiUrl.development;
 
 export const groupApi = {
-  // 그룹 목록 조회
-  fetchGroups: async () => {
+  // 사용자의 그룹 목록 조회
+  fetchGroups: async (userId) => {
     try {
       const options = {
         method: "GET",
@@ -13,7 +13,10 @@ export const groupApi = {
           "Content-Type": "application/json",
         },
       };
-      const response = await fetch(`${API_URL}/api/group`, options);
+      const response = await fetch(
+        `${API_URL}/api/group?userId=${userId}`,
+        options
+      );
       return response.json();
     } catch (error) {
       console.error("API Error:", error);
@@ -22,14 +25,14 @@ export const groupApi = {
   },
 
   // 그룹 추가
-  createGroup: async (name) => {
+  createGroup: async (name, userId) => {
     try {
       const response = await fetch(`${API_URL}/api/group`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, userId }),
       });
 
       const data = await response.json();

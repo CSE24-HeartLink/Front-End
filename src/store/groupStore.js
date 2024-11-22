@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { groupApi } from "../api/groupApi";
+import useAuthStore from "./authStore";
 
 const useGroupStore = create((set, get) => ({
   groups: [],
@@ -11,9 +12,14 @@ const useGroupStore = create((set, get) => ({
   // 그룹 목록 조회
   fetchGroups: async () => {
     try {
+      const userId = useAuthStore.getState().getUserId();
+      if (!userId) {
+        throw new Error("사용자 인증이 필요합니다.");
+      }
+
       set({ isLoading: true, error: null });
-      const groups = await groupApi.fetchGroups();
-      set({ groups, isLoading: false });
+      const response = await groupApi.fetchGroups(userId);
+      set({ groups: response.groups, isLoading: false });
     } catch (error) {
       set({
         error: "그룹 목록을 불러오는데 실패했습니다.",
@@ -25,18 +31,16 @@ const useGroupStore = create((set, get) => ({
   // 그룹 추가
   addGroup: async (name) => {
     try {
-      set({ isLoading: true, error: null });
-      const newGroup = await groupApi.createGroup(name);
+      const userId = useAuthStore.getState().getUserId();
+      if (!userId) {
+        throw new Error("사용자 인증이 필요합니다.");
+      }
 
-      // 백이랑 데이터 형식 맞추기
-      const formattedGroup = {
-        id: newGroup.groupId,
-        name: newGroup.gName,
-        createdAt: newGroup.createdAt,
-      };
+      set({ isLoading: true, error: null });
+      const newGroup = await groupApi.createGroup(name, userId);
 
       set((state) => ({
-        groups: [...state.groups, formattedGroup],
+        groups: [...state.groups, newGroup],
         isLoading: false,
       }));
 
