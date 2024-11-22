@@ -22,12 +22,19 @@ import MainHeader from "../components/navigation/MainHeader";
 import AddFeedIcon from "../../assets/images/AddFeed.png";
 
 const MainFeedScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  const [isCommentVisible, setIsCommentVisible] = useState(false);
+  const [selectedFeedId, setSelectedFeedId] = useState(null);
+
   const flatListRef = useRef(null);
+  const feedListRef = useRef(null);
+  const { feedId, commentId } = route.params || {};
+
   const { feeds, filteredFeeds, setSelectedGroup, error, isLoading } =
     useFeedStore();
   const getAccessToken = useAuthStore((state) => state.getAccessToken);
-  const navigation = useNavigation();
-  const route = useRoute();
   const [currentGroupId, setCurrentGroupId] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -89,6 +96,24 @@ const MainFeedScreen = () => {
     }, [route.params, currentGroupId, loadFeeds])
   );
 
+  //선택된 코멘트로 이동
+  useEffect(() => {
+    if (feedId) {
+      const feedIndex = filteredFeeds.findIndex(
+        (feed) => feed.feedId === feedId
+      );
+      if (feedIndex !== -1) {
+        flatListRef.current?.scrollToIndex({
+          index: feedIndex,
+          animated: true,
+          viewOffset: 0,
+        });
+        setSelectedFeedId(feedId);
+        setIsCommentVisible(true);
+      }
+    }
+  }, [feedId, filteredFeeds]);
+
   const handleRefresh = useCallback(async () => {
     console.log("[MainFeedScreen] Manual refresh triggered");
     setRefreshing(true);
@@ -97,22 +122,15 @@ const MainFeedScreen = () => {
   }, [currentGroupId, loadFeeds]);
 
   const renderItem = useCallback(
-    ({ item }) => {
-      if (!item?.feedId) {
-        console.log("[MainFeedScreen] Invalid feed item:", item);
-        return null;
-      }
-      return (
-        <FeedItem
-          feed={item}
-          onDeleteSuccess={() => {
-            console.log("[MainFeedScreen] Feed deleted, refreshing list");
-            loadFeeds(currentGroupId);
-          }}
-        />
-      );
-    },
-    [currentGroupId, loadFeeds]
+    ({ item }) => (
+      <FeedItem
+        feed={item}
+        onDeleteSuccess={() => loadFeeds(currentGroupId)}
+        isCommentVisible={isCommentVisible && item.feedId === selectedFeedId}
+        setIsCommentVisible={setIsCommentVisible}
+      />
+    ),
+    [currentGroupId, loadFeeds, isCommentVisible, selectedFeedId]
   );
 
   return (
@@ -133,6 +151,9 @@ const MainFeedScreen = () => {
           keyExtractor={(item) => String(item?.feedId || Math.random())}
           renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
+          onScrollToIndexFailed={(info) => {
+            console.log("Scroll to index failed:", info);
+          }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

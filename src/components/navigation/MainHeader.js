@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
@@ -12,7 +12,11 @@ import TopFilterButton from "../ui/TopFilterButton";
 const MainHeader = ({ onPressCategory, selectedGroup }) => {
   const navigation = useNavigation();
   const groups = useGroupStore((state) => state.groups);
-  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const { unreadCount, updateUnreadCount } = useNotificationStore(); // 전체 상태 가져오기
+
+  useEffect(() => {
+    updateUnreadCount();
+  }, []);
 
   const getGroupName = () => {
     const group = groups.find((g) => g.id === selectedGroup);
@@ -32,9 +36,9 @@ const MainHeader = ({ onPressCategory, selectedGroup }) => {
       >
         <Icon name="bell" size={20} color={Colors.pink40} />
         {unreadCount > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {unreadCount > 99 ? "99+" : unreadCount}
+          <View style={[styles.badge, { backgroundColor: "red" }]}>
+            <Text style={[styles.badgeText, { color: "white" }]}>
+              {unreadCount}
             </Text>
           </View>
         )}
@@ -62,11 +66,11 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: 5,
-    right: 5,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
+    top: 0,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: Colors.red,
     justifyContent: "center",
     alignItems: "center",

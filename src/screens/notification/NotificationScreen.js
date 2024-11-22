@@ -32,6 +32,7 @@ const NotificationScreen = ({ navigation }) => {
     handleFriendRequest,
     markAsRead,
     markAllAsRead,
+    unreadCount,
   } = useNotificationStore();
 
   // 화면 진입 시 알림 목록 로드
@@ -44,7 +45,7 @@ const NotificationScreen = ({ navigation }) => {
 
   // 모든 알림 읽음 처리는 notifications가 있을 때만
   useEffect(() => {
-    if (notifications.length > 0) {
+    if (notifications.length > 0 && notifications.some((n) => !n.isRead)) {
       markAllAsRead();
     }
   }, [notifications]);
@@ -120,12 +121,13 @@ const NotificationScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Header navigation={navigation} />
+        <Header navigation={navigation} unreadCount={unreadCount} />
         <NotificationList
           notifications={notifications}
           onAccept={handlers.accept}
           onReject={handlers.reject}
           onMarkAsRead={markAsRead}
+          navigation={navigation}
         />
         <AddFriendGroupModal
           visible={isModalVisible}
@@ -161,7 +163,9 @@ const NotificationList = ({
   onAccept,
   onReject,
   onMarkAsRead,
+  navigation,
 }) => {
+  console.log("NotificationList navigation:", navigation);
   if (notifications.length === 0) {
     return (
       <View style={styles.emptyContainer}>
@@ -179,7 +183,8 @@ const NotificationList = ({
           item={item}
           onAccept={onAccept}
           onReject={onReject}
-          onPress={() => onMarkAsRead(item._id)}
+          navigation={navigation}
+          markAsRead={onMarkAsRead}
         />
       )}
       style={styles.list}
@@ -208,7 +213,8 @@ const styles = StyleSheet.create({
     width: 24,
   },
   titleContainer: {
-    width: 160,
+    width: "auto", // 160에서 auto로 변경
+    minWidth: 160, // 최소 너비 추가
     height: 40,
     backgroundColor: Colors.primaryBeige,
     paddingHorizontal: 20,
@@ -221,6 +227,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.red20,
     textAlign: "center",
+    flexShrink: 1, // 추가
   },
   rightPlaceholder: {
     width: 24,
