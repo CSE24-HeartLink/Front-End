@@ -43,18 +43,37 @@ export const friendApi = {
   },
 
   // 친구 목록 조회
-  getFriends: async (userId) => {
+  // 친구 목록 조회 (전체 또는 그룹별)
+  getFriends: async (userId, groupId = 'all') => {
     try {
       const { data } = await axios.get(`${API_URL}/api/friend`, {
-        params: { userId },
+        params: { 
+          userId,
+          groupId  // groupId 파라미터 추가
+        },
       });
       return { success: true, data };
     } catch (error) {
       console.error("친구 목록 조회 실패:", error);
       return {
         success: false,
-        error:
-          error.response?.data?.error || "친구 목록을 불러오는데 실패했습니다.",
+        error: error.response?.data?.error || "친구 목록을 불러오는데 실패했습니다.",
+      };
+    }
+  },
+
+  // 친구 그룹 이동
+  moveToGroup: async (friendId, groupId) => {
+    try {
+      const { data } = await axios.put(`${API_URL}/api/friend/${friendId}/group`, {
+        groupId
+      });
+      return { success: true, data };
+    } catch (error) {
+      console.error("그룹 이동 실패:", error);
+      return {
+        success: false,
+        error: error.response?.data?.error || "그룹 이동에 실패했습니다.",
       };
     }
   },

@@ -7,6 +7,8 @@ import {
   Image,
   RefreshControl,
   Alert,
+  View,
+  Text,
 } from "react-native";
 import {
   useNavigation,
@@ -21,13 +23,29 @@ import Colors from "../constants/colors";
 import MainHeader from "../components/navigation/MainHeader";
 import AddFeedIcon from "../../assets/images/AddFeed.png";
 
+const EmptyState = () => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyTitle}>아직 피드가 없어요</Text>
+    <Text style={styles.emptyDescription}>
+      새로운 피드를 작성하고 친구들과 공유해보세요!
+    </Text>
+  </View>
+);
+
 const MainFeedScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  const [isCommentVisible, setIsCommentVisible] = useState(false);
+  const [selectedFeedId, setSelectedFeedId] = useState(null);
+
   const flatListRef = useRef(null);
+  const feedListRef = useRef(null);
+  const { feedId, commentId } = route.params || {};
+
   const { feeds, filteredFeeds, setSelectedGroup, error, isLoading } =
     useFeedStore();
   const getAccessToken = useAuthStore((state) => state.getAccessToken);
-  const navigation = useNavigation();
-  const route = useRoute();
   const [currentGroupId, setCurrentGroupId] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -89,6 +107,24 @@ const MainFeedScreen = () => {
     }, [route.params, currentGroupId, loadFeeds])
   );
 
+  //선택된 코멘트로 이동
+  useEffect(() => {
+    if (feedId) {
+      const feedIndex = filteredFeeds.findIndex(
+        (feed) => feed.feedId === feedId
+      );
+      if (feedIndex !== -1) {
+        flatListRef.current?.scrollToIndex({
+          index: feedIndex,
+          animated: true,
+          viewOffset: 0,
+        });
+        setSelectedFeedId(feedId);
+        setIsCommentVisible(true);
+      }
+    }
+  }, [feedId, filteredFeeds]);
+
   const handleRefresh = useCallback(async () => {
     console.log("[MainFeedScreen] Manual refresh triggered");
     setRefreshing(true);
@@ -97,22 +133,15 @@ const MainFeedScreen = () => {
   }, [currentGroupId, loadFeeds]);
 
   const renderItem = useCallback(
-    ({ item }) => {
-      if (!item?.feedId) {
-        console.log("[MainFeedScreen] Invalid feed item:", item);
-        return null;
-      }
-      return (
-        <FeedItem
-          feed={item}
-          onDeleteSuccess={() => {
-            console.log("[MainFeedScreen] Feed deleted, refreshing list");
-            loadFeeds(currentGroupId);
-          }}
-        />
-      );
-    },
-    [currentGroupId, loadFeeds]
+    ({ item }) => (
+      <FeedItem
+        feed={item}
+        onDeleteSuccess={() => loadFeeds(currentGroupId)}
+        isCommentVisible={isCommentVisible && item.feedId === selectedFeedId}
+        setIsCommentVisible={setIsCommentVisible}
+      />
+    ),
+    [currentGroupId, loadFeeds, isCommentVisible, selectedFeedId]
   );
 
   return (
@@ -133,6 +162,9 @@ const MainFeedScreen = () => {
           keyExtractor={(item) => String(item?.feedId || Math.random())}
           renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
+          onScrollToIndexFailed={(info) => {
+            console.log("Scroll to index failed:", info);
+          }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -142,7 +174,9 @@ const MainFeedScreen = () => {
             />
           }
         />
-      ) : null}
+      ) : (
+        <EmptyState />
+      )}
       <TouchableOpacity
         style={styles.addFeedButton}
         onPress={() => {
@@ -176,6 +210,24 @@ const styles = StyleSheet.create({
     width: 68,
     height: 68,
     resizeMode: "contain",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: Colors.textPrimary,
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
   },
 });
 

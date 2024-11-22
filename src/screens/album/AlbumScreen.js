@@ -21,10 +21,20 @@ import MainHeader from "../../components/navigation/MainHeader";
 import { albumDummyData } from "../../constants/albumDummy";
 import Colors from "../../constants/colors";
 
+import useAuthStore from "../../store/authStore";
 import useGroupStore from "../../store/groupStore";
 
 const windowWidth = Dimensions.get("window").width;
 const cardWidth = (windowWidth - 16) / 3;
+
+const EmptyState = () => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyTitle}>아직 앨범이 비어있어요</Text>
+    <Text style={styles.emptyDescription}>
+      피드를 작성하면 자동으로 앨범에 추가됩니다!
+    </Text>
+  </View>
+);
 
 const AlbumScreen = () => {
   const navigation = useNavigation();
@@ -39,15 +49,18 @@ const AlbumScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       fetchGroups(); // 그룹 데이터 가져오기
-      const groupId = route.params?.selectedGroup || currentGroupId;
+      const groupId = route.params?.selectedGroupId || currentGroupId;
       handleFilterFeeds(groupId);
       setCurrentGroupId(groupId);
-    }, [route.params?.selectedGroup, currentGroupId])
+    }, [route.params?.selectedGroupId, currentGroupId])
   );
 
   // 선택된 그룹에 따라 피드 필터링
   const handleFilterFeeds = (groupId) => {
-    if (groupId && groupId !== "all") {
+    if (groupId === "my") {
+      const userId = useAuthStore.getState().getUserId();
+      setFilteredFeeds(albumDummyData.filter((feed) => feed.userId === userId));
+    } else if (groupId !== "all") {
       setFilteredFeeds(
         albumDummyData.filter((feed) => feed.groupId === groupId)
       );
@@ -127,13 +140,17 @@ const AlbumScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.grid}>
-            {filteredFeeds.map((feed) => (
-              <View key={feed.feedId} style={styles.cardContainer}>
-                {renderCard(feed)}
-              </View>
-            ))}
-          </View>
+          {filteredFeeds.length > 0 ? (
+            <View style={styles.grid}>
+              {filteredFeeds.map((feed) => (
+                <View key={feed.feedId} style={styles.cardContainer}>
+                  {renderCard(feed)}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <EmptyState />
+          )}
         </ScrollView>
 
         <Modal
@@ -174,6 +191,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 8,
     paddingBottom: 72,
+    flex: 1, // emptyState 위지조정용
   },
   grid: {
     flexDirection: "row",
@@ -255,6 +273,24 @@ const styles = StyleSheet.create({
   modalImage: {
     width: "100%",
     height: "100%",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: Colors.textPrimary,
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
   },
 });
 

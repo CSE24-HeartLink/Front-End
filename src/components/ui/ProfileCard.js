@@ -1,21 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
 
 import useProfileStore from "../../store/profileStore";
 import useAuthStore from "../../store/authStore";
+import useFeedStore from "../../store/feedStore";
 
 const ProfileCard = ({ onPress }) => {
-  const { userProfile } = useProfileStore();
-  const { user } = useAuthStore(); // AuthStore에서 사용자 정보 가져오기
+  const { userProfile, fetchUserStats } = useProfileStore();
+  const { user } = useAuthStore();
+  const { setSelectedGroup } = useFeedStore();
+
+  useEffect(() => {
+    const loadData = async () => {
+      await setSelectedGroup("my");  // 먼저 피드를 로드
+      fetchUserStats();  // 그 다음 통계 계산
+    };
+    loadData();
+  }, []);
 
   return (
     <TouchableOpacity style={styles.profileCard} onPress={onPress}>
       <View style={styles.headerRow}>
         <Image source={userProfile.profileImage} style={styles.profileImage} />
         <Text style={styles.nameText}>{user?.nickname || "사용자"}</Text>
-        <Icon name="chevron-right" size={24} color={Colors.Gray40} />
+        <Icon name="chevron-right" size={24} color={Colors.gray40} />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.introText}>

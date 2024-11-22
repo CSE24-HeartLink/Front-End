@@ -72,22 +72,43 @@ export const feedApi = {
   },
 
   // 전체 피드 조회
-  getAllFeeds: async () => {
+  getAllFeeds: async (currentUserId) => {
     try {
       console.log("Fetching all feeds");
       const url = `${API_URL}/api/feed`;
       console.log("API URL:", url);
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, {
+        params: { currentUserId },
+      });
       console.log("Server response for all feeds:", response.data);
 
-      // 응답이 배열이 아닌 경우 처리
       if (!Array.isArray(response.data) && response.data.feeds) {
         return response.data.feeds;
       }
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("[Debug] Get all feeds error:", error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // 사용자의 피드 조회
+  getUserFeeds: async (userId, currentUserId) => {
+    try {
+      console.log("[FeedApi] Fetching user feeds for userId:", userId);
+      const url = `${API_URL}/api/feed/user/${userId}`;
+      console.log("[FeedApi] Request URL:", url);
+
+      const response = await axios.get(url, {
+        params: {
+          currentUserId,
+        },
+      });
+      console.log("[FeedApi] User feeds response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[Debug] Get user feeds error:", error);
       throw error.response?.data || error.message;
     }
   },

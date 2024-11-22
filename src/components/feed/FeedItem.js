@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -14,14 +14,19 @@ import FeedDeleteModal from "../modals/FeedDeleteModal";
 import CommentModal from "./CommentModal";
 import CommentListModal from "./CommentListModal";
 
-const FeedItem = ({ feed, onDeleteSuccess }) => {
+const FeedItem = ({
+  feed,
+  onDeleteSuccess,
+  isCommentVisible,
+  feedId,
+  commentId,
+}) => {
   // 상태 관리
   const navigation = useNavigation();
   const [isCommentModalVisible, setIsCommentModalVisible] = useState(false);
   const [isCommentListVisible, setIsCommentListVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  //const [comments, setComments] = useState([]);
 
   // Store에서 필요한 함수들 가져오기
   const addComment = useFeedStore((state) => state.addComment);
@@ -46,6 +51,19 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
     profileImage: feed.userId.profileImage,
     id: feed.userId._id,
   };
+
+  // commentId가 있으면 해당 댓글로 스크롤
+  useEffect(() => {
+    if (feed.feedId === feedId && commentId) {
+      setIsCommentListVisible(true);
+    }
+  }, [feed.feedId, feedId, commentId]);
+
+  // isCommentVisible prop이 변경되면 모달 상태도 변경
+  useEffect(() => {
+    setIsCommentModalVisible(isCommentVisible);
+    setIsCommentListVisible(isCommentVisible);
+  }, [isCommentVisible]);
 
   // 댓글 추가 처리
   const handleAddComment = async (text) => {
@@ -76,7 +94,6 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
       console.error("[FeedItem] No feedId provided for deletion");
       return;
     }
-
     try {
       setIsDeleting(true);
       const result = await deleteFeed(feed.feedId);
@@ -163,6 +180,7 @@ const FeedItem = ({ feed, onDeleteSuccess }) => {
         visible={isCommentListVisible}
         feedId={feed.feedId}
         onClose={handleCloseCommentList}
+        selectedCommentId={commentId}
       />
     </View>
   );

@@ -60,11 +60,21 @@ const MyPageScreen = () => {
         <View style={styles.buttonContainer}>
           <ToMeButton
             title="내 게시글"
-            onPress={() => console.log("내 게시글 클릭")}
+            onPress={() =>
+              navigation.navigate("MainTab", {
+                screen: "피드",
+                params: { selectedGroupId: "my" },
+              })
+            }
           />
           <ToMeButton
             title="내 앨범"
-            onPress={() => console.log("내 앨범 클릭")}
+            onPress={() =>
+              navigation.navigate("MainTab", {
+                screen: "앨범",
+                params: { selectedGroupId: "my" },
+              })
+            }
           />
         </View>
 
