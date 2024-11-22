@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
+
+import useAuthStore from "../../store/authStore";
 import useGroupStore from "../../store/groupStore";
 import Colors from "../../constants/colors";
 
@@ -32,15 +34,28 @@ const AlbumGroupSelectScreen = () => {
   }, [route.params?.currentGroupId]);
 
   // 전체 포함한 그룹 리스트
-  const allGroups = [{ id: "all", name: "전체" }, ...groups];
+  const allGroups = [
+    { id: "all", name: "전체" },
+    ...groups,
+    { id: "my", name: "나" },
+  ];
 
   // 그룹 선택 처리
   const handleSelectGroup = (groupId) => {
-    navigation.navigate("MainTab", {
-      screen: "앨범",
-      params: { selectedGroup: groupId },
-      initial: false,
-    });
+    if (groupId === "my") {
+      const userId = useAuthStore.getState().getUserId();
+      navigation.navigate("MainTab", {
+        screen: "앨범",
+        params: { selectedGroupId: groupId, userId: userId },
+        initial: false,
+      });
+    } else {
+      navigation.navigate("MainTab", {
+        screen: "앨범",
+        params: { selectedGroupId: groupId },
+        initial: false,
+      });
+    }
   };
 
   // 에러 발생시 표시

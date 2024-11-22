@@ -7,6 +7,8 @@ import {
   Image,
   RefreshControl,
   Alert,
+  View,
+  Text,
 } from "react-native";
 import {
   useNavigation,
@@ -20,6 +22,15 @@ import FeedItem from "../components/feed/FeedItem";
 import Colors from "../constants/colors";
 import MainHeader from "../components/navigation/MainHeader";
 import AddFeedIcon from "../../assets/images/AddFeed.png";
+
+const EmptyState = () => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyTitle}>아직 피드가 없어요</Text>
+    <Text style={styles.emptyDescription}>
+      새로운 피드를 작성하고 친구들과 공유해보세요!
+    </Text>
+  </View>
+);
 
 const MainFeedScreen = () => {
   const navigation = useNavigation();
@@ -163,7 +174,9 @@ const MainFeedScreen = () => {
             />
           }
         />
-      ) : null}
+      ) : (
+        <EmptyState />
+      )}
       <TouchableOpacity
         style={styles.addFeedButton}
         onPress={() => {
@@ -197,6 +210,24 @@ const styles = StyleSheet.create({
     width: 68,
     height: 68,
     resizeMode: "contain",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: Colors.textPrimary,
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
   },
 });
 

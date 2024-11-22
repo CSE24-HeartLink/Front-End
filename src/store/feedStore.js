@@ -1,6 +1,8 @@
 import { create } from "zustand";
+
 import { feedApi } from "../api/feedApi";
 import useAuthStore from "./authStore";
+import useProfileStore from "./profileStore";
 
 const useFeedStore = create((set, get) => ({
   feeds: [],
@@ -11,6 +13,7 @@ const useFeedStore = create((set, get) => ({
   selectedReactions: {}, // 초기화 추가
   comments: {}, // Organized by feedId
 
+  //피드 추가
   addFeed: async (feedData) => {
     const userId = useAuthStore.getState().getUserId();
     if (!userId) throw new Error("인증 정보가 없습니다.");
@@ -45,6 +48,7 @@ const useFeedStore = create((set, get) => ({
         isLoading: false,
         error: null,
       }));
+      useProfileStore.getState().fetchUserStats(); // 프로필 업데이트
 
       return newFeed;
     } catch (error) {
@@ -52,6 +56,8 @@ const useFeedStore = create((set, get) => ({
       throw error;
     }
   },
+
+  //피드 수정
   updateFeed: async (feedId, updateData) => {
     try {
       set({ isLoading: true, error: null });
@@ -108,6 +114,7 @@ const useFeedStore = create((set, get) => ({
           error: null,
           isLoading: false,
         }));
+        useProfileStore.getState().fetchUserStats(); // 프로필 업데이트
         return { success: true };
       } else {
         throw new Error(result.error || "피드 삭제에 실패했습니다.");
@@ -122,6 +129,7 @@ const useFeedStore = create((set, get) => ({
     }
   },
 
+  //선택 그룹 설정
   setSelectedGroup: async (groupId) => {
     try {
       set({ isLoading: true, error: null });
