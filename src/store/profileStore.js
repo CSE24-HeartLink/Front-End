@@ -20,18 +20,21 @@ const useProfileStore = create((set, get) => ({
   setUserProfile: (profile) =>
     set({ userProfile: { ...get().userProfile, ...profile } }),
 
-  //닉네임 뱐걍
   updateNickname: async (newName) => {
     try {
-      const authState = useAuthStore.getState();
-      console.log("Auth State:", authState); // 전체 authState 확인
+      const userId = useAuthStore.getState().getUserId(); // userId 직접 가져오기
+      if (!userId) {
+        throw new Error("userId is required");
+      }
+
+      console.log("Updating nickname for userId:", userId); // 로그 추가
 
       set({ isLoading: true, error: null });
 
       const response = await profileApi.updateProfile(
-        authState.user.userId,
+        userId, // authState.user.userId 대신 직접 가져온 userId 사용
         newName,
-        authState.userToken
+        useAuthStore.getState().userToken
       );
 
       set((state) => ({
@@ -48,7 +51,6 @@ const useProfileStore = create((set, get) => ({
       throw error;
     }
   },
-
   setRenameModalVisible: (visible) => set({ isRenameModalVisible: visible }),
 
   handleRename: async (newName) => {
