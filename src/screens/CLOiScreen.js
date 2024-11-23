@@ -1,4 +1,5 @@
-import React from "react";
+// CLOiScreen.js
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -6,12 +7,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../constants/colors";
 import ProgressBar from "../components/ui/ProgressBar";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import useCLOiStore from "../store/CLOiStore";
+import useAuthStore from "../store/authStore";
 import CLOiLv1 from "../../assets/images/CLOiLv1.png";
 import CLOiLv2 from "../../assets/images/CLOiLv2.png";
 import CLOiLv3 from "../../assets/images/CLOiLv3.png";
@@ -23,14 +27,34 @@ import RenameModal from "../components/modals/RenameModal";
 const CLOiScreen = () => {
   const {
     name,
-    postCount,
+    level,
+    message,
     showInfo,
     isRenameModalVisible,
-    level,
+    isLoading,
+    appearance,
+    fetchCloiInfo,
     setRenameModalVisible,
     handleRename,
     toggleInfo,
+    calculateProgress,
   } = useCLOiStore();
+
+  const userId = useAuthStore((state) => state.user?._id);
+
+  useEffect(() => {
+    if (userId) {
+      fetchCloiInfo(userId);
+    }
+  }, [userId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchCloiInfo(userId);
+      }
+    }, [userId])
+  );
 
   const handleProfilePress = () => {
     setRenameModalVisible(true);
@@ -38,6 +62,10 @@ const CLOiScreen = () => {
 
   const handleRenameClose = () => {
     setRenameModalVisible(false);
+  };
+
+  const handleRenameSubmit = (newName) => {
+    handleRename(userId, newName);
   };
 
   const getLevelImage = () => {
@@ -48,20 +76,28 @@ const CLOiScreen = () => {
       4: CLOiLv4,
       5: CLOiLv5,
     };
-    return levelImages[Math.min(level(), 5)];
+    return levelImages[Math.min(level, 5)];
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.red20} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header Profile */}
         <TouchableOpacity style={styles.header} onPress={handleProfilePress}>
           <Image source={getLevelImage()} style={styles.profileImage} />
           <Text style={styles.nameText}>{name}</Text>
           <Icon name="chevron-right" size={24} color={Colors.gray40} />
         </TouchableOpacity>
 
-        {/* CLOi Character Container */}
         <View style={styles.cloiWrapper}>
           <View style={styles.cloiContainer}>
             <Image source={CLOiBackground} style={styles.backgroundImage} />
@@ -69,12 +105,11 @@ const CLOiScreen = () => {
           </View>
         </View>
 
-        {/* Progress Section */}
         <View style={styles.progressSection}>
           <View style={styles.levelContainer}>
-            <Text style={styles.levelText}>LV.{level()}</Text>
+            <Text style={styles.levelText}>LV.{level}</Text>
             <View style={styles.progressContainer}>
-              <ProgressBar level={level()} progress={postCount} />
+              <ProgressBar level={level} progress={calculateProgress()} />
               <TouchableOpacity
                 onPress={toggleInfo}
                 style={styles.questionButton}
@@ -85,7 +120,6 @@ const CLOiScreen = () => {
           </View>
         </View>
 
-        {/* Info Box and Speech Bubble */}
         <View style={styles.bottomContainer}>
           {showInfo && (
             <View style={styles.infoBox}>
@@ -97,22 +131,18 @@ const CLOiScreen = () => {
               </Text>
             </View>
           )}
-          <SpeechBubble
-            message="안녕하세요. 오늘 비가 온다고 하네요.
-          우산 꼭 챙기세요!"
-          />
+          <SpeechBubble message={message} />
         </View>
+
         <RenameModal
           visible={isRenameModalVisible}
           onClose={handleRenameClose}
-          onConfirm={handleRename}
+          onConfirm={handleRenameSubmit}
         />
       </View>
     </SafeAreaView>
   );
 };
-
-// styles는 그대로 유지...
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
