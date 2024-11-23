@@ -107,6 +107,7 @@ const useFeedStore = create((set, get) => ({
   },
 
   //피드 삭제
+  //피드 삭제
   deleteFeed: async (feedId) => {
     console.log("[FeedStore] Delete feed called with id:", feedId);
     try {
@@ -129,7 +130,12 @@ const useFeedStore = create((set, get) => ({
           error: null,
           isLoading: false,
         }));
-        useProfileStore.getState().fetchUserStats(); // 프로필 업데이트
+
+        // 프로필 업데이트 콜백 사용
+        if (get().onFeedUpdate) {
+          get().onFeedUpdate();
+        }
+
         return { success: true };
       } else {
         throw new Error(result.error || "피드 삭제에 실패했습니다.");

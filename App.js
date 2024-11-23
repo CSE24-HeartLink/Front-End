@@ -5,6 +5,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Text } from "react-native";
 
 import useAuthStore from "./src/store/authStore";
+import useFeedStore from "./src/store/feedStore";
+import useProfileStore from "./src/store/profileStore";
 import AppNavigator from "./src/components/navigation/AppNavigator";
 
 import LoadingScreen from "./src/screens/LoadingScreen";
@@ -23,9 +25,17 @@ const App = () => {
   };
 
   useEffect(() => {
+    // 기존 인증 초기화
     initAuth();
+
+    // 피드 업데이트 시 프로필 통계 갱신하도록 콜백 설정
+    const feedStore = useFeedStore.getState();
+    feedStore.setOnFeedUpdate(() => {
+      useProfileStore.getState().fetchUserStats();
+    });
   }, []);
 
+  //로딩
   if (isLoading) {
     return <LoadingScreen />;
   }
