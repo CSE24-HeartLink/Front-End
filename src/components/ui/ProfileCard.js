@@ -6,20 +6,42 @@ import Colors from "../../constants/colors";
 import useProfileStore from "../../store/profileStore";
 import useAuthStore from "../../store/authStore";
 import useFeedStore from "../../store/feedStore";
+import useCLOiStore from "../../store/CLOiStore";
 
-const ProfileCard = ({ onPress }) => {
+const ProfileCard = ({ onPress, userId }) => {
   const { userProfile, fetchUserStats } = useProfileStore();
   const { user } = useAuthStore();
   const { setSelectedGroup } = useFeedStore();
+  const { fetchCloiInfo, level } = useCLOiStore();
+  // token과 getUserId 추가
+  const token = useAuthStore((state) => state.userToken);
+  const getUserId = useAuthStore((state) => state.getUserId);
+
+  // displayLevel 선언 추가
+  const displayLevel = level ?? 1; // level이 undefined나 null이면 1을 사용
 
   useEffect(() => {
     const loadData = async () => {
-      await setSelectedGroup("my");  // 먼저 피드를 로드
-      fetchUserStats();  // 그 다음 통계 계산
-    };
-    loadData();
-  }, []);
+      const currentUserId = getUserId(); // getUserId 함수 사용
+      console.log("ProfileCard - Current userId:", currentUserId);
 
+      if (currentUserId) {
+        try {
+          await setSelectedGroup("my");
+          await fetchUserStats();
+          await fetchCloiInfo(currentUserId);
+        } catch (error) {
+          console.error("ProfileCard loadData error:", error);
+        }
+      }
+    };
+
+    if (token) {
+      loadData();
+    }
+  }, [token]);
+
+  // displayLevel을 실제로 사용하도록 변경
   return (
     <TouchableOpacity style={styles.profileCard} onPress={onPress}>
       <View style={styles.headerRow}>
@@ -31,7 +53,8 @@ const ProfileCard = ({ onPress }) => {
         <Text style={styles.introText}>
           총 작성한 게시글 수 {userProfile.postCount}개
         </Text>
-        <Text style={styles.introText}>클로이 레벨{userProfile.cloiLevel}</Text>
+        {/* level 대신 displayLevel 사용 */}
+        <Text style={styles.introText}>클로이 레벨 {displayLevel}</Text>
         <Text style={styles.introText}>
           {userProfile.streakDays}일 연속 게시글 업로드🔥
         </Text>

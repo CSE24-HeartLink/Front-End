@@ -23,6 +23,9 @@ const ToMeButton = ({ title, onPress }) => {
 };
 
 const MyPageScreen = () => {
+  const getUserId = useAuthStore((state) => state.getUserId);
+  const userId = getUserId();
+
   const navigation = useNavigation();
   const { isRenameModalVisible, setRenameModalVisible, handleRename } =
     useMyPageStore();
@@ -56,7 +59,7 @@ const MyPageScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <ProfileCard onPress={handleProfilePress} />
+        <ProfileCard userId={userId} onPress={handleProfilePress} />
         <View style={styles.buttonContainer}>
           <ToMeButton
             title="내 게시글"

@@ -15,15 +15,16 @@ import Colors from "../constants/colors";
 import ProgressBar from "../components/ui/ProgressBar";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import useCLOiStore from "../store/CLOiStore";
-import useAuthStore from "../store/authStore";
 import CLOiLv1 from "../../assets/images/CLOiLv1.png";
 import CLOiLv2 from "../../assets/images/CLOiLv2.png";
 import CLOiLv3 from "../../assets/images/CLOiLv3.png";
 import CLOiLv4 from "../../assets/images/CLOiLv4.png";
 import CLOiLv5 from "../../assets/images/CLOiLv5.png";
 import CLOiBackground from "../../assets/images/CLOiBackground.png";
-import RenameModal from "../components/modals/RenameModal";
+import CLOiRenameModal from "../components/modals/CLOiRenameModal";
+import useAuthStore from "../store/authStore"; // 추가: authStore import
 
+// CLOiScreen.js
 const CLOiScreen = () => {
   const {
     name,
@@ -33,26 +34,50 @@ const CLOiScreen = () => {
     isRenameModalVisible,
     isLoading,
     appearance,
+    progress,
     fetchCloiInfo,
+    checkGrowth,
     setRenameModalVisible,
     handleRename,
     toggleInfo,
-    calculateProgress,
   } = useCLOiStore();
 
-  const userId = useAuthStore((state) => state.user?._id);
+  const getUserId = useAuthStore((state) => state.getUserId);
+  const userId = getUserId();
+
+  console.log("CLOiScreen - Current userId:", userId); // 로그 추가
 
   useEffect(() => {
-    if (userId) {
-      fetchCloiInfo(userId);
-    }
+    const initCLOi = async () => {
+      if (userId) {
+        console.log("Initializing CLOi for userId:", userId); // 로그 추가
+        try {
+          await fetchCloiInfo(userId);
+          await checkGrowth(userId);
+        } catch (error) {
+          console.error("Error initializing CLOi:", error);
+        }
+      }
+    };
+
+    initCLOi();
   }, [userId]);
 
+  // 사용자가 글을 작성할 때마다 성장 체크
   useFocusEffect(
     React.useCallback(() => {
-      if (userId) {
-        fetchCloiInfo(userId);
-      }
+      const updateGrowth = async () => {
+        if (userId) {
+          console.log("Checking growth on focus for userId:", userId); // 로그 추가
+          try {
+            await checkGrowth(userId);
+          } catch (error) {
+            console.error("Error checking growth:", error);
+          }
+        }
+      };
+
+      updateGrowth();
     }, [userId])
   );
 
@@ -89,6 +114,8 @@ const CLOiScreen = () => {
     );
   }
 
+  console.log("CLOiScreen - Current progress:", progress); // 로그 추가
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -109,7 +136,7 @@ const CLOiScreen = () => {
           <View style={styles.levelContainer}>
             <Text style={styles.levelText}>LV.{level}</Text>
             <View style={styles.progressContainer}>
-              <ProgressBar level={level} progress={calculateProgress()} />
+              <ProgressBar level={level} progress={progress} />
               <TouchableOpacity
                 onPress={toggleInfo}
                 style={styles.questionButton}
@@ -131,10 +158,10 @@ const CLOiScreen = () => {
               </Text>
             </View>
           )}
-          <SpeechBubble message={message} />
+          <SpeechBubble message={message || "안녕하세요!"} />
         </View>
 
-        <RenameModal
+        <CLOiRenameModal
           visible={isRenameModalVisible}
           onClose={handleRenameClose}
           onConfirm={handleRenameSubmit}

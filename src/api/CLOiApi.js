@@ -1,16 +1,23 @@
 import axios from "axios";
 import Constants from "expo-constants";
+import useAuthStore from "../store/authStore";
 
 const API_URL = Constants.expoConfig.extra.apiUrl.development;
 
 export const cloiApi = {
-  // 클로이 정보 조회 - 응답 타입 명시
+  // 클로이 정보 조회
   getCloiInfo: async (userId) => {
     try {
       console.log("[CLOiApi] Fetching CLOi info for userId:", userId);
-      const response = await axios.get(`${API_URL}/api/cloi/${userId}`);
+      const token = useAuthStore.getState().userToken; // 토큰 가져오기
+
+      const response = await axios.get(`${API_URL}/api/cloi/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Authorization 헤더 추가
+        },
+      });
       console.log("[CLOiApi] CLOi info response:", response.data);
-      // 백엔드 응답 구조와 일치
+
       return {
         ...response.data,
         appearance:
@@ -21,16 +28,23 @@ export const cloiApi = {
       throw error.response?.data?.message || error.message;
     }
   },
-
-  // 클로이와 대화 - message 응답 추가
+  // 클로이와 대화
   chatWithCloi: async (userId, message) => {
     try {
       console.log("[CLOiApi] Sending chat message:", { userId, message });
-      const response = await axios.post(`${API_URL}/api/cloi/${userId}/chat`, {
-        message,
-      });
+      const token = useAuthStore.getState().userToken; // 토큰 가져오기
+
+      const response = await axios.post(
+        `${API_URL}/api/cloi/${userId}/chat`,
+        { message },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authorization 헤더 추가
+          },
+        }
+      );
       console.log("[CLOiApi] Chat response:", response.data);
-      // 백엔드 응답 구조와 일치
+
       return {
         message: response.data.message,
         appearance: response.data.appearance,
@@ -41,20 +55,24 @@ export const cloiApi = {
     }
   },
 
-  // 클로이 성장 상태 체크 - growth 정보 추가
+  // 클로이 성장 상태 체크
   checkGrowth: async (userId) => {
     try {
       console.log("[CLOiApi] Checking growth for userId:", userId);
+      const token = useAuthStore.getState().userToken; // 토큰 가져오기
+
       const response = await axios.post(
-        `${API_URL}/api/cloi/${userId}/growth/check`
+        `${API_URL}/api/cloi/${userId}/growth/check`,
+        {}, // 빈 객체를 body로 전송
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authorization 헤더 추가
+          },
+        }
       );
       console.log("[CLOiApi] Growth check response:", response.data);
-      // 백엔드 응답 구조와 일치
-      return {
-        cloi: response.data.cloi,
-        appearance: response.data.appearance,
-        growth: response.data.growth,
-      };
+
+      return response.data;
     } catch (error) {
       console.error("[CLOiApi] Growth check error:", error);
       throw error.response?.data?.message || error.message;
@@ -64,6 +82,8 @@ export const cloiApi = {
   // 클로이 이름 변경
   updateCloiName: async (userId, newName) => {
     try {
+      const token = useAuthStore.getState().userToken; // 토큰 가져오기
+
       if (!newName || newName.trim().length === 0) {
         throw new Error("클로이 이름을 입력해주세요.");
       }
@@ -72,9 +92,15 @@ export const cloiApi = {
       }
 
       console.log("[CLOiApi] Updating CLOi name:", { userId, newName });
-      const response = await axios.put(`${API_URL}/api/cloi/${userId}/name`, {
-        name: newName.trim(),
-      });
+      const response = await axios.put(
+        `${API_URL}/api/cloi/${userId}/name`,
+        { name: newName.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authorization 헤더 추가
+          },
+        }
+      );
       console.log("[CLOiApi] Name update response:", response.data);
       return response.data;
     } catch (error) {
