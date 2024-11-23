@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../constants/colors";
+
 import ProgressBar from "../components/ui/ProgressBar";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import useCLOiStore from "../store/CLOiStore";
@@ -21,6 +22,7 @@ import CLOiLv3 from "../../assets/images/CLOiLv3.png";
 import CLOiLv4 from "../../assets/images/CLOiLv4.png";
 import CLOiLv5 from "../../assets/images/CLOiLv5.png";
 import CLOiBackground from "../../assets/images/CLOiBackground.png";
+
 import CLOiRenameModal from "../components/modals/CLOiRenameModal";
 import useAuthStore from "../store/authStore"; // 추가: authStore import
 

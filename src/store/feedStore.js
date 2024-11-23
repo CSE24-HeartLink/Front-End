@@ -1,19 +1,25 @@
+// feedStore.js
 import { create } from "zustand";
-
 import { feedApi } from "../api/feedApi";
 import useAuthStore from "./authStore";
-import useProfileStore from "./profileStore";
 
+/**
+ * 피드 관련 상태를 관리하는 store
+ * - 피드 목록
+ * - 피드 필터링
+ * - 댓글
+ * - 리액션
+ */
 const useFeedStore = create((set, get) => ({
   feeds: [],
   filteredFeeds: [],
   selectedGroup: "all",
   isLoading: false,
   error: null,
-  selectedReactions: {}, // 초기화 추가
-  comments: {}, // Organized by feedId
+  selectedReactions: {},
+  comments: {},
 
-  //피드 추가
+  // 피드 추가
   addFeed: async (feedData) => {
     const userId = useAuthStore.getState().getUserId();
     if (!userId) throw new Error("인증 정보가 없습니다.");
@@ -48,13 +54,22 @@ const useFeedStore = create((set, get) => ({
         isLoading: false,
         error: null,
       }));
-      useProfileStore.getState().fetchUserStats(); // 프로필 업데이트
+
+      // 대신 이벤트를 발행하거나 콜백을 통해 프로필 업데이트를 트리거
+      if (get().onFeedUpdate) {
+        get().onFeedUpdate();
+      }
 
       return newFeed;
     } catch (error) {
       set({ error: "피드 작성에 실패했습니다.", isLoading: false });
       throw error;
     }
+  },
+
+  // 피드 업데이트 콜백 설정
+  setOnFeedUpdate: (callback) => {
+    set({ onFeedUpdate: callback });
   },
 
   //피드 수정

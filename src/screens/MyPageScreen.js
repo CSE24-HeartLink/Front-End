@@ -11,7 +11,7 @@ import RenameModal from "../components/modals/RenameModal";
 import Colors from "../constants/colors";
 import useMyPageStore from "../store/profileStore";
 import useAuthStore from "../store/authStore";
-import authApi from "../api/authApi";
+import useFeedStore from "../store/feedStore";
 
 const ToMeButton = ({ title, onPress }) => {
   return (
@@ -23,13 +23,13 @@ const ToMeButton = ({ title, onPress }) => {
 };
 
 const MyPageScreen = () => {
-  const getUserId = useAuthStore((state) => state.getUserId);
-  const userId = getUserId();
+  // const getUserId = useAuthStore((state) => state.getUserId);
+  // const userId = getUserId();
 
   const navigation = useNavigation();
   const { isRenameModalVisible, setRenameModalVisible, handleRename } =
     useMyPageStore();
-  const { userToken, signOut } = useAuthStore();
+  const { signOut } = useAuthStore();
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const handleProfilePress = () => {
@@ -42,9 +42,7 @@ const MyPageScreen = () => {
 
   const handleLogout = async () => {
     try {
-      console.log("Logout attempt with token:", userToken); // 토큰 확인
-      await authApi.logout(userToken);
-      await signOut();
+      await signOut(); // store의 signOut 함수만 호출
       navigation.reset({
         index: 0,
         routes: [{ name: "Welcome" }],
@@ -56,10 +54,18 @@ const MyPageScreen = () => {
     }
   };
 
+  const handleLoadProfileData = async () => {
+    const feedStore = useFeedStore.getState();
+    await feedStore.setSelectedGroup("my");
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <ProfileCard userId={userId} onPress={handleProfilePress} />
+        <ProfileCard
+          onPress={handleProfilePress}
+          onLoadData={handleLoadProfileData}
+        />
         <View style={styles.buttonContainer}>
           <ToMeButton
             title="내 게시글"

@@ -25,8 +25,6 @@ const AccountInfo = ({
     console.log("[AccountInfo] Delete button pressed for feedId:", feedId);
     onDelete?.();
   };
-
-  // const formatDate = (date) => {
   //   if (!date) return "날짜 없음";
 
   //   try {

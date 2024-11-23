@@ -1,10 +1,15 @@
+// profileStore.js
 import { create } from "zustand";
 import { profileApi } from "../api/profileApi";
-
-import useAuthStore from "./authStore";
-import useFeedStore from "./feedStore";
 import { feedApi } from "../api/feedApi";
+import useAuthStore from "./authStore";
 
+/**
+ * 프로필 관련 상태를 관리하는 store
+ * - 유저 프로필 정보
+ * - 프로필 수정 관련 모달
+ * - 통계 정보
+ */
 const useProfileStore = create((set, get) => ({
   userProfile: {
     profileImage: null,
@@ -17,22 +22,20 @@ const useProfileStore = create((set, get) => ({
   isLoading: false,
   error: null,
 
+  // 프로필 정보 업데이트
   setUserProfile: (profile) =>
     set({ userProfile: { ...get().userProfile, ...profile } }),
 
+  // 닉네임 업데이트 
   updateNickname: async (newName) => {
     try {
-      const userId = useAuthStore.getState().getUserId(); // userId 직접 가져오기
-      if (!userId) {
-        throw new Error("userId is required");
-      }
-
-      console.log("Updating nickname for userId:", userId); // 로그 추가
+      const userId = useAuthStore.getState().getUserId();
+      if (!userId) throw new Error("userId is required");
 
       set({ isLoading: true, error: null });
 
       const response = await profileApi.updateProfile(
-        userId, // authState.user.userId 대신 직접 가져온 userId 사용
+        userId,
         newName,
         useAuthStore.getState().userToken
       );
@@ -51,8 +54,11 @@ const useProfileStore = create((set, get) => ({
       throw error;
     }
   },
+
+  // 이름 변경 모달 표시 여부
   setRenameModalVisible: (visible) => set({ isRenameModalVisible: visible }),
 
+  // 이름 변경 처리
   handleRename: async (newName) => {
     if (newName.trim()) {
       try {
@@ -65,7 +71,7 @@ const useProfileStore = create((set, get) => ({
     }
   },
 
-  //유저 게시글 스탯 확인
+  // 유저 통계 조회
   fetchUserStats: async () => {
     try {
       const userId = useAuthStore.getState().getUserId();
@@ -98,8 +104,11 @@ const useProfileStore = create((set, get) => ({
           streakDays,
         },
       }));
+
+      return { postCount: userFeeds.length, streakDays }; // 통계 정보 반환
     } catch (error) {
       console.error("Failed to fetch user stats:", error);
+      throw error;
     }
   },
 }));
