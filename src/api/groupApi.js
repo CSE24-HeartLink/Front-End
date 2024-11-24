@@ -7,7 +7,7 @@ export const groupApi = {
   // 사용자의 그룹 목록 조회
   fetchGroups: async (userId) => {
     try {
-      const response = await axios.get(`${API_URL}/api/group`, {
+      const response = await axios.get(`${API_URL}/api/sns/group`, {
         params: { userId },
       });
       return response.data;
@@ -20,7 +20,7 @@ export const groupApi = {
   // 그룹 추가
   createGroup: async (name, userId) => {
     try {
-      const response = await axios.post(`${API_URL}/api/group`, {
+      const response = await axios.post(`${API_URL}/api/sns/group`, {
         name,
         userId,
       });
@@ -34,7 +34,7 @@ export const groupApi = {
   // 그룹 수정
   updateGroup: async (groupId, newName) => {
     try {
-      const response = await axios.put(`${API_URL}/api/group/${groupId}`, {
+      const response = await axios.put(`${API_URL}/api/sns/group/${groupId}`, {
         name: newName,
       });
       return response.data;
@@ -47,7 +47,7 @@ export const groupApi = {
   // 그룹 삭제
   deleteGroup: async (groupId) => {
     try {
-      await axios.delete(`${API_URL}/api/group/${groupId}`);
+      await axios.delete(`${API_URL}/api/sns/group/${groupId}`);
     } catch (error) {
       console.error("Delete error:", error);
       throw error;
@@ -59,7 +59,7 @@ export const groupApi = {
     try {
       console.log("Sending request:", { groupId, friendId, requesterId });
       const response = await axios.post(
-        `${API_URL}/api/group/${groupId}/members`,
+        `${API_URL}/api/sns/group/${groupId}/members`,
         {
           friendId,
           requesterId,

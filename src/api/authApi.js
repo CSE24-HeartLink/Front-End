@@ -8,7 +8,7 @@ export const authApi = {
   signup: async (userData) => {
     try {
       console.log("Sending signup request with:", userData);
-      const response = await axios.post(`${API_URL}/api/auth/signup`, userData);
+      const response = await axios.post(`${API_URL}/api/sns/auth/signup`, userData);
       console.log("Signup response:", response.data);
 
       if (!response.data.token || !response.data.user) {
@@ -32,7 +32,7 @@ export const authApi = {
   login: async (email, password) => {
     try {
       console.log("Sending login request:", { email });
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
+      const response = await axios.post(`${API_URL}/api/sns/auth/login`, {
         email: email.trim().toLowerCase(),
         password,
       });
@@ -59,7 +59,7 @@ export const authApi = {
   logout: async (token) => {
     try {
       console.log("Sending logout request with token:", token);
-      const response = await axios.post(`${API_URL}/api/auth/logout`, null, {
+      const response = await axios.post(`${API_URL}/api/sns/auth/logout`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -12,7 +12,7 @@ export const profileApi = {
     }
     try {
       const response = await axios.put(
-        `${API_URL}/api/profile/myprofile?userId=${userId}`,
+        `${API_URL}/api/sns/profile/myprofile?userId=${userId}`,
         { nickname },
         {
           headers: {
@@ -33,7 +33,7 @@ export const profileApi = {
       console.log("[ProfileApi] Fetching profile for user:", userId);
 
       const response = await axios.get(
-        `${API_URL}/api/users/myprofile?userId=${userId}`,
+        `${API_URL}/api/sns/users/myprofile?userId=${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

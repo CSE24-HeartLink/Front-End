@@ -11,7 +11,7 @@ export const cloiApi = {
       console.log("[CLOiApi] Fetching CLOi info for userId:", userId);
       const token = useAuthStore.getState().userToken; // 토큰 가져오기
 
-      const response = await axios.get(`${API_URL}/api/cloi/${userId}`, {
+      const response = await axios.get(`${API_URL}/api/sns/cloi/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Authorization 헤더 추가
         },
@@ -35,7 +35,7 @@ export const cloiApi = {
       const token = useAuthStore.getState().userToken; // 토큰 가져오기
 
       const response = await axios.post(
-        `${API_URL}/api/cloi/${userId}/chat`,
+        `${API_URL}/api/sns/cloi/${userId}/chat`,
         { message },
         {
           headers: {
@@ -62,7 +62,7 @@ export const cloiApi = {
       const token = useAuthStore.getState().userToken; // 토큰 가져오기
 
       const response = await axios.post(
-        `${API_URL}/api/cloi/${userId}/growth/check`,
+        `${API_URL}/api/sns/cloi/${userId}/growth/check`,
         {}, // 빈 객체를 body로 전송
         {
           headers: {
@@ -93,7 +93,7 @@ export const cloiApi = {
 
       console.log("[CLOiApi] Updating CLOi name:", { userId, newName });
       const response = await axios.put(
-        `${API_URL}/api/cloi/${userId}/name`,
+        `${API_URL}/api/sns/cloi/${userId}/name`,
         { name: newName.trim() },
         {
           headers: {
