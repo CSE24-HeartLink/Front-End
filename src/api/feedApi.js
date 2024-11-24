@@ -8,7 +8,7 @@ export const feedApi = {
   createFeed: async (formData) => {
     try {
       console.log("Creating feed with formData:", formData);
-      const response = await axios.post(`${API_URL}/api/feed`, formData, {
+      const response = await axios.post(`${API_URL}/api/sns/feed`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -28,7 +28,7 @@ export const feedApi = {
       console.log("[FeedApi] Updating feed:", feedId, updateData);
 
       const response = await axios.put(
-        `${API_URL}/api/feed/${feedId}`,
+        `${API_URL}/api/sns/feed/${feedId}`,
         updateData
       );
       console.log("[FeedApi] Update response:", response.data);
@@ -44,7 +44,7 @@ export const feedApi = {
     try {
       console.log("[FeedApi] Deleting feed:", feedId);
 
-      await axios.delete(`${API_URL}/api/feed/${feedId}`);
+      await axios.delete(`${API_URL}/api/sns/feed/${feedId}`);
       return { success: true };
     } catch (error) {
       console.error("[FeedApi] Delete feed error:", error);
@@ -59,7 +59,7 @@ export const feedApi = {
   getGroupFeeds: async (groupId) => {
     try {
       console.log("Fetching feeds for group:", groupId);
-      const url = `${API_URL}/api/feed/group/${groupId}`;
+      const url = `${API_URL}/api/sns/feed/group/${groupId}`;
       console.log("API URL:", url);
 
       const response = await axios.get(url);
@@ -75,7 +75,7 @@ export const feedApi = {
   getAllFeeds: async (currentUserId) => {
     try {
       console.log("Fetching all feeds");
-      const url = `${API_URL}/api/feed`;
+      const url = `${API_URL}/api/sns/feed`;
       console.log("API URL:", url);
 
       const response = await axios.get(url, {
@@ -97,7 +97,7 @@ export const feedApi = {
   getUserFeeds: async (userId, currentUserId) => {
     try {
       console.log("[FeedApi] Fetching user feeds for userId:", userId);
-      const url = `${API_URL}/api/feed/user/${userId}`;
+      const url = `${API_URL}/api/sns/feed/user/${userId}`;
       console.log("[FeedApi] Request URL:", url);
 
       const response = await axios.get(url, {
@@ -115,20 +115,20 @@ export const feedApi = {
 
   getComments: async (feedId) => {
     console.log("API 호출 - 댓글 목록 조회:", feedId);
-    const response = await axios.get(`${API_URL}/api/feed/${feedId}/comments`);
+    const response = await axios.get(`${API_URL}/api/sns/feed/${feedId}/comments`);
     console.log("API 응답 - 댓글 목록:", response.data);
     return response.data;
   },
 
   addComment: async (feedId, commentData) => {
-    console.log("API URL:", `${API_URL}/api/feed/${feedId}/comment`);
+    console.log("API URL:", `${API_URL}/api/sns/feed/${feedId}/comment`);
     console.log("전체 요청 정보:", {
       feedId,
-      url: `${API_URL}/api/feed/${feedId}/comment`,
+      url: `${API_URL}/api/sns/feed/${feedId}/comment`,
       data: commentData,
     });
     const response = await axios.post(
-      `${API_URL}/api/feed/${feedId}/comment`,
+      `${API_URL}/api/sns/feed/${feedId}/comment`,
       commentData // {userId, content} 형태
     );
     return response.data;
@@ -137,7 +137,7 @@ export const feedApi = {
   deleteComment: async (feedId, commentId) => {
     console.log("API 호출 - 댓글 삭제:", { feedId, commentId });
     const response = await axios.delete(
-      `${API_URL}/api/feed/${feedId}/comment/${commentId}`
+      `${API_URL}/api/sns/feed/${feedId}/comment/${commentId}`
     );
     console.log("API 응답 - 댓글 삭제:", response.data);
     return response.data;

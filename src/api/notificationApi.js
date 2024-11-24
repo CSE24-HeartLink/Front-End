@@ -6,7 +6,7 @@ export const notificationApi = {
   // 알림 목록 조회
   getNotifications: async (userId) => {
     try {
-      const url = `${API_URL}/api/notify/${userId}`;
+      const url = `${API_URL}/api/sns/notify/${userId}`;
       console.log("Fetching URL:", url); // API URL 확인
       console.log("userId:", userId); // userId 값 확인
 
@@ -24,7 +24,7 @@ export const notificationApi = {
   // 읽지 않은 알림 개수 조회
   getUnreadCount: async (userId) => {
     try {
-      const response = await fetch(`${API_URL}/api/notify/unread/${userId}`);
+      const response = await fetch(`${API_URL}/api/sns/notify/unread/${userId}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch unread count");
@@ -42,7 +42,7 @@ export const notificationApi = {
   markAsRead: async (notificationId) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/notify/read/${notificationId}`,
+        `${API_URL}/api/sns/notify/read/${notificationId}`,
         {
           method: "PATCH",
         }
@@ -63,7 +63,7 @@ export const notificationApi = {
   // 모든 알림 읽음 처리
   markAllAsRead: async (userId) => {
     try {
-      const response = await fetch(`${API_URL}/api/notify/read-all/${userId}`, {
+      const response = await fetch(`${API_URL}/api/sns/notify/read-all/${userId}`, {
         method: "PATCH",
       });
 
@@ -84,11 +84,11 @@ export const notificationApi = {
       console.log("Accepting friend request:", {
         notificationId,
         groupId,
-        url: `${API_URL}/api/friend/requests/${notificationId}/response`, // friend로 수정
+        url: `${API_URL}/api/sns/friend/requests/${notificationId}/response`, // friend로 수정
       });
 
       const response = await fetch(
-        `${API_URL}/api/friend/requests/${notificationId}/response`, // friend로 수정
+        `${API_URL}/api/sns/friend/requests/${notificationId}/response`, // friend로 수정
         {
           method: "PUT",
           headers: {
@@ -118,7 +118,7 @@ export const notificationApi = {
   rejectFriendRequest: async (notificationId) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/friend/requests/${notificationId}/reject`,
+        `${API_URL}/api/sns/friend/requests/${notificationId}/reject`,
         {
           method: "PUT",
         }
@@ -128,7 +128,7 @@ export const notificationApi = {
       const data = await response.json();
 
       // 알림도 함께 삭제
-      await fetch(`${API_URL}/api/notifications/${notificationId}`, {
+      await fetch(`${API_URL}/api/sns/notifications/${notificationId}`, {
         method: "DELETE",
       });
 
