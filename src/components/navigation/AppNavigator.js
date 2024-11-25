@@ -22,6 +22,8 @@ import RenameModal from "../modals/RenameModal.js";
 import BottomTabNavigator from "./BottomTabNavigator";
 import CreatePost from "../../screens/CreatePost";
 import GroupSelectScreen from "../../screens/GroupSelectScreen.js";
+import CLOiScreen from "../../screens/CLOiScreen";
+import ChatbotScreen from "../../screens/ChatbotScreen";
 
 const Stack = createStackNavigator();
 
@@ -66,6 +68,8 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen name="RenameModal" component={RenameModal} />
+      <Stack.Screen name="CLOiScreen" component={CLOiScreen} />
+      <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
     </Stack.Navigator>
   );
 };

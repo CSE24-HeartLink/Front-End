@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Feather";
 import Colors from "../constants/colors";
 
@@ -22,12 +23,14 @@ import CLOiLv3 from "../../assets/images/CLOiLv3.png";
 import CLOiLv4 from "../../assets/images/CLOiLv4.png";
 import CLOiLv5 from "../../assets/images/CLOiLv5.png";
 import CLOiBackground from "../../assets/images/CLOiBackground.png";
+import ChatbotButton from "../../assets/images/ChatbotButton.png";
 
 import CLOiRenameModal from "../components/modals/CLOiRenameModal";
 import useAuthStore from "../store/authStore"; // 추가: authStore import
 
 // CLOiScreen.js
 const CLOiScreen = () => {
+  const navigation = useNavigation();
   const {
     name,
     level,
@@ -93,6 +96,12 @@ const CLOiScreen = () => {
 
   const handleRenameSubmit = (newName) => {
     handleRename(userId, newName);
+  };
+
+  const navigateToChatbot = (shouldNavigate) => {
+    if (shouldNavigate) {
+      navigation.navigate("ChatbotScreen"); // ChatbotScreen으로 이동
+    }
   };
 
   const getLevelImage = () => {
@@ -162,6 +171,13 @@ const CLOiScreen = () => {
           )}
           <SpeechBubble message={message || "안녕하세요!"} />
         </View>
+
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigateToChatbot(true)}
+        >
+          <Image source={ChatbotButton} style={styles.addButtonImage} />
+        </TouchableOpacity>
 
         <CLOiRenameModal
           visible={isRenameModalVisible}
@@ -272,6 +288,16 @@ const styles = StyleSheet.create({
     fontFamily: "Pretendard",
     fontSize: 14,
     lineHeight: 20,
+  },
+  addButton: {
+    position: "absolute",
+    bottom: 60,
+    right: 20,
+  },
+  addButtonImage: {
+    width: 64,
+    height: 64,
+    resizeMode: "contain",
   },
 });
 
