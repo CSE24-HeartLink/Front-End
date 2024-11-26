@@ -7,6 +7,7 @@ const useFriendStore = create((set, get) => ({
   loading: false,
   error: null,
 
+  //친구추가
   addFriend: async (nickname) => {
     set({ loading: true, error: null });
     try {
@@ -58,6 +59,7 @@ const useFriendStore = create((set, get) => ({
     }
   },
 
+  //친구삭제
   deleteFriend: async (friendId) => {
     set({ loading: true });
     try {
@@ -96,14 +98,16 @@ const useFriendStore = create((set, get) => ({
     }
   },
 
-  updateFriendGroup: (friendId, newGroup) =>
+  //친구 그룹 수정
+  updateFriendGroup: (friendId, groupId) => {
     set((state) => ({
       friends: state.friends.map((friend) =>
         friend.friendId._id === friendId
-          ? { ...friend, group: newGroup }
+          ? { ...friend, group: groupId }
           : friend
       ),
-    })),
+    }));
+  },
 
   getFriendsByGroup: (group) => {
     const state = get();

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { groupApi } from "../api/groupApi";
+
 import useAuthStore from "./authStore";
+import useFriendStore from "./friendStore";
 
 const useGroupStore = create((set, get) => ({
   groups: [],
@@ -129,28 +131,39 @@ const useGroupStore = create((set, get) => ({
     }
   },
 
-  moveToGroup: async (friendId, newGroupId) => {
-    set({ loading: true });
+  //그룹 멤버 이동
+  moveGroupMember: async (groupId, friendId) => {
     try {
-      // API 호출
-      const result = await friendApi.moveToGroup(friendId, newGroupId);
+      const userId = useAuthStore.getState().getUserId();
+      if (!userId) {
+        throw new Error("사용자 인증이 필요합니다.");
+      }
+
+      set({ isLoading: true, error: null });
+
+      console.log("Moving member:", { groupId, friendId, userId });
+      const result = await groupApi.moveGroupMember(groupId, friendId, userId);
 
       if (result.success) {
-        // 친구 목록에서 해당 친구의 그룹 정보 업데이트
-        set((state) => ({
-          friends: state.friends.map((friend) =>
-            friend.friendId._id === friendId
-              ? { ...friend, group: newGroupId }
-              : friend
-          ),
-        }));
+        // 그룹 목록 새로고침
+        await get().fetchGroups();
+
+        // FriendStore의 상태도 업데이트
+        const friendStore = useFriendStore.getState();
+        friendStore.updateFriendGroup(friendId, groupId);
+
+        console.log("Member moved successfully:", result.data);
       }
+
+      set({ isLoading: false });
       return result;
     } catch (error) {
-      set({ error: error.message });
+      console.error("Move member error:", error);
+      set({
+        error: error.message || "그룹 이동에 실패했습니다.",
+        isLoading: false,
+      });
       throw error;
-    } finally {
-      set({ loading: false });
     }
   },
 

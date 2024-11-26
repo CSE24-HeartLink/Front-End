@@ -19,9 +19,10 @@ import LoadingScreen from "./LoadingScreen";
 import Colors from "../constants/colors";
 import { toastConfig } from "../components/ui/ToastConfig";
 
+import useGroupStore from "../store/groupStore";
 import useFriendStore from "../store/friendStore";
-import useAuthStore from "../store/authStore";
 
+//친구없을시
 const EmptyState = ({ onAddPress }) => (
   <View style={styles.emptyContainer}>
     <Text style={styles.emptyTitle}>아직 친구가 없어요</Text>
@@ -44,45 +45,77 @@ const FriendsScreen = () => {
   const updateFriendGroup = useFriendStore((state) => state.updateFriendGroup);
   const getFriends = useFriendStore((state) => state.getFriends);
 
+  const groups = useGroupStore((state) => state.groups); // 추가
+  const fetchGroups = useGroupStore((state) => state.fetchGroups); // 추가
+
   // Local states
   const [filteredFriends, setFilteredFriends] = useState(friends);
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  // 초기 친구 목록 로딩
   useEffect(() => {
-    loadFriends();
+    console.log("Current groups:", groups);
+    console.log("Current friends:", friends);
+  }, [groups, friends]);
+
+  // 초기 데이터 로딩 (친구 목록 & 그룹 목록)
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await Promise.all([getFriends(), fetchGroups()]);
+      } catch (error) {
+        console.error("Failed to load data:", error);
+        Toast.show({
+          type: "error",
+          text1: "데이터 로딩 실패",
+          text2: "잠시 후 다시 시도해주세요",
+          visibilityTime: 3000,
+          position: "bottom",
+          bottomOffset: 100,
+        });
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
-  const loadFriends = async () => {
-    try {
-      await getFriends();
-    } catch (error) {
-      console.error("Failed to load friends:", error);
-      Toast.show({
-        type: "error",
-        text1: "친구 목록 로딩 실패",
-        text2: "잠시 후 다시 시도해주세요",
-        visibilityTime: 3000,
-        position: "bottom",
-        bottomOffset: 100,
-      });
-    } finally {
-      setIsInitialLoading(false);
-    }
-  };
-
-  // 친구 목록 필터링
+  // 그룹별 친구 목록 필터링
   useEffect(() => {
+    console.log("Filtering with:", {
+      selectedGroup,
+      friends: friends.map((f) => ({
+        id: f._id,
+        nickname: f.friendId.nickname,
+        group: f.group,
+      })),
+      groups: groups.map((g) => ({
+        id: g.id,
+        name: g.name,
+        members: g.members,
+      })),
+    });
+
     if (selectedGroup && selectedGroup !== "all") {
+      // 두 가지 방식으로 필터링
       setFilteredFriends(
-        friends.filter((friend) => friend.group === selectedGroup)
+        friends.filter(
+          (friend) =>
+            friend.group === selectedGroup || // group 필드로 확인
+            groups.some(
+              (g) =>
+                g.id === selectedGroup &&
+                g.members &&
+                g.members.includes(friend.friendId._id)
+            ) // members 배열로 확인
+        )
       );
     } else {
       setFilteredFriends(friends);
     }
-  }, [selectedGroup, friends]);
+  }, [selectedGroup, friends, groups]);
 
+  // 친구 추가 처리
   const handleAddFriend = async (nickname) => {
     if (!nickname?.trim()) return;
 
@@ -125,10 +158,12 @@ const FriendsScreen = () => {
     }
   };
 
+  // 친구 삭제 처리
   const handleDelete = (friendId) => {
     deleteFriend(friendId);
   };
 
+  //로딩
   if (isInitialLoading || loading) {
     return <LoadingScreen />;
   }

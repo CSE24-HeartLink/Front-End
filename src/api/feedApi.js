@@ -113,6 +113,7 @@ export const feedApi = {
     }
   },
 
+  //댓글조회
   getComments: async (feedId) => {
     console.log("API 호출 - 댓글 목록 조회:", feedId);
     const response = await axios.get(`${API_URL}/api/sns/feed/${feedId}/comments`);
@@ -120,6 +121,7 @@ export const feedApi = {
     return response.data;
   },
 
+  //댓글추가
   addComment: async (feedId, commentData) => {
     console.log("API URL:", `${API_URL}/api/sns/feed/${feedId}/comment`);
     console.log("전체 요청 정보:", {
@@ -134,6 +136,7 @@ export const feedApi = {
     return response.data;
   },
 
+  //댓글삭제
   deleteComment: async (feedId, commentId) => {
     console.log("API 호출 - 댓글 삭제:", { feedId, commentId });
     const response = await axios.delete(

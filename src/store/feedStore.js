@@ -107,7 +107,6 @@ const useFeedStore = create((set, get) => ({
   },
 
   //피드 삭제
-  //피드 삭제
   deleteFeed: async (feedId) => {
     console.log("[FeedStore] Delete feed called with id:", feedId);
     try {

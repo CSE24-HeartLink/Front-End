@@ -26,17 +26,35 @@ const FriendsItem = ({ friend, onMoveGroup, onDelete }) => {
     }
   };
 
-  // groupId로 그룹 이름 찾기
+  // 친구가 속한 그룹 이름 찾기
   const getGroupName = (groupId) => {
-    console.log("groups:", groups);
-    console.log("찾는 groupId:", groupId);
+    console.log("groups in getGroupName:", groups);
+    console.log("현재 friend의 group:", groupId);
 
     if (!groupId || groupId === "null" || groupId === null) {
       return "전체";
     }
 
-    const group = groups.find((g) => g.id === groupId);
-    return group ? group.name : "전체";
+    if (!groups || groups.length === 0) {
+      console.log("그룹 정보가 없음");
+      return "전체";
+    }
+
+    // 직접 groupId로 찾기
+    const foundGroup = groups.find((group) => group.id === groupId);
+    console.log("찾은 그룹:", foundGroup);
+
+    if (foundGroup) {
+      return foundGroup.name;
+    }
+
+    // members 배열로도 확인
+    const groupByMember = groups.find(
+      (group) => group.members && group.members.includes(friend.friendId._id)
+    );
+    console.log("멤버로 찾은 그룹:", groupByMember);
+
+    return groupByMember ? groupByMember.name : "전체";
   };
 
   const handleDeleteClick = () => {

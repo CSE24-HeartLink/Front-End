@@ -27,8 +27,15 @@ const FeedGroupSelectScreen = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentGroupId, setCurrentGroupId] = useState("all");
 
-  const { groups, isLoading, error, fetchGroups, addGroup, editGroupName } =
-    useGroupStore();
+  const {
+    groups,
+    isLoading,
+    error,
+    fetchGroups,
+    addGroup,
+    editGroupName,
+    deleteGroup,
+  } = useGroupStore();
 
   useEffect(() => {
     fetchGroups();
@@ -70,6 +77,45 @@ const FeedGroupSelectScreen = () => {
       setIsEditGroupModalVisible(false);
     } catch (error) {
       Alert.alert("오류", "그룹명 수정에 실패했습니다.");
+    }
+  };
+
+  //그룹삭제
+  const handleDeleteGroup = async () => {
+    try {
+      if (!selectedGroup?.id) {
+        throw new Error("삭제할 그룹을 찾을 수 없습니다.");
+      }
+
+      // 삭제 확인 Alert 추가
+      Alert.alert("그룹 삭제", "정말로 이 그룹을 삭제하시겠습니까?", [
+        {
+          text: "취소",
+          style: "cancel",
+        },
+        {
+          text: "삭제",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteGroup(selectedGroup.id);
+              setIsEditGroupModalVisible(false);
+              setSelectedGroup(null);
+              // 삭제 후 그룹 목록 새로고침
+              fetchGroups();
+            } catch (error) {
+              console.error("Group deletion error:", error);
+              Alert.alert(
+                "삭제 실패",
+                error.response?.data?.error || "그룹 삭제에 실패했습니다."
+              );
+            }
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Delete group error:", error);
+      Alert.alert("오류", error.message);
     }
   };
 
@@ -173,8 +219,12 @@ const FeedGroupSelectScreen = () => {
 
         <EditGroupNameModal
           visible={isEditGroupModalVisible}
-          onClose={() => setIsEditGroupModalVisible(false)}
+          onClose={() => {
+            setIsEditGroupModalVisible(false);
+            setSelectedGroup(null);
+          }}
           onConfirm={handleEditGroupName}
+          onDelete={handleDeleteGroup}
           currentGroupName={selectedGroup?.name || ""}
         />
       </View>

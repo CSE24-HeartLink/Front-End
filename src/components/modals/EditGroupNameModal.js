@@ -7,12 +7,14 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
+import Icon from "react-native-vector-icons/Feather";
 import Colors from "../../constants/colors";
 
 const EditGroupNameModal = ({
   visible,
   onClose,
   onConfirm,
+  onDelete,
   currentGroupName,
 }) => {
   const [groupName, setGroupName] = useState(currentGroupName);
@@ -26,6 +28,11 @@ const EditGroupNameModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
+          {/* Close button */}
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Icon name="x" size={24} color={Colors.gray50} />
+          </TouchableOpacity>
+
           <Text style={styles.title}>그룹 이름 수정</Text>
 
           <View style={styles.inputContainer}>
@@ -39,8 +46,10 @@ const EditGroupNameModal = ({
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.buttonText}>취소</Text>
+            <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+              <Text style={[styles.buttonText, styles.deleteButtonText]}>
+                그룹삭제
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -69,6 +78,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightBeige,
     borderRadius: 16,
   },
+  closeButton: {
+    position: "absolute",
+    right: 16,
+    top: 16,
+    zIndex: 1,
+  },
   title: {
     position: "absolute",
     top: "13.04%",
@@ -81,7 +96,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.gray50,
   },
-  groupSelectContainer: {
+  inputContainer: {
     position: "absolute",
     left: "12.46%",
     right: "9.92%",
@@ -90,45 +105,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray15,
     borderRadius: 8,
     justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 12,
   },
-  selectedGroupText: {
+  input: {
     fontFamily: "Pretendard",
     fontSize: 16,
-    fontWeight: "600",
     color: Colors.gray50,
-  },
-  dropdownList: {
-    position: "absolute",
-    top: "50%",
-    left: "12.46%",
-    right: "9.92%",
-    backgroundColor: Colors.white,
-    borderRadius: 8,
-    elevation: 5,
-    shadowColor: Colors.gray50,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.gray15,
-  },
-  dropdownItemSelected: {
-    backgroundColor: Colors.gray15,
-  },
-  dropdownItemText: {
-    fontFamily: "Pretendard",
-    fontSize: 16,
-    fontWeight: "400",
-    color: Colors.gray50,
-    textAlign: "center",
-  },
-  dropdownItemTextSelected: {
-    fontWeight: "600",
   },
   buttonContainer: {
     position: "absolute",
@@ -140,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     zIndex: 1,
   },
-  cancelButton: {
+  deleteButton: {
     flex: 1,
     height: "100%",
     marginRight: 8,
@@ -166,21 +148,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.gray50,
   },
-  inputContainer: {
-    position: "absolute",
-    left: "12.46%",
-    right: "9.92%",
-    top: "33.15%",
-    height: 40,
-    backgroundColor: Colors.gray15,
-    borderRadius: 8,
-    justifyContent: "center",
-    paddingHorizontal: 12,
-  },
-  input: {
-    fontFamily: "Pretendard",
-    fontSize: 16,
-    color: Colors.gray50,
+  deleteButtonText: {
+    color: Colors.darkRed20,
   },
 });
 
