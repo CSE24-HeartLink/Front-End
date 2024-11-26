@@ -24,6 +24,7 @@ import CreatePost from "../../screens/CreatePost";
 import GroupSelectScreen from "../../screens/GroupSelectScreen.js";
 import CLOiScreen from "../../screens/CLOiScreen";
 import ChatbotScreen from "../../screens/ChatbotScreen";
+import LoadingScreen from "../../screens/LoadingScreen.js";
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,7 @@ const AppNavigator = () => {
       }}
     >
       {/* Auth Screens */}
+
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
@@ -70,6 +72,7 @@ const AppNavigator = () => {
       <Stack.Screen name="RenameModal" component={RenameModal} />
       <Stack.Screen name="CLOiScreen" component={CLOiScreen} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
+      <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
     </Stack.Navigator>
   );
 };
