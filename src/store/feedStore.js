@@ -260,10 +260,29 @@ const useFeedStore = create((set, get) => ({
       if (!userId) throw new Error('인증 정보가 없습니다.')
 
       // 서버에 리액션 토글 요청
-      await feedApi.toggleReaction(feedId, userId, reactionType)
+      const response = await feedApi.toggleReaction(feedId, userId, reactionType)
 
-      // 로컬 상태 업데이트
+      // feeds와 filteredFeeds 둘 다 업데이트
       set((state) => ({
+        feeds: state.feeds.map((feed) => {
+          if (feed.feedId === feedId) {
+            return {
+              ...feed,
+              reactions: response.reactions, // 서버에서 받은 최신 reactions로 업데이트
+            }
+          }
+          return feed
+        }),
+        filteredFeeds: state.filteredFeeds.map((feed) => {
+          if (feed.feedId === feedId) {
+            return {
+              ...feed,
+              reactions: response.reactions, // 서버에서 받은 최신 reactions로 업데이트
+            }
+          }
+          return feed
+        }),
+        // 로컬 리액션 상태도 업데이트
         selectedReactions: {
           ...state.selectedReactions,
           [feedId]: state.selectedReactions[feedId] === reactionType ? null : reactionType,
