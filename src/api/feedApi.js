@@ -146,4 +146,19 @@ export const feedApi = {
     console.log('API 응답 - 댓글 삭제:', response.data)
     return response.data
   },
+
+  // 리액션 토글
+  toggleReaction: async (feedId, userId, reactionType) => {
+    try {
+      console.log('[FeedApi] Toggling reaction:', { feedId, userId, reactionType })
+      const response = await axios.post(`${API_URL}/api/sns/feed/${feedId}/reaction`, {
+        userId,
+        reactionType,
+      })
+      return response.data
+    } catch (error) {
+      console.error('[FeedApi] Toggle reaction error:', error)
+      throw error.response?.data || error.message
+    }
+  },
 }
