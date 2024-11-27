@@ -48,4 +48,51 @@ export const profileApi = {
       throw error.response?.data || error.message;
     }
   },
+
+  // 새로운 프로필 이미지 업로드 API 추가
+  uploadProfileImage: async (userId, imageUri, token) => {
+    try {
+      console.log("[ProfileApi] Uploading profile image. Details:", {
+        userId,
+        imageUri,
+        hasToken: !!token,
+      });
+
+      const formData = new FormData();
+      // userId를 문자열로 전달
+      formData.append("userId", userId.toString());
+
+      const imageUriParts = imageUri.split(".");
+      const fileExtension = imageUriParts[imageUriParts.length - 1];
+
+      formData.append("profileImage", {
+        uri: imageUri,
+        name: `profile-${userId}.${fileExtension}`,
+        type: `image/${fileExtension}`,
+      });
+
+      console.log("[ProfileApi] FormData created:", formData);
+
+      const response = await axios.post(
+        `${API_URL}/api/sns/profile/upload-profile-image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("[ProfileApi] Upload response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[ProfileApi] Upload error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      throw error.response?.data || error.message;
+    }
+  },
 };

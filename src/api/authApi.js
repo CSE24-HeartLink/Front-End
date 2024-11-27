@@ -8,7 +8,10 @@ export const authApi = {
   signup: async (userData) => {
     try {
       console.log("Sending signup request with:", userData);
-      const response = await axios.post(`${API_URL}/api/sns/auth/signup`, userData);
+      const response = await axios.post(
+        `${API_URL}/api/sns/auth/signup`,
+        userData
+      );
       console.log("Signup response:", response.data);
 
       if (!response.data.token || !response.data.user) {
@@ -47,6 +50,7 @@ export const authApi = {
         user: {
           email: response.data.user.email,
           nickname: response.data.user.nickname,
+          profileImage: response.data.user.profileImage, // 프로필 이미지 추가
         },
       };
     } catch (error) {
@@ -59,11 +63,15 @@ export const authApi = {
   logout: async (token) => {
     try {
       console.log("Sending logout request with token:", token);
-      const response = await axios.post(`${API_URL}/api/sns/auth/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `${API_URL}/api/sns/auth/logout`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       console.log("Logout response:", response.data);
       return response.data;
     } catch (error) {
