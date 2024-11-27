@@ -293,6 +293,19 @@ const useFeedStore = create((set, get) => ({
       throw error
     }
   },
+
+  //ai 이미지 생성
+  generateAIImage: async (content) => {
+    try {
+      set({ isLoading: true, error: null })
+      const response = await feedApi.generateAIImage(content)
+      set({ isLoading: false })
+      return response
+    } catch (error) {
+      set({ error: 'AI 이미지 생성에 실패했습니다.', isLoading: false })
+      throw error
+    }
+  },
 }))
 
 export default useFeedStore
