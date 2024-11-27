@@ -62,6 +62,28 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // 프로필 이미지 업데이트 함수 추가
+  updateProfileImage: async (imageUrl) => {
+    try {
+      const currentUser = get().user;
+      const updatedUser = {
+        ...currentUser,
+        profileImage: imageUrl,
+      };
+
+      // 로컬 스토리지 업데이트
+      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // 상태 업데이트
+      set({ user: updatedUser });
+
+      return updatedUser;
+    } catch (e) {
+      console.error("Failed to update profile image:", e);
+      throw e;
+    }
+  },
+
   // 사용자 정보 업데이트
   updateUser: async (userData) => {
     try {
