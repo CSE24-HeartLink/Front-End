@@ -161,4 +161,25 @@ export const feedApi = {
       throw error.response?.data || error.message
     }
   },
+
+  //ai 이미지 생성
+  generateAIImage: async (content) => {
+    try {
+      console.log('[FeedApi] Generating AI image with content:', content)
+
+      const formData = new FormData()
+      formData.append('text_content', content)
+
+      const response = await axios.post(`${API_URL}/api/ai/img/generate-image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      console.error('[FeedApi] Error details:', error.response || error)
+      throw error
+    }
+  },
 }
