@@ -23,8 +23,14 @@ const ChatbotScreen = () => {
   const [message, setMessage] = useState('')
   const flatListRef = useRef(null)
   const { name, level, getLevelFaceImage } = useCLOiStore()
-  const { messages, sendMessage } = useChatStore()
+  const { messages, sendMessage, getChatHistory } = useChatStore()
   const userId = useAuthStore((state) => state.getUserId())
+
+  useEffect(() => {
+    if (userId) {
+      getChatHistory(userId)
+    }
+  }, [userId])
 
   const handleSend = async () => {
     if (!message.trim()) return
