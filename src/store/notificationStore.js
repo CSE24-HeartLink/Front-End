@@ -1,6 +1,8 @@
 // store/notificationStore.js
 import { create } from 'zustand'
 import { notificationApi } from '../api/notificationApi'
+
+import useFriendStore from './friendStore'
 import useAuthStore from './authStore'
 import * as Notifications from 'expo-notifications'
 
@@ -123,9 +125,15 @@ const useNotificationStore = create((set, get) => ({
         : await notificationApi.rejectFriendRequest(notificationId)
 
       if (response.success) {
+        //알림 제거
         set((state) => ({
           notifications: state.notifications.filter((n) => n._id !== notificationId),
         }))
+        // 수락한 경우에만 친구 목록 갱신
+        if (accept) {
+          const friendStore = useFriendStore.getState()
+          await friendStore.getFriends() // 친구 목록 새로고침
+        }
         return true
       }
       return false

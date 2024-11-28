@@ -150,8 +150,15 @@ const NotificationList = ({ notifications, onAccept, onReject, onMarkAsRead, nav
     <FlatList
       data={notifications}
       keyExtractor={(item) => item._id}
-      renderItem={({ item }) => (
-        <NotificationItem item={item} onAccept={onAccept} onReject={onReject} navigation={navigation} markAsRead={onMarkAsRead} />
+      renderItem={({ item, index }) => (
+        <NotificationItem
+          item={item}
+          index={index}
+          onAccept={onAccept}
+          onReject={onReject}
+          navigation={navigation}
+          markAsRead={onMarkAsRead}
+        />
       )}
       style={styles.list}
     />
@@ -171,8 +178,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.red20,
     justifyContent: 'space-between',
   },
   backButton: {
