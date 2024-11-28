@@ -146,6 +146,7 @@ import Colors from '../../constants/colors'
 import useProfileStore from '../../store/profileStore'
 import useAuthStore from '../../store/authStore'
 import { profileApi } from '../../api/profileApi'
+import useFeedStore from '../../store/feedStore'
 
 const ProfileCard = ({ onPress, onLoadData }) => {
   const { userProfile, fetchUserStats } = useProfileStore()
@@ -154,49 +155,7 @@ const ProfileCard = ({ onPress, onLoadData }) => {
   const updateProfileImage = useAuthStore((state) => state.updateProfileImage)
   const getUserId = useAuthStore((state) => state.getUserId)
 
-  /*  const handleImagePress = async () => {
-    try {
-      if (Platform.OS !== "web") {
-        const { status } =
-          await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("권한 필요", "갤러리 접근 권한이 필요합니다.");
-          return;
-        }
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      if (!result.canceled && result.assets[0].uri) {
-        try {
-          const userId = getUserId();
-          // authStore에서 token 직접 가져오기
-          const token = useAuthStore.getState().getAccessToken();
-
-          const response = await profileApi.uploadProfileImage(
-            userId,
-            result.assets[0].uri,
-            token
-          );
-
-          if (response.user && response.user.profileImage) {
-            await updateProfileImage(response.user.profileImage);
-          }
-        } catch (error) {
-          console.error("Profile image upload error:", error);
-          Alert.alert("오류", "프로필 이미지 업데이트에 실패했습니다.");
-        }
-      }
-    } catch (error) {
-      console.error("Image picker error:", error);
-      Alert.alert("오류", "이미지를 선택하는 중 오류가 발생했습니다.");
-    }
-  }; */
+  const setSelectedGroup = useFeedStore((state) => state.setSelectedGroup)
 
   const handleImagePress = async () => {
     try {
@@ -220,13 +179,14 @@ const ProfileCard = ({ onPress, onLoadData }) => {
           const userId = getUserId()
           const token = useAuthStore.getState().getAccessToken()
 
-          // 현재 프로필 이미지 존재 여부에 따라 API 호출 구분
           const response = user?.profileImage
             ? await profileApi.updateProfileImage(userId, result.assets[0].uri, token)
             : await profileApi.uploadProfileImage(userId, result.assets[0].uri, token)
 
           if (response.user && response.user.profileImage) {
             await updateProfileImage(response.user.profileImage)
+            // 이미지 업데이트 후 피드 새로고침
+            await setSelectedGroup('all')
             Alert.alert('성공', `프로필 이미지가 ${user?.profileImage ? '수정' : '등록'}되었습니다.`)
           }
         } catch (error) {
@@ -266,6 +226,8 @@ const ProfileCard = ({ onPress, onLoadData }) => {
 
       if (response.user) {
         await updateProfileImage(null)
+        // 이미지 삭제 후 피드 새로고침
+        await setSelectedGroup('all')
         Alert.alert('성공', '프로필 이미지가 삭제되었습니다.')
       }
     } catch (error) {
