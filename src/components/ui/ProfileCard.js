@@ -137,32 +137,24 @@ const ProfileCard = ({ onPress, onLoadData }) => {
   //);
 //}; */
 
-import React from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  Image,
-  TouchableOpacity,
-  Platform,
-  Alert,
-} from "react-native";
-import { Feather } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import Colors from "../../constants/colors";
+import React from 'react'
+import { View, StyleSheet, Text, Image, TouchableOpacity, Platform, Alert } from 'react-native'
+import { Feather } from '@expo/vector-icons'
+import * as ImagePicker from 'expo-image-picker'
+import Colors from '../../constants/colors'
 
-import useProfileStore from "../../store/profileStore";
-import useAuthStore from "../../store/authStore";
-import { profileApi } from "../../api/profileApi";
+import useProfileStore from '../../store/profileStore'
+import useAuthStore from '../../store/authStore'
+import { profileApi } from '../../api/profileApi'
 
 const ProfileCard = ({ onPress, onLoadData }) => {
-  const { userProfile, fetchUserStats } = useProfileStore();
+  const { userProfile, fetchUserStats } = useProfileStore()
   // store에서 필요한 것들만 가져오기
-  const user = useAuthStore((state) => state.user);
-  const updateProfileImage = useAuthStore((state) => state.updateProfileImage);
-  const getUserId = useAuthStore((state) => state.getUserId);
+  const user = useAuthStore((state) => state.user)
+  const updateProfileImage = useAuthStore((state) => state.updateProfileImage)
+  const getUserId = useAuthStore((state) => state.getUserId)
 
-  const handleImagePress = async () => {
+  /*  const handleImagePress = async () => {
     try {
       if (Platform.OS !== "web") {
         const { status } =
@@ -204,63 +196,125 @@ const ProfileCard = ({ onPress, onLoadData }) => {
       console.error("Image picker error:", error);
       Alert.alert("오류", "이미지를 선택하는 중 오류가 발생했습니다.");
     }
-  };
+  }; */
+
+  const handleImagePress = async () => {
+    try {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (status !== 'granted') {
+          Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.')
+          return
+        }
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      })
+
+      if (!result.canceled && result.assets[0].uri) {
+        try {
+          const userId = getUserId()
+          const token = useAuthStore.getState().getAccessToken()
+
+          // 현재 프로필 이미지 존재 여부에 따라 API 호출 구분
+          const response = user?.profileImage
+            ? await profileApi.updateProfileImage(userId, result.assets[0].uri, token)
+            : await profileApi.uploadProfileImage(userId, result.assets[0].uri, token)
+
+          if (response.user && response.user.profileImage) {
+            await updateProfileImage(response.user.profileImage)
+            Alert.alert('성공', `프로필 이미지가 ${user?.profileImage ? '수정' : '등록'}되었습니다.`)
+          }
+        } catch (error) {
+          console.error('Profile image upload/update error:', error)
+          Alert.alert('오류', `프로필 이미지 ${user?.profileImage ? '수정' : '등록'}에 실패했습니다.`)
+        }
+      }
+    } catch (error) {
+      console.error('Image picker error:', error)
+      Alert.alert('오류', '이미지를 선택하는 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 이미지 컨테이너 부분에 롱프레스 이벤트 추가
+  const handleLongPress = () => {
+    if (user?.profileImage) {
+      Alert.alert('프로필 이미지 삭제', '프로필 이미지를 삭제하시겠습니까?', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: handleDeleteImage,
+        },
+      ])
+    }
+  }
+
+  const handleDeleteImage = async () => {
+    try {
+      const userId = getUserId()
+      const token = useAuthStore.getState().getAccessToken()
+
+      const response = await profileApi.deleteProfileImage(userId, token)
+
+      if (response.user) {
+        await updateProfileImage(null)
+        Alert.alert('성공', '프로필 이미지가 삭제되었습니다.')
+      }
+    } catch (error) {
+      console.error('Profile image delete error:', error)
+      Alert.alert('오류', '프로필 이미지 삭제에 실패했습니다.')
+    }
+  }
 
   return (
-    <TouchableOpacity style={styles.profileCard} onPress={onPress}>
+    <TouchableOpacity style={styles.profileCard} onPress={onPress} onLongPress={handleLongPress}>
       <View style={styles.headerRow}>
-        <TouchableOpacity
-          style={styles.imageContainer}
-          onPress={handleImagePress}
-        >
+        <TouchableOpacity style={styles.imageContainer} onPress={handleImagePress}>
           {user?.profileImage ? (
-            <Image
-              source={{ uri: user.profileImage }}
-              style={styles.profileImage}
-            />
+            <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
           ) : (
-            <View
-              style={[styles.profileImage, styles.profileImagePlaceholder]}
-            />
+            <View style={[styles.profileImage, styles.profileImagePlaceholder]} />
           )}
           <View style={styles.imageEditBadge}>
             <Feather name="edit-2" size={12} color={Colors.white} />
           </View>
         </TouchableOpacity>
-        <Text style={styles.nameText}>{user?.nickname || "사용자"}</Text>
+        <Text style={styles.nameText}>{user?.nickname || '사용자'}</Text>
         <Feather name="chevron-right" size={24} color={Colors.gray40} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.introText}>
-          총 작성한 게시글 수 {userProfile.postCount}개
-        </Text>
-        <Text style={styles.introText}>
-          클로이 레벨 {userProfile.cloiLevel}
-        </Text>
-        <Text style={styles.introText}>
-          {userProfile.streakDays}일 연속 게시글 업로드🔥
-        </Text>
+        <Text style={styles.introText}>총 작성한 게시글 수 {userProfile.postCount}개</Text>
+        <Text style={styles.introText}>클로이 레벨 {userProfile.cloiLevel}</Text>
+        <Text style={styles.introText}>{userProfile.streakDays}일 연속 게시글 업로드🔥</Text>
       </View>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   profileCard: {
     backgroundColor: Colors.lightBeige,
     borderRadius: 16,
     padding: 24,
-    width: "100%",
+    width: '100%',
     height: 217,
   },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 24,
   },
   // 이미지와 편집 배지
   imageContainer: {
-    position: "relative",
+    position: 'relative',
     marginRight: 8,
   },
   profileImage: {
@@ -274,23 +328,23 @@ const styles = StyleSheet.create({
   },
   //편집 아이콘이 들어가는 배지
   imageEditBadge: {
-    position: "absolute",
+    position: 'absolute',
     right: 4,
     bottom: 4,
     backgroundColor: Colors.gray40,
     borderRadius: 12,
     width: 24,
     height: 24,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.white,
   },
   nameText: {
     fontSize: 22,
     color: Colors.gray50,
-    fontFamily: "Pretendard",
-    fontWeight: "700",
+    fontFamily: 'Pretendard',
+    fontWeight: '700',
     flex: 1,
     marginLeft: 8,
   },
@@ -300,10 +354,10 @@ const styles = StyleSheet.create({
   introText: {
     fontSize: 18,
     color: Colors.gray50,
-    fontFamily: "Pretendard",
-    fontWeight: "500",
+    fontFamily: 'Pretendard',
+    fontWeight: '500',
     marginBottom: 8,
   },
-});
+})
 
-export default ProfileCard;
+export default ProfileCard
