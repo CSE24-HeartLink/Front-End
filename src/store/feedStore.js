@@ -157,8 +157,9 @@ const useFeedStore = create((set, get) => ({
         const response = await feedApi.getUserFeeds(currentUserId, currentUserId)
         feedsData = response.feeds || []
       } else {
-        // 특정 그룹 피드 로딩
+        // 그룹 멤버의 피드도 함께 가져오도록 요청
         const response = await feedApi.getGroupFeeds(groupId)
+        console.log('Group feeds userId:', response.feeds[0].userId)
         feedsData = response.feeds || []
       }
 

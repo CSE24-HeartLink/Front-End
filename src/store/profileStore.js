@@ -1,8 +1,8 @@
 // profileStore.js
-import { create } from "zustand";
-import { profileApi } from "../api/profileApi";
-import { feedApi } from "../api/feedApi";
-import useAuthStore from "./authStore";
+import { create } from 'zustand'
+import { profileApi } from '../api/profileApi'
+import { feedApi } from '../api/feedApi'
+import useAuthStore from './authStore'
 
 /**
  * 프로필 관련 상태를 관리하는 store
@@ -14,7 +14,7 @@ const useProfileStore = create((set, get) => ({
   userProfile: {
     profileImage: null,
     postCount: 0,
-    nickname: "",
+    nickname: '',
     streakDays: 0,
     cloiLevel: 1,
   },
@@ -23,22 +23,17 @@ const useProfileStore = create((set, get) => ({
   error: null,
 
   // 프로필 정보 업데이트
-  setUserProfile: (profile) =>
-    set({ userProfile: { ...get().userProfile, ...profile } }),
+  setUserProfile: (profile) => set({ userProfile: { ...get().userProfile, ...profile } }),
 
-  // 닉네임 업데이트 
+  // 닉네임 업데이트
   updateNickname: async (newName) => {
     try {
-      const userId = useAuthStore.getState().getUserId();
-      if (!userId) throw new Error("userId is required");
+      const userId = useAuthStore.getState().getUserId()
+      if (!userId) throw new Error('userId is required')
 
-      set({ isLoading: true, error: null });
+      set({ isLoading: true, error: null })
 
-      const response = await profileApi.updateProfile(
-        userId,
-        newName,
-        useAuthStore.getState().userToken
-      );
+      const response = await profileApi.updateProfile(userId, newName, useAuthStore.getState().userToken)
 
       set((state) => ({
         userProfile: {
@@ -46,12 +41,12 @@ const useProfileStore = create((set, get) => ({
           nickname: response.profile.nickname,
         },
         isLoading: false,
-      }));
+      }))
 
-      return response;
+      return response
     } catch (error) {
-      set({ error: error.message, isLoading: false });
-      throw error;
+      set({ error: error.message, isLoading: false })
+      throw error
     }
   },
 
@@ -62,11 +57,11 @@ const useProfileStore = create((set, get) => ({
   handleRename: async (newName) => {
     if (newName.trim()) {
       try {
-        await get().updateNickname(newName);
-        set({ isRenameModalVisible: false });
+        await get().updateNickname(newName)
+        set({ isRenameModalVisible: false })
       } catch (error) {
-        console.error("[ProfileStore] Handle rename error:", error);
-        throw error;
+        console.error('[ProfileStore] Handle rename error:', error)
+        throw error
       }
     }
   },
@@ -74,27 +69,21 @@ const useProfileStore = create((set, get) => ({
   // 유저 통계 조회
   fetchUserStats: async () => {
     try {
-      const userId = useAuthStore.getState().getUserId();
-      const response = await feedApi.getUserFeeds(userId, userId);
-      const userFeeds = response.feeds;
+      const userId = useAuthStore.getState().getUserId()
+      const response = await feedApi.getUserFeeds(userId, userId)
+      const userFeeds = response.feeds
 
       // 연속 업로드 일수 계산
-      const sortedDates = userFeeds
-        .map((feed) => new Date(feed.createdAt).toDateString())
-        .sort((a, b) => new Date(b) - new Date(a));
+      const sortedDates = userFeeds.map((feed) => new Date(feed.createdAt).toDateString()).sort((a, b) => new Date(b) - new Date(a))
 
-      let streakDays = 0;
-      let currentDate = new Date();
-      currentDate.setHours(0, 0, 0, 0);
+      let streakDays = 0
+      let currentDate = new Date()
+      currentDate.setHours(0, 0, 0, 0)
 
       for (let i = 0; i < sortedDates.length; i++) {
-        const feedDate = new Date(sortedDates[i]);
-        if (
-          currentDate.getTime() - feedDate.getTime() >
-          (streakDays + 1) * 86400000
-        )
-          break;
-        if (i === 0 || sortedDates[i] !== sortedDates[i - 1]) streakDays++;
+        const feedDate = new Date(sortedDates[i])
+        if (currentDate.getTime() - feedDate.getTime() > (streakDays + 1) * 86400000) break
+        if (i === 0 || sortedDates[i] !== sortedDates[i - 1]) streakDays++
       }
 
       set((state) => ({
@@ -103,14 +92,48 @@ const useProfileStore = create((set, get) => ({
           postCount: userFeeds.length,
           streakDays,
         },
-      }));
+      }))
 
-      return { postCount: userFeeds.length, streakDays }; // 통계 정보 반환
+      return { postCount: userFeeds.length, streakDays } // 통계 정보 반환
     } catch (error) {
-      console.error("Failed to fetch user stats:", error);
-      throw error;
+      console.error('Failed to fetch user stats:', error)
+      throw error
     }
   },
-}));
 
-export default useProfileStore;
+  // 프로필 이미지 업로드/수정
+  updateProfileImage: async (userId, imageUri, isUpdate = false) => {
+    try {
+      const token = useAuthStore.getState().getAccessToken()
+      const response = isUpdate
+        ? await profileApi.updateProfileImage(userId, imageUri, token)
+        : await profileApi.uploadProfileImage(userId, imageUri, token)
+
+      if (response.user && response.user.profileImage) {
+        await useAuthStore.getState().updateProfileImage(response.user.profileImage)
+      }
+      return response
+    } catch (error) {
+      console.error('[ProfileStore] Profile image update error:', error)
+      throw error
+    }
+  },
+
+  // 프로필 이미지 삭제
+  deleteProfileImage: async (userId) => {
+    try {
+      const token = useAuthStore.getState().getAccessToken()
+      const response = await profileApi.deleteProfileImage(userId, token)
+
+      if (response.user) {
+        await useAuthStore.getState().updateProfileImage(null)
+      }
+      return response
+    } catch (error) {
+      console.error('[ProfileStore] Profile image delete error:', error)
+      throw error
+    }
+  },
+}))
+
+export default useProfileStore
