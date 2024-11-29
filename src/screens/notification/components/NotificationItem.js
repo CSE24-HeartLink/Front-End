@@ -14,11 +14,21 @@ const NotificationItem = ({ item, onAccept, onReject, navigation, index }) => {
   }
 
   const handlePress = () => {
+    //comment 타입은 댓글창이 열린 상태로 이동
     if (item.type === 'comment' && item.reference?.feedId) {
       navigation.navigate('MainFeedScreen', {
         feedId: item.reference.feedId,
         commentId: item.reference.commentId,
       })
+      //reaction 타입일 때는 해당 피드로만 이동
+    } else if (item.type === 'reaction' && item.reference?.feedId) {
+      navigation.navigate('MainFeedScreen', {
+        selectedFeedId: item.reference.feedId,
+      })
+    }
+
+    if (!item.isRead) {
+      markAsRead(item._id)
     }
   }
   // const handleDelete = async () => {
