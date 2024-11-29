@@ -80,17 +80,13 @@ export const feedApi = {
   // 그룹별 피드 조회 (기존 메서드 수정)
   getGroupFeeds: async (groupId, type = 'feed') => {
     try {
-      console.log('Fetching feeds for group:', groupId, 'type:', type)
+      // 그룹의 피드와 멤버들의 피드를 모두 가져오는 엔드포인트 호출
       const url = `${API_URL}/api/sns/feed/group/${groupId}`
-      console.log('API URL:', url)
-
       const response = await axios.get(url, {
         params: { type },
       })
-      console.log('Server response for group feeds:', response.data)
       return response.data
     } catch (error) {
-      console.error('[Debug] Get group feeds error:', error)
       throw error.response?.data || error.message
     }
   },
