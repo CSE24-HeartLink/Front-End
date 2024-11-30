@@ -1,5 +1,5 @@
 // CLOiScreen.js
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
@@ -19,6 +19,7 @@ import ChatbotButton from '../../assets/images/ChatbotButton.png'
 
 import CLOiRenameModal from '../components/modals/CLOiRenameModal'
 import useAuthStore from '../store/authStore' // 추가: authStore import
+import FloatingHeart from '../components/ui/FloatingHeart'
 
 // CLOiScreen.js
 const CLOiScreen = () => {
@@ -39,9 +40,29 @@ const CLOiScreen = () => {
     toggleInfo,
     getLevelFaceImage,
   } = useCLOiStore()
-
+  const [hearts, setHearts] = useState([])
   const getUserId = useAuthStore((state) => state.getUserId)
   const userId = getUserId()
+
+  const handleCharacterPress = (event) => {
+    // 터치한 위치에 하트 생성
+    const heartId = Date.now()
+    const touchX = event.nativeEvent.locationX
+    const touchY = event.nativeEvent.locationY
+
+    setHearts((currentHearts) => [
+      ...currentHearts,
+      {
+        id: heartId,
+        x: touchX,
+        y: touchY,
+      },
+    ])
+  }
+
+  const removeHeart = (heartId) => {
+    setHearts((currentHearts) => currentHearts.filter((heart) => heart.id !== heartId))
+  }
 
   console.log('CLOiScreen - Current userId:', userId) // 로그 추가
 
@@ -130,10 +151,21 @@ const CLOiScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.cloiWrapper}>
-          <View style={styles.cloiContainer}>
+          <TouchableOpacity style={styles.cloiContainer} onPress={handleCharacterPress} activeOpacity={0.8}>
             <Image source={CLOiBackground} style={styles.backgroundImage} />
             <Image source={getLevelImage()} style={styles.characterImage} />
-          </View>
+            {hearts.map((heart) => (
+              <FloatingHeart
+                key={heart.id}
+                style={{
+                  position: 'absolute',
+                  left: heart.x,
+                  top: heart.y,
+                }}
+                onComplete={() => removeHeart(heart.id)}
+              />
+            ))}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.progressSection}>
@@ -216,6 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingTop: 24,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   backgroundImage: {
     width: 360,
