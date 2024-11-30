@@ -68,6 +68,11 @@ const WritingScreen = () => {
     } else {
       if (route.params?.selectedGroupId) setSelectedGroup(route.params.selectedGroupId)
       else if (route.params?.currentGroupId) setSelectedGroup(route.params.currentGroupId)
+
+      // STT로 변환된 텍스트가 있다면 입력값으로 설정
+      if (route.params?.transcribedText) {
+        setTextInputValue(route.params.transcribedText.trim())
+      }
     }
   }, [])
 
