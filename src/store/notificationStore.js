@@ -125,20 +125,35 @@ const useNotificationStore = create((set, get) => ({
         : await notificationApi.rejectFriendRequest(notificationId)
 
       if (response.success) {
-        //알림 제거
+        // 알림 목록에서 제거
         set((state) => ({
           notifications: state.notifications.filter((n) => n._id !== notificationId),
         }))
-        // 수락한 경우에만 친구 목록 갱신
-        if (accept) {
+
+        if (accept && response.data) {
           const friendStore = useFriendStore.getState()
-          await friendStore.getFriends() // 친구 목록 새로고침
+
+          // 수락한 사람의 친구 목록 새로고침
+          await friendStore.getFriends()
+
+          // 요청한 사람의 친구 목록에도 즉시 추가
+          if (response.data.requester && response.data.relationId) {
+            friendStore.updateFriendsList({
+              _id: response.data.relationId,
+              friendId: {
+                _id: useAuthStore.getState().getUserId(),
+                nickname: useAuthStore.getState().user.nickname,
+                profileImage: useAuthStore.getState().user.profileImage,
+              },
+              group: groupId || null,
+            })
+          }
         }
         return true
       }
       return false
     } catch (error) {
-      console.error('Failed to handle friend request:', error)
+      console.error('친구 요청 처리 실패:', error)
       return false
     }
   },

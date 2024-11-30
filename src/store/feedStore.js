@@ -147,7 +147,7 @@ const useFeedStore = create((set, get) => ({
       set({ isLoading: true, error: null })
       const currentUserId = useAuthStore.getState().getUserId()
 
-      let feedsData
+      let feedsData = []
       if (groupId === 'all') {
         // 전체 피드 로딩 (친구 피드만)
         const response = await feedApi.getAllFeeds(currentUserId)
@@ -159,12 +159,11 @@ const useFeedStore = create((set, get) => ({
       } else {
         // 그룹 멤버의 피드도 함께 가져오도록 요청
         const response = await feedApi.getGroupFeeds(groupId)
-        console.log('Group feeds userId:', response.feeds[0].userId)
-        feedsData = response.feeds || []
+        feedsData = response?.feeds || []
       }
 
-      // 활성 상태인 피드만 필터링
-      const activeFeeds = feedsData.filter((feed) => feed.status === 'active')
+      // userId가 있는 활성 피드만 필터링
+      const activeFeeds = feedsData.filter((feed) => feed && feed.userId && feed.status === 'active')
 
       set({
         selectedGroup: groupId,

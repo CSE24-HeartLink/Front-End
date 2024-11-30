@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { FlatList, StyleSheet, SafeAreaView, TouchableOpacity, Image, RefreshControl, Alert, View, Text } from 'react-native'
+import { FlatList, StyleSheet, SafeAreaView, TouchableOpacity, Image, RefreshControl, Alert, ScrollView, Text } from 'react-native'
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'
 
 import Colors from '../constants/colors'
@@ -10,11 +10,15 @@ import FeedItem from '../components/feed/FeedItem'
 import MainHeader from '../components/navigation/MainHeader'
 import AddFeedIcon from '../../assets/images/AddFeed.png'
 
-const EmptyState = () => (
-  <View style={styles.emptyContainer}>
+//피드 없을시
+const EmptyState = ({ refreshing, onRefresh }) => (
+  <ScrollView
+    contentContainerStyle={styles.emptyContainer}
+    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.red20} colors={[Colors.red20]} />}
+  >
     <Text style={styles.emptyTitle}>아직 피드가 없어요</Text>
     <Text style={styles.emptyDescription}>새로운 피드를 작성하고 친구들과 공유해보세요!</Text>
-  </View>
+  </ScrollView>
 )
 
 const MainFeedScreen = () => {
@@ -150,7 +154,7 @@ const MainFeedScreen = () => {
           }
         />
       ) : (
-        <EmptyState />
+        <EmptyState refreshing={refreshing} onRefresh={handleRefresh} />
       )}
       <TouchableOpacity
         style={styles.addFeedButton}

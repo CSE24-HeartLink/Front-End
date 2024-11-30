@@ -1,5 +1,17 @@
 import React, { useState, useCallback } from 'react'
-import { View, Text, ScrollView, SafeAreaView, Image, StyleSheet, Dimensions, TouchableOpacity, Modal, Pressable } from 'react-native'
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  RefreshControl,
+} from 'react-native'
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native'
 
 import MainHeader from '../../components/navigation/MainHeader'
@@ -7,35 +19,51 @@ import Colors from '../../constants/colors'
 import { feedApi } from '../../api/feedApi'
 import useAuthStore from '../../store/authStore'
 import useGroupStore from '../../store/groupStore'
+import LoadingScreen from '../LoadingScreen'
 
+// 화면 너비를 기준으로 카드 크기 계산
 const windowWidth = Dimensions.get('window').width
 const cardWidth = (windowWidth - 16) / 3
 
-const EmptyState = () => (
-  <View style={styles.emptyContainer}>
+// 데이터가 없을 때 표시되는 EmptyState 컴포넌트
+const EmptyState = ({ refreshing, onRefresh }) => (
+  <ScrollView
+    contentContainerStyle={styles.emptyContainer}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.darkRed20} colors={[Colors.darkRed20]} />
+    }
+  >
     <Text style={styles.emptyTitle}>아직 앨범이 비어있어요</Text>
     <Text style={styles.emptyDescription}>피드를 작성하면 자동으로 앨범에 추가됩니다!</Text>
-  </View>
+  </ScrollView>
 )
 
 const AlbumScreen = () => {
+  // 네비게이션과 라우트 설정
   const navigation = useNavigation()
   const route = useRoute()
-  const [albumData, setAlbumData] = useState([])
-  const [currentGroupId, setCurrentGroupId] = useState('all')
-  const [selectedImage, setSelectedImage] = useState(null)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+
+  // 상태 관리
+  const [albumData, setAlbumData] = useState([]) // 앨범 데이터 저장
+  const [currentGroupId, setCurrentGroupId] = useState('all') // 현재 선택된 그룹
+  const [selectedImage, setSelectedImage] = useState(null) // 선택된 이미지 정보
+  const [modalVisible, setModalVisible] = useState(false) // 모달 표시 여부
+  const [isLoading, setIsLoading] = useState(false) // 로딩 상태
+  const [refreshing, setRefreshing] = useState(false) // 새로고침 상태
+
+  // 스토어에서 필요한 데이터와 함수 가져오기
   const { groups, fetchGroups } = useGroupStore()
   const { getUserId } = useAuthStore()
   const userId = getUserId()
 
+  // 앨범 데이터 가져오기 함수
   const fetchAlbumData = useCallback(
     async (groupId) => {
       try {
         setIsLoading(true)
         let response
 
+        // 그룹 ID에 따라 다른 API 호출
         if (groupId === 'my') {
           response = await feedApi.getUserFeeds(userId, userId, 'album')
         } else if (groupId !== 'all') {
@@ -71,6 +99,18 @@ const AlbumScreen = () => {
     [userId],
   )
 
+  // 새로고침 처리 함수
+  const handleRefresh = useCallback(async () => {
+    console.log('[AlbumScreen] Manual refresh triggered')
+    setRefreshing(true)
+    try {
+      await Promise.all([fetchGroups(), fetchAlbumData(currentGroupId)])
+    } finally {
+      setRefreshing(false)
+    }
+  }, [currentGroupId, fetchGroups, fetchAlbumData])
+
+  // 화면에 포커스될 때마다 데이터 새로고침
   useFocusEffect(
     useCallback(() => {
       fetchGroups()
@@ -80,17 +120,20 @@ const AlbumScreen = () => {
     }, [route.params?.selectedGroupId, currentGroupId]),
   )
 
+  // 카테고리 버튼 클릭 핸들러
   const handleCategoryPress = () => {
     navigation.navigate('AlbumGroupSelectScreen', {
       currentGroupId: currentGroupId,
     })
   }
 
+  // 날짜 포맷 함수
   const formatDate = (date) => {
     const d = new Date(date)
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
   }
 
+  // 핀 렌더링 컴포넌트
   const renderPin = () => (
     <View style={styles.pinContainer}>
       <View style={styles.pinHead} />
@@ -98,6 +141,7 @@ const AlbumScreen = () => {
     </View>
   )
 
+  // 이미지 길게 누르기 핸들러 - 피드로 이동
   const handleLongPress = (image) => {
     navigation.navigate('MainTab', {
       screen: '피드',
@@ -108,11 +152,13 @@ const AlbumScreen = () => {
     })
   }
 
+  // 이미지 클릭 핸들러 - 모달 표시
   const handlePress = (image) => {
     setSelectedImage(image)
     setModalVisible(true)
   }
 
+  // 카드 렌더링 컴포넌트
   const renderCard = (image) => (
     <TouchableOpacity
       style={styles.card}
@@ -129,14 +175,9 @@ const AlbumScreen = () => {
     </TouchableOpacity>
   )
 
+  // 로딩 중일 때 로딩 화면 표시
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.loadingContainer}>
-          <Text>로딩 중...</Text>
-        </View>
-      </SafeAreaView>
-    )
+    return <LoadingScreen />
   }
 
   return (
@@ -147,8 +188,14 @@ const AlbumScreen = () => {
           onPressCategory={handleCategoryPress}
           onPressNotification={() => console.log('notification')}
         />
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {albumData.length > 0 ? (
+        {albumData.length > 0 ? (
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={Colors.darkRed20} colors={[Colors.darkRed20]} />
+            }
+          >
             <View style={styles.grid}>
               {albumData.map((image, index) => (
                 <View key={`${image.url}-${index}`} style={styles.cardContainer}>
@@ -156,11 +203,12 @@ const AlbumScreen = () => {
                 </View>
               ))}
             </View>
-          ) : (
-            <EmptyState />
-          )}
-        </ScrollView>
+          </ScrollView>
+        ) : (
+          <EmptyState refreshing={refreshing} onRefresh={handleRefresh} />
+        )}
 
+        {/* 이미지 상세보기 모달 */}
         <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
             <View style={styles.modalContent}>
@@ -202,7 +250,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     height: 164,
-    //paddingTop: 15, // 핀을 위한 상단 패딩 추가
   },
   imageContainer: {
     flex: 1,
