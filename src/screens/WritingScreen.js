@@ -12,6 +12,7 @@ import {
   Alert,
   Dimensions,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -22,6 +23,7 @@ import CameraIcon from '../../assets/images/icons/CameraIcon.svg'
 import TopFilterButton from '../components/ui/TopFilterButton'
 import MiddleCircleBackground from '../components/ui/MiddleCircleBackground'
 import Colors from '../constants/colors'
+import PostLoadingOverlay from '../components/ui/PostLoadingOverlay'
 
 import useFeedStore from '../store/feedStore'
 import useGroupStore from '../store/groupStore'
@@ -151,6 +153,7 @@ const WritingScreen = () => {
   // 게시글 작성/수정 처리
   const handleSendPost = async () => {
     setIsSubmitting(true)
+    Keyboard.dismiss() // 키보드 숨기기
     if (!textInputValue.trim() && !selectedImage) {
       Alert.alert('알림', '텍스트나 이미지를 입력해주세요.')
       setIsSubmitting(false)
@@ -225,12 +228,7 @@ const WritingScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isSubmitting && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={Colors.red20} />
-          <Text style={styles.loadingText}>게시글 업로드 중...</Text>
-        </View>
-      )}
+      {isSubmitting && <PostLoadingOverlay />}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Icon name="chevron-back" size={24} color={Colors.darkRed20} />
