@@ -7,8 +7,7 @@ import Colors from '../constants/colors'
 import Icon from 'react-native-vector-icons/Ionicons'
 import BigCircleBackground from '../components/ui/BigCircleBackground'
 import MicIcon from '../../assets/images/icons/MicIcon.svg'
-import RecordingPic from '../../assets/images/recording.png'
-
+import LottieView from 'lottie-react-native'
 /**
  * 음성 녹음 화면 컴포넌트
  * 사용자가 음성으로 글을 작성할 수 있는 화면 제공
@@ -68,6 +67,12 @@ const RecordScreen = () => {
    */
   const startRecording = async () => {
     try {
+      // 기존 녹음 객체가 있다면 먼저 정리
+      if (recording) {
+        await recording.stopAndUnloadAsync()
+        setRecording(null)
+      }
+
       // 마이크 권한 요청
       const { status } = await Audio.requestPermissionsAsync()
       if (status !== 'granted') {
@@ -157,7 +162,9 @@ const RecordScreen = () => {
 
       <Text style={styles.recordingText}>{isRecording ? '듣고있어요.' : '녹음 버튼을 눌러주세요'}</Text>
 
-      {isRecording && <Image source={RecordingPic} style={styles.recordingImage} />}
+      {isRecording && (
+        <LottieView source={require('../../assets/animations/Recording.json')} autoPlay loop style={styles.recordingAnimation} />
+      )}
     </View>
   )
 }
@@ -208,6 +215,11 @@ const styles = StyleSheet.create({
     width: '80%',
     height: 110,
     resizeMode: 'contain',
+    marginTop: 20,
+  },
+  recordingAnimation: {
+    width: '80%',
+    height: 150,
     marginTop: 20,
   },
 })
