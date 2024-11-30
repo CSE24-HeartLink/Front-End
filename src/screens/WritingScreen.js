@@ -24,6 +24,7 @@ import TopFilterButton from '../components/ui/TopFilterButton'
 import MiddleCircleBackground from '../components/ui/MiddleCircleBackground'
 import Colors from '../constants/colors'
 import PostLoadingOverlay from '../components/ui/PostLoadingOverlay'
+import FeedImageLoadingOverlay from '../components/ui/FeedImageLoadingOverlay'
 
 import useFeedStore from '../store/feedStore'
 import useGroupStore from '../store/groupStore'
@@ -130,7 +131,6 @@ const WritingScreen = () => {
       setIsLoading(false)
     }
   }
-
   // 갤러리에서 이미지 선택 - 수정 모드에서는 비활성화
   const handleGallerySelect = async () => {
     if (editMode.isEdit) return
@@ -228,6 +228,7 @@ const WritingScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       {isSubmitting && <PostLoadingOverlay />}
+      {isLoading && <FeedImageLoadingOverlay />}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Icon name="chevron-back" size={24} color={Colors.darkRed20} />
