@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Text, SafeAreaView, Alert } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Feather";
+import React, { useState } from 'react'
+import { View, StyleSheet, Text, SafeAreaView, Alert } from 'react-native'
+import { TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/Feather'
 
-import ProfileCard from "../components/ui/ProfileCard";
-import LogoutModal from "../components/modals/LogoutModal";
-import RenameModal from "../components/modals/RenameModal";
+import ProfileCard from '../components/ui/ProfileCard'
+import LogoutModal from '../components/modals/LogoutModal'
+import RenameModal from '../components/modals/RenameModal'
+import ProfileImageLoadingOverlay from '../components/ui/ProfileImageLoadingOverlay'
 
-import Colors from "../constants/colors";
-import useMyPageStore from "../store/profileStore";
-import useAuthStore from "../store/authStore";
-import useFeedStore from "../store/feedStore";
+import Colors from '../constants/colors'
+import useMyPageStore from '../store/profileStore'
+import useAuthStore from '../store/authStore'
+import useFeedStore from '../store/feedStore'
 
 const ToMeButton = ({ title, onPress }) => {
   return (
@@ -19,96 +20,79 @@ const ToMeButton = ({ title, onPress }) => {
       <Text style={styles.buttonText}>{title}</Text>
       <Icon name="chevron-right" size={24} color={Colors.Gray40} />
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 const MyPageScreen = () => {
-  // const getUserId = useAuthStore((state) => state.getUserId);
-  // const userId = getUserId();
-
-  const navigation = useNavigation();
-  const { isRenameModalVisible, setRenameModalVisible, handleRename } =
-    useMyPageStore();
-  const { signOut } = useAuthStore();
-  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const navigation = useNavigation()
+  const { isRenameModalVisible, setRenameModalVisible, handleRename } = useMyPageStore()
+  const { signOut } = useAuthStore()
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleProfilePress = () => {
-    setRenameModalVisible(true);
-  };
+    setRenameModalVisible(true)
+  }
 
   const handleRenameClose = () => {
-    setRenameModalVisible(false);
-  };
+    setRenameModalVisible(false)
+  }
 
   const handleLogout = async () => {
     try {
-      await signOut(); // store의 signOut 함수만 호출
+      await signOut()
       navigation.reset({
         index: 0,
-        routes: [{ name: "Welcome" }],
-      });
+        routes: [{ name: 'Welcome' }],
+      })
     } catch (error) {
-      console.error("Logout failed:", error);
-      setLogoutModalVisible(false);
-      Alert.alert("알림", "로그아웃에 실패했습니다. 다시 시도해주세요.");
+      console.error('Logout failed:', error)
+      setLogoutModalVisible(false)
+      Alert.alert('알림', '로그아웃에 실패했습니다. 다시 시도해주세요.')
     }
-  };
+  }
 
   const handleLoadProfileData = async () => {
-    const feedStore = useFeedStore.getState();
-    await feedStore.setSelectedGroup("my");
-  };
+    const feedStore = useFeedStore.getState()
+    await feedStore.setSelectedGroup('my')
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {isUploading && <ProfileImageLoadingOverlay />}
       <View style={styles.container}>
-        <ProfileCard
-          onPress={handleProfilePress}
-          onLoadData={handleLoadProfileData}
-        />
+        <ProfileCard onPress={handleProfilePress} onLoadData={handleLoadProfileData} setIsUploading={setIsUploading} />
         <View style={styles.buttonContainer}>
           <ToMeButton
             title="내 게시글"
             onPress={() =>
-              navigation.navigate("MainTab", {
-                screen: "피드",
-                params: { selectedGroupId: "my" },
+              navigation.navigate('MainTab', {
+                screen: '피드',
+                params: { selectedGroupId: 'my' },
               })
             }
           />
           <ToMeButton
             title="내 앨범"
             onPress={() =>
-              navigation.navigate("MainTab", {
-                screen: "앨범",
-                params: { selectedGroupId: "my" },
+              navigation.navigate('MainTab', {
+                screen: '앨범',
+                params: { selectedGroupId: 'my' },
               })
             }
           />
         </View>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => setLogoutModalVisible(true)}
-        >
+        <TouchableOpacity style={styles.logoutButton} onPress={() => setLogoutModalVisible(true)}>
           <Text style={styles.logoutButtonText}>로그아웃</Text>
         </TouchableOpacity>
 
-        <RenameModal
-          visible={isRenameModalVisible}
-          onClose={handleRenameClose}
-          onConfirm={handleRename}
-        />
-
-        <LogoutModal
-          visible={isLogoutModalVisible}
-          onClose={() => setLogoutModalVisible(false)}
-          onConfirm={handleLogout}
-        />
+        <RenameModal visible={isRenameModalVisible} onClose={handleRenameClose} onConfirm={handleRename} />
+        <LogoutModal visible={isLogoutModalVisible} onClose={() => setLogoutModalVisible(false)} onConfirm={handleLogout} />
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -129,30 +113,30 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightBeige,
     borderRadius: 12,
     padding: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   buttonText: {
     fontSize: 20,
     color: Colors.gray50,
-    fontFamily: "Pretendard",
-    fontWeight: "500",
+    fontFamily: 'Pretendard',
+    fontWeight: '500',
   },
   logoutButton: {
     backgroundColor: Colors.gray20,
     borderRadius: 12,
     padding: 16,
-    marginTop: "auto",
+    marginTop: 'auto',
     marginBottom: 32,
-    alignItems: "center",
+    alignItems: 'center',
   },
   logoutButtonText: {
     fontSize: 16,
     color: Colors.gray50,
-    fontFamily: "Pretendard",
-    fontWeight: "500",
+    fontFamily: 'Pretendard',
+    fontWeight: '500',
   },
-});
+})
 
-export default MyPageScreen;
+export default MyPageScreen

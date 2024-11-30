@@ -10,7 +10,7 @@ import { profileApi } from '../../api/profileApi'
 import useFeedStore from '../../store/feedStore'
 import useCLOiStore from '../../store/CLOiStore'
 
-const ProfileCard = ({ onPress, onLoadData }) => {
+const ProfileCard = ({ onPress, onLoadData, setIsUploading }) => {
   // store에서 필요한 상태와 함수들을 가져옴
   const { userProfile, fetchUserStats, updateProfileImage, deleteProfileImage } = useProfileStore()
   const user = useAuthStore((state) => state.user)
@@ -19,12 +19,6 @@ const ProfileCard = ({ onPress, onLoadData }) => {
   const setSelectedGroup = useFeedStore((state) => state.setSelectedGroup)
   const { fetchCloiInfo, level } = useCLOiStore()
 
-  /**
-   * 컴포넌트 마운트 시 초기 데이터를 로드
-   * - 사용자 통계
-   * - CLOi 정보
-   * - 추가 데이터 (onLoadData prop이 있는 경우)
-   */
   useEffect(() => {
     const loadData = async () => {
       const currentUserId = getUserId()
@@ -42,16 +36,8 @@ const ProfileCard = ({ onPress, onLoadData }) => {
     if (token) loadData()
   }, [token])
 
-  /**
-   * 이미지 선택 및 업로드/수정 처리
-   * - 갤러리 권한 확인
-   * - 이미지 피커 실행
-   * - 프로필 이미지 업로드/수정
-   * - 피드 새로고침
-   */
   const handleImagePress = async () => {
     try {
-      // 갤러리 권한 확인
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
         if (status !== 'granted') {
@@ -60,7 +46,6 @@ const ProfileCard = ({ onPress, onLoadData }) => {
         }
       }
 
-      // 이미지 피커 실행
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -69,26 +54,27 @@ const ProfileCard = ({ onPress, onLoadData }) => {
       })
 
       if (!result.canceled && result.assets[0].uri) {
+        setIsUploading(true)
         try {
           const userId = getUserId()
           const response = await updateProfileImage(userId, result.assets[0].uri, !!user?.profileImage)
 
           if (response.user && response.user.profileImage) {
-            await setSelectedGroup('all') // 피드 새로고침
+            await setSelectedGroup('all')
             Alert.alert('성공', `프로필 이미지가 ${user?.profileImage ? '수정' : '등록'}되었습니다.`)
           }
         } catch (error) {
           Alert.alert('오류', `프로필 이미지 ${user?.profileImage ? '수정' : '등록'}에 실패했습니다.`)
+        } finally {
+          setIsUploading(false)
         }
       }
     } catch (error) {
       Alert.alert('오류', '이미지를 선택하는 중 오류가 발생했습니다.')
+      setIsUploading(false)
     }
   }
 
-  /**
-   * 이미지 롱프레스 처리 - 삭제 확인 다이얼로그 표시
-   */
   const handleLongPress = () => {
     if (user?.profileImage) {
       Alert.alert('프로필 이미지 삭제', '프로필 이미지를 삭제하시겠습니까?', [
@@ -98,11 +84,6 @@ const ProfileCard = ({ onPress, onLoadData }) => {
     }
   }
 
-  /**
-   * 프로필 이미지 삭제 처리
-   * - 이미지 삭제 API 호출
-   * - 피드 새로고침
-   */
   const handleDeleteImage = async () => {
     try {
       const userId = getUserId()
@@ -155,7 +136,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  // 이미지와 편집 배지
   imageContainer: {
     position: 'relative',
     marginRight: 8,
@@ -165,11 +145,9 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 24,
   },
-  //이미지가 없을 때 표시되는 placeholder
   profileImagePlaceholder: {
     backgroundColor: Colors.gray20,
   },
-  //편집 아이콘이 들어가는 배지
   imageEditBadge: {
     position: 'absolute',
     right: 4,
