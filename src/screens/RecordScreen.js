@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Audio } from 'expo-av'
+
+import { sttApi } from '../api/sttApi'
 
 import Colors from '../constants/colors'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -117,13 +119,17 @@ const RecordScreen = () => {
       setRecording(null)
       setIsRecording(false)
 
-      // TODO: STT 구현시 여기서 처리
-      console.log('Recording URI:', uri)
+      // STT API 호출
+      const result = await sttApi.transcribeAudio(uri)
 
-      navigation.navigate('WritingScreen', {
-        // audioUri: uri,
-        // transcribedText: '' // STT 결과 텍스트가 들어갈 자리
-      })
+      if (result.success) {
+        navigation.navigate('WritingScreen', {
+          transcribedText: result.data.text,
+        })
+      } else {
+        Alert.alert('오류', '음성 변환에 실패했습니다.')
+        console.error('STT Error:', result.error)
+      }
     } catch (error) {
       console.error('Failed to stop recording:', error)
       Alert.alert('오류', '녹음을 중지할 수 없습니다.')
