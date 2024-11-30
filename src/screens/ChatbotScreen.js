@@ -17,6 +17,7 @@ import Colors from '../constants/colors'
 import useCLOiStore from '../store/CLOiStore'
 import useChatStore from '../store/chatStore'
 import useAuthStore from '../store/authStore'
+import TypingIndicator from '../components/ui/TypingIndicator'
 
 const ChatbotScreen = () => {
   const navigation = useNavigation()
@@ -25,6 +26,7 @@ const ChatbotScreen = () => {
   const { name, level, getLevelFaceImage } = useCLOiStore()
   const { messages, sendMessage, getChatHistory } = useChatStore()
   const userId = useAuthStore((state) => state.getUserId())
+  const [isTyping, setIsTyping] = useState(false)
 
   useEffect(() => {
     if (userId) {
@@ -35,8 +37,13 @@ const ChatbotScreen = () => {
   const handleSend = async () => {
     if (!message.trim()) return
 
-    await sendMessage(userId, message)
-    setMessage('')
+    try {
+      setIsTyping(true)
+      setMessage('')
+      await sendMessage(userId, message)
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   const renderMessage = ({ item }) => (
@@ -65,6 +72,16 @@ const ChatbotScreen = () => {
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={styles.messageList}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+          ListFooterComponent={() =>
+            isTyping ? (
+              <View style={styles.botMessageContainer}>
+                <Image source={getLevelFaceImage(getLevelFaceImage)} style={styles.botAvatar} />
+                <View style={[styles.messageBubble, styles.botBubble]}>
+                  <TypingIndicator />
+                </View>
+              </View>
+            ) : null
+          }
         />
 
         <KeyboardAvoidingView
@@ -80,8 +97,8 @@ const ChatbotScreen = () => {
             placeholderTextColor={Colors.gray40}
             multiline
           />
-          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-            <Icon name="send" size={24} color={Colors.red20} />
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton} disabled={isTyping}>
+            <Icon name="send" size={24} color={isTyping ? Colors.gray40 : Colors.red20} />
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </View>
