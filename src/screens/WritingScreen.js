@@ -76,17 +76,19 @@ const WritingScreen = () => {
     }
   }, [route.params?.selectedGroupId])
 
-  // 갤러리 권한 요청
+  // 갤러리 권한 요청 - 수정 모드가 아닐 때만
   useEffect(() => {
-    ;(async () => {
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-        if (status !== 'granted') {
-          Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.')
+    if (!editMode.isEdit) {
+      ;(async () => {
+        if (Platform.OS !== 'web') {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+          if (status !== 'granted') {
+            Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.')
+          }
         }
-      }
-    })()
-  }, [])
+      })()
+    }
+  }, [editMode.isEdit])
 
   // 그룹 선택 화면으로 이동
   const handleGroupSelect = () => {
@@ -101,8 +103,10 @@ const WritingScreen = () => {
     })
   }
 
-  // AI 이미지 생성 처리
+  // AI 이미지 생성 처리 - 수정 모드에서는 비활성화
   const handleAIImageGenerate = async () => {
+    if (editMode.isEdit) return
+
     if (!textInputValue.trim()) {
       Alert.alert('알림', '이미지 생성을 위한 텍스트를 입력해주세요.')
       return
@@ -110,16 +114,11 @@ const WritingScreen = () => {
 
     try {
       setIsLoading(true)
-      console.log('Generating image for text:', textInputValue)
-
       const response = await generateAIImage(textInputValue)
-      console.log('AI image generation response:', response)
 
       if (response.data?.[0]?.url) {
-        console.log('Setting image URL:', response.data[0].url)
         setSelectedImage(response.data[0].url)
       } else {
-        console.log('No image URL found in response:', response)
         Alert.alert('오류', '이미지 URL을 찾을 수 없습니다.')
       }
     } catch (error) {
@@ -130,8 +129,10 @@ const WritingScreen = () => {
     }
   }
 
-  // 갤러리에서 이미지 선택
+  // 갤러리에서 이미지 선택 - 수정 모드에서는 비활성화
   const handleGallerySelect = async () => {
+    if (editMode.isEdit) return
+
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -165,10 +166,10 @@ const WritingScreen = () => {
 
     try {
       if (editMode.isEdit) {
-        // 수정 모드일 때
+        // 수정 모드일 때 - 이미지 관련 데이터는 포함하지 않음
         const updateData = {
           content: textInputValue,
-          emotion: 'happy', // 기존 감정 유지 또는 변경
+          emotion: 'happy',
         }
 
         const result = await updateFeed(editMode.feedId, updateData)
@@ -210,14 +211,12 @@ const WritingScreen = () => {
     }
   }
 
-  // 텍스트 입력 처리
   const handleTextChange = (text) => {
     if (text.length <= 500) {
       setTextInputValue(text)
     }
   }
 
-  // 선택된 그룹 이름 가져오기
   const getGroupName = () => {
     const group = groups.find((g) => g.id === selectedGroup)
     return group ? group.name : '전체'
@@ -254,7 +253,7 @@ const WritingScreen = () => {
           />
         </View>
 
-        {selectedImage && (
+        {selectedImage && !editMode.isEdit && (
           <View style={[styles.imagePreviewContainer, styles.textInputContainer]}>
             <View style={styles.imageWrapper}>
               <Image source={typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage} style={styles.imagePreview} />
@@ -264,22 +263,32 @@ const WritingScreen = () => {
             </TouchableOpacity>
           </View>
         )}
+
+        {selectedImage && editMode.isEdit && (
+          <View style={[styles.imagePreviewContainer, styles.textInputContainer]}>
+            <View style={styles.imageWrapper}>
+              <Image source={typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage} style={styles.imagePreview} />
+            </View>
+          </View>
+        )}
       </ScrollView>
 
-      <View style={styles.circleButtonsContainer}>
-        <TouchableOpacity onPress={handleAIImageGenerate} disabled={isLoading}>
-          <MiddleCircleBackground>
-            <AIImageIcon width={60} height={60} />
-            <Text style={styles.circleButtonText}>{isLoading ? '생성 중...' : 'AI 이미지'}</Text>
-          </MiddleCircleBackground>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleGallerySelect}>
-          <MiddleCircleBackground>
-            <CameraIcon width={60} height={60} />
-            <Text style={styles.circleButtonText}>갤러리</Text>
-          </MiddleCircleBackground>
-        </TouchableOpacity>
-      </View>
+      {!editMode.isEdit && (
+        <View style={styles.circleButtonsContainer}>
+          <TouchableOpacity onPress={handleAIImageGenerate} disabled={isLoading}>
+            <MiddleCircleBackground>
+              <AIImageIcon width={60} height={60} />
+              <Text style={styles.circleButtonText}>{isLoading ? '생성 중...' : 'AI 이미지'}</Text>
+            </MiddleCircleBackground>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleGallerySelect}>
+            <MiddleCircleBackground>
+              <CameraIcon width={60} height={60} />
+              <Text style={styles.circleButtonText}>갤러리</Text>
+            </MiddleCircleBackground>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   )
 }
