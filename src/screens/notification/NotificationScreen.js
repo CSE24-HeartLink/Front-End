@@ -97,6 +97,7 @@ const NotificationScreen = ({ navigation }) => {
     },
   }
 
+  //로딩
   if (loading) return <LoadingScreen />
 
   return (

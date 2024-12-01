@@ -144,6 +144,9 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
   },
+  profileImagePlaceholder: {
+    backgroundColor: Colors.gray20,
+  },
   infoContainer: {
     marginLeft: 12,
   },

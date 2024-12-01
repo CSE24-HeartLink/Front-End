@@ -157,6 +157,24 @@ const useNotificationStore = create((set, get) => ({
       return false
     }
   },
+
+  // 알림 삭제
+  deleteNotification: async (notificationId) => {
+    try {
+      const response = await notificationApi.deleteNotification(notificationId)
+      if (response.success) {
+        // 알림 목록에서 제거
+        set((state) => ({
+          notifications: state.notifications.filter((n) => n._id !== notificationId),
+        }))
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to delete notification:', error)
+      return false
+    }
+  },
 }))
 
 export default useNotificationStore
