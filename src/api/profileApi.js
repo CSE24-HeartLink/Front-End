@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Constants from 'expo-constants'
 
-const API_URL = Constants.expoConfig.extra.apiUrl.development
+const API_URL = Constants.expoConfig.extra.apiUrl.production
 
 export const profileApi = {
   // 프로필 정보 수정 (닉네임)

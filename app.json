@@ -12,13 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.popramel.fe"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.popramel.fe"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,8 +37,11 @@
     ],
     "extra": {
       "apiUrl": {
-        "development": "http://192.168.45.142:3000",
-        "production": "https://your-production-api.com"
+        "development": "http://192.168.102.151:3000",
+        "production": "http://13.209.84.83:3000"
+      },
+      "eas": {
+        "projectId": "6ce24fbc-ebc6-4c0e-bc3d-6dce08c28af8"
       }
     }
   }

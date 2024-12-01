@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Constants from 'expo-constants'
 
-const API_URL = Constants.expoConfig.extra.apiUrl.development
+const API_URL = Constants.expoConfig.extra.apiUrl.production
 
 export const groupApi = {
   // 사용자의 그룹 목록 조회
