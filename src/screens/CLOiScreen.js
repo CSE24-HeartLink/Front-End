@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Feather'
 import Colors from '../constants/colors'
+import LottieView from 'lottie-react-native'
 
 import ProgressBar from '../components/ui/ProgressBar'
 import SpeechBubble from '../components/ui/SpeechBubble'
@@ -16,12 +17,9 @@ import CLOiLv4 from '../../assets/images/CLOiLv4.png'
 import CLOiLv5 from '../../assets/images/CLOiLv5.png'
 import CLOiBackground from '../../assets/images/CLOiBackground.png'
 import ChatbotButton from '../../assets/images/ChatbotButton.png'
-
 import CLOiRenameModal from '../components/modals/CLOiRenameModal'
-import useAuthStore from '../store/authStore' // 추가: authStore import
-import FloatingHeart from '../components/ui/FloatingHeart'
+import useAuthStore from '../store/authStore'
 
-// CLOiScreen.js
 const CLOiScreen = () => {
   const navigation = useNavigation()
   const {
@@ -40,36 +38,40 @@ const CLOiScreen = () => {
     toggleInfo,
     getLevelFaceImage,
   } = useCLOiStore()
-  const [hearts, setHearts] = useState([])
+
   const getUserId = useAuthStore((state) => state.getUserId)
   const userId = getUserId()
+  const [animations, setAnimations] = useState([])
+  const heartAnimation = require('../../assets/animations/heart.json')
+
+  const handleAnimationFinish = (animationId) => {
+    setAnimations((current) => current.filter((animation) => animation.id !== animationId))
+  }
 
   const handleCharacterPress = (event) => {
-    // 터치한 위치에 하트 생성
-    const heartId = Date.now()
+    const animationId = Date.now()
     const touchX = event.nativeEvent.locationX
     const touchY = event.nativeEvent.locationY
 
-    setHearts((currentHearts) => [
-      ...currentHearts,
+    setAnimations((current) => [
+      ...current,
       {
-        id: heartId,
+        id: animationId,
         x: touchX,
         y: touchY,
+        completed: false,
       },
     ])
-  }
 
-  const removeHeart = (heartId) => {
-    setHearts((currentHearts) => currentHearts.filter((heart) => heart.id !== heartId))
+    setTimeout(() => {
+      handleAnimationFinish(animationId)
+    }, 2000)
   }
-
-  console.log('CLOiScreen - Current userId:', userId) // 로그 추가
 
   useEffect(() => {
     const initCLOi = async () => {
       if (userId) {
-        console.log('Initializing CLOi for userId:', userId) // 로그 추가
+        console.log('Initializing CLOi for userId:', userId)
         try {
           await fetchCloiInfo(userId)
           await checkGrowth(userId)
@@ -82,12 +84,11 @@ const CLOiScreen = () => {
     initCLOi()
   }, [userId])
 
-  // 사용자가 글을 작성할 때마다 성장 체크
   useFocusEffect(
     React.useCallback(() => {
       const updateGrowth = async () => {
         if (userId) {
-          console.log('Checking growth on focus for userId:', userId) // 로그 추가
+          console.log('Checking growth on focus for userId:', userId)
           try {
             await checkGrowth(userId)
           } catch (error) {
@@ -114,7 +115,7 @@ const CLOiScreen = () => {
 
   const navigateToChatbot = (shouldNavigate) => {
     if (shouldNavigate) {
-      navigation.navigate('ChatbotScreen') // ChatbotScreen으로 이동
+      navigation.navigate('ChatbotScreen')
     }
   }
 
@@ -139,8 +140,6 @@ const CLOiScreen = () => {
     )
   }
 
-  console.log('CLOiScreen - Current progress:', progress) // 로그 추가
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -154,15 +153,22 @@ const CLOiScreen = () => {
           <TouchableOpacity style={styles.cloiContainer} onPress={handleCharacterPress} activeOpacity={0.8}>
             <Image source={CLOiBackground} style={styles.backgroundImage} />
             <Image source={getLevelImage()} style={styles.characterImage} />
-            {hearts.map((heart) => (
-              <FloatingHeart
-                key={heart.id}
-                style={{
-                  position: 'absolute',
-                  left: heart.x,
-                  top: heart.y,
-                }}
-                onComplete={() => removeHeart(heart.id)}
+            {animations.map((animation) => (
+              <LottieView
+                key={animation.id}
+                source={heartAnimation}
+                autoPlay
+                loop={false}
+                speed={1}
+                style={[
+                  styles.lottieHeart,
+                  {
+                    position: 'absolute',
+                    left: animation.x - 75,
+                    top: animation.y - 75,
+                  },
+                ]}
+                onAnimationFinish={() => handleAnimationFinish(animation.id)}
               />
             ))}
           </TouchableOpacity>
@@ -203,6 +209,7 @@ const CLOiScreen = () => {
     </SafeAreaView>
   )
 }
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -314,6 +321,10 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     resizeMode: 'contain',
+  },
+  lottieHeart: {
+    width: 150,
+    height: 150,
   },
 })
 
