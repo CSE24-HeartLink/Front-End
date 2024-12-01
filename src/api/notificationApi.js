@@ -1,141 +1,130 @@
-import Constants from "expo-constants";
+// api/notificationApi.js
+import axios from 'axios'
+import Constants from 'expo-constants'
 
-const API_URL = Constants.expoConfig.extra.apiUrl.development;
+const API_URL = Constants.expoConfig.extra.apiUrl.development
+
+const api = axios.create({
+  baseURL: API_URL,
+  timeout: 10000,
+})
 
 export const notificationApi = {
   // 알림 목록 조회
   getNotifications: async (userId) => {
     try {
-      const url = `${API_URL}/api/sns/notify/${userId}`;
-      console.log("Fetching URL:", url); // API URL 확인
-      console.log("userId:", userId); // userId 값 확인
+      const url = `/api/sns/notify/${userId}`
+      console.log('Fetching URL:', url)
+      console.log('userId:', userId)
 
-      const response = await fetch(url);
-      const data = await response.json();
-      console.log("API Response:", data); // 응답 데이터 확인
+      const { data } = await api.get(url)
+      console.log('API Response:', data)
 
-      return data;
+      return data
     } catch (error) {
-      console.error("Fetch error:", error);
-      return { success: false, error: error.message };
+      console.error('Fetch error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
 
   // 읽지 않은 알림 개수 조회
   getUnreadCount: async (userId) => {
     try {
-      const response = await fetch(`${API_URL}/api/sns/notify/unread/${userId}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch unread count");
-      }
-
-      const data = await response.json();
-      return { success: true, count: data.count };
+      const { data } = await api.get(`/api/sns/notify/unread/${userId}`)
+      return { success: true, count: data.count }
     } catch (error) {
-      console.error("[NotificationApi] Get unread count error:", error);
-      return { success: false, error: error.message };
+      console.error('[NotificationApi] Get unread count error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
 
   // 알림 읽음 처리
   markAsRead: async (notificationId) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/sns/notify/read/${notificationId}`,
-        {
-          method: "PATCH",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to mark notification as read");
-      }
-
-      const data = await response.json();
-      return { success: true, data };
+      const { data } = await api.patch(`/api/sns/notify/read/${notificationId}`)
+      return { success: true, data }
     } catch (error) {
-      console.error("[NotificationApi] Mark as read error:", error);
-      return { success: false, error: error.message };
+      console.error('[NotificationApi] Mark as read error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
 
   // 모든 알림 읽음 처리
   markAllAsRead: async (userId) => {
     try {
-      const response = await fetch(`${API_URL}/api/sns/notify/read-all/${userId}`, {
-        method: "PATCH",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to mark all notifications as read");
-      }
-
-      return { success: true };
+      await api.patch(`/api/sns/notify/read-all/${userId}`)
+      return { success: true }
     } catch (error) {
-      console.error("[NotificationApi] Mark all as read error:", error);
-      return { success: false, error: error.message };
+      console.error('[NotificationApi] Mark all as read error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
 
   // 친구 요청 수락
   acceptFriendRequest: async (notificationId, groupId) => {
     try {
-      console.log("Accepting friend request:", {
+      console.log('Accepting friend request:', {
         notificationId,
         groupId,
-        url: `${API_URL}/api/sns/friend/requests/${notificationId}/response`, // friend로 수정
-      });
+      })
 
-      const response = await fetch(
-        `${API_URL}/api/sns/friend/requests/${notificationId}/response`, // friend로 수정
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            response: "accepted",
-            groupId,
-          }),
-        }
-      );
+      const { data } = await api.put(`/api/sns/friend/requests/${notificationId}/response`, {
+        response: 'accepted',
+        groupId,
+      })
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error("Server response:", errorData);
-        throw new Error("Failed to accept friend request");
-      }
-
-      return { success: true };
+      // data 자체가 서버에서 success: true를 포함하고 있다면 data를 그대로 반환
+      return data.success ? data : { success: true, data }
     } catch (error) {
-      console.error("[NotificationApi] Accept friend request error:", error);
-      return { success: false, error: error.message };
+      console.error('[NotificationApi] Accept friend request error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
 
   // 친구 요청 거절
   rejectFriendRequest: async (notificationId) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/sns/friend/requests/${notificationId}/reject`,
-        {
-          method: "PUT",
-        }
-      );
-      console.log("Reject response status:", response.status);
-
-      const data = await response.json();
+      const { data } = await api.put(`/api/sns/friend/requests/${notificationId}/reject`)
 
       // 알림도 함께 삭제
-      await fetch(`${API_URL}/api/sns/notifications/${notificationId}`, {
-        method: "DELETE",
-      });
+      await api.delete(`/api/sns/notify/${notificationId}`)
 
-      return { success: true, data };
+      return { success: true, data }
     } catch (error) {
-      console.error("[NotificationApi] Reject friend request error:", error);
-      return { success: false, error: error.message };
+      console.error('[NotificationApi] Reject friend request error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
     }
   },
-};
+
+  // 알림 삭제
+  deleteNotification: async (notificationId) => {
+    try {
+      await api.delete(`/api/sns/notify/${notificationId}`)
+      return { success: true }
+    } catch (error) {
+      console.error('[NotificationApi] Delete notification error:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message,
+      }
+    }
+  },
+}
