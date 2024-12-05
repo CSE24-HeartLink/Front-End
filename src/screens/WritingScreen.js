@@ -11,8 +11,8 @@ import {
   Platform,
   Alert,
   Dimensions,
-  ActivityIndicator,
   Keyboard,
+  ActionSheetIOS,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -84,14 +84,21 @@ const WritingScreen = () => {
     }
   }, [route.params?.selectedGroupId])
 
-  // 갤러리 권한 요청 - 수정 모드가 아닐 때만
+  // 갤러리/카메라 권한 요청 - 수정 모드가 아닐 때만
   useEffect(() => {
     if (!editMode.isEdit) {
       ;(async () => {
         if (Platform.OS !== 'web') {
-          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-          if (status !== 'granted') {
+          // 갤러리 권한
+          const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
+          if (galleryStatus.status !== 'granted') {
             Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.')
+          }
+
+          // 카메라 권한
+          const cameraStatus = await ImagePicker.requestCameraPermissionsAsync()
+          if (cameraStatus.status !== 'granted') {
+            Alert.alert('권한 필요', '카메라 접근 권한이 필요합니다.')
           }
         }
       })()
@@ -136,23 +143,76 @@ const WritingScreen = () => {
       setIsLoading(false)
     }
   }
-  // 갤러리에서 이미지 선택 - 수정 모드에서는 비활성화
-  const handleGallerySelect = async () => {
-    if (editMode.isEdit) return
 
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      })
-
-      if (!result.canceled) {
-        setSelectedImage(result.assets[0].uri)
-      }
-    } catch (error) {
-      Alert.alert('오류', '이미지를 선택하는 중 오류가 발생했습니다.')
+  // 갤러리에서 이미지 선택 혹은 카메라로 사진 촬영
+  //수정 모드에서는 비활성화
+  const handleCameraPress = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['취소', '사진 촬영', '갤러리에서 선택'],
+          cancelButtonIndex: 0,
+        },
+        async (buttonIndex) => {
+          if (buttonIndex === 1) {
+            // 카메라 실행
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            })
+            if (!result.canceled) {
+              setSelectedImage(result.assets[0].uri)
+            }
+          } else if (buttonIndex === 2) {
+            // 갤러리 실행
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            })
+            if (!result.canceled) {
+              setSelectedImage(result.assets[0].uri)
+            }
+          }
+        },
+      )
+    } else {
+      // Android의 경우 Alert.alert 사용
+      Alert.alert('사진 선택', '어떤 방식으로 사진을 선택하시겠습니까?', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '사진 촬영',
+          onPress: async () => {
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            })
+            if (!result.canceled) {
+              setSelectedImage(result.assets[0].uri)
+            }
+          },
+        },
+        {
+          text: '갤러리에서 선택',
+          onPress: async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            })
+            if (!result.canceled) {
+              setSelectedImage(result.assets[0].uri)
+            }
+          },
+        },
+      ])
     }
   }
 
@@ -285,10 +345,10 @@ const WritingScreen = () => {
               <Text style={styles.circleButtonText}>{isLoading ? '생성 중...' : 'AI 이미지'}</Text>
             </MiddleCircleBackground>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleGallerySelect}>
+          <TouchableOpacity onPress={handleCameraPress}>
             <MiddleCircleBackground>
               <CameraIcon width={60} height={60} />
-              <Text style={styles.circleButtonText}>갤러리</Text>
+              <Text style={styles.circleButtonText}>사진</Text>
             </MiddleCircleBackground>
           </TouchableOpacity>
         </View>

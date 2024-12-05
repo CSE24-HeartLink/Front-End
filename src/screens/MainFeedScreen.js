@@ -41,17 +41,13 @@ const MainFeedScreen = () => {
   const loadFeeds = useCallback(
     async (groupId = 'all') => {
       try {
-        console.log('[MainFeedScreen] Loading feeds for group:', groupId)
         const token = getAccessToken()
         if (!token) {
-          console.log('[MainFeedScreen] No token found, navigating to login')
           navigation.navigate('Login')
           return
         }
         await setSelectedGroup(groupId)
-        console.log('[MainFeedScreen] Feeds loaded successfully')
       } catch (error) {
-        console.error('[MainFeedScreen] Feed loading error:', error)
         Alert.alert('오류', '피드를 불러오는데 실패했습니다.')
       }
     },
@@ -60,18 +56,15 @@ const MainFeedScreen = () => {
 
   // 초기 로딩
   useEffect(() => {
-    console.log('[MainFeedScreen] Initial feed loading')
     loadFeeds('all')
   }, []) // 컴포넌트 마운트 시 한 번만 실행
 
   // 화면에 포커스될 때마다 실행
   useFocusEffect(
     useCallback(() => {
-      console.log('[MainFeedScreen] Screen focused')
       const newGroupId = route.params?.selectedGroupId || currentGroupId
 
       if (newGroupId !== currentGroupId) {
-        console.log('[MainFeedScreen] Group changed, loading new feeds')
         setCurrentGroupId(newGroupId)
         loadFeeds(newGroupId)
       }
@@ -110,7 +103,6 @@ const MainFeedScreen = () => {
   }, [feedId, filteredFeeds])
 
   const handleRefresh = useCallback(async () => {
-    console.log('[MainFeedScreen] Manual refresh triggered')
     setRefreshing(true)
     await loadFeeds(currentGroupId)
     setRefreshing(false)
