@@ -26,6 +26,8 @@ import Colors from '../constants/colors'
 import PostLoadingOverlay from '../components/ui/PostLoadingOverlay'
 import FeedImageLoadingOverlay from '../components/ui/FeedImageLoadingOverlay'
 
+import { nuguApi } from '../api/websocket'
+
 import useFeedStore from '../store/feedStore'
 import useGroupStore from '../store/groupStore'
 import useAuthStore from '../store/authStore'
@@ -76,6 +78,42 @@ const WritingScreen = () => {
       }
     }
   }, [])
+
+   // textInputValue나 selectedImage가 변경될 때마다 현재 데이터 업데이트
+   useEffect(() => {
+    nuguApi.updateWritingData({
+        text: textInputValue,
+        image: selectedImage,
+        group: selectedGroup
+    });
+}, [textInputValue, selectedImage, selectedGroup]);
+
+useEffect(() => {
+  nuguApi.setCurrentScreen('WritingScreen');
+  console.log("WritingScreen 마운트됨");
+
+  const unsubscribe = nuguApi.subscribe((data) => {
+      if (data.type === "AI_IMAGE_GENERATED") {
+          const imageUrl = data?.data?.[0]?.data?.[0]?.url;
+          if (imageUrl) {
+              setSelectedImage(imageUrl);
+          }
+      } else if (data.type === "TRIGGER_SEND_POST") {
+          console.log("현재 상태:", {
+              text: textInputValue,
+              image: selectedImage,
+              group: selectedGroup
+          });
+          
+          handleSendPost();
+      }
+  });
+
+  return () => {
+      unsubscribe();
+      nuguApi.setCurrentScreen(null);
+  };
+}, [textInputValue, selectedImage, selectedGroup, handleSendPost]);
 
   // 그룹 선택 후 업데이트
   useEffect(() => {
@@ -218,18 +256,25 @@ const WritingScreen = () => {
 
   // 게시글 작성/수정 처리
   const handleSendPost = async () => {
-    setIsSubmitting(true)
-    Keyboard.dismiss() // 키보드 숨기기
-    if (!textInputValue.trim() && !selectedImage) {
-      Alert.alert('알림', '텍스트나 이미지를 입력해주세요.')
-      setIsSubmitting(false)
-      return
-    }
+    console.log("=== handleSendPost 실행 시작 ===");
+    console.log("텍스트:", textInputValue);
+    console.log("이미지:", selectedImage);
+    console.log("그룹:", selectedGroup);
+    
+    setIsSubmitting(true);
+    Keyboard.dismiss();
+    
+    // 검증 로직을 좀 더 명확하게
+    const hasText = Boolean(textInputValue && textInputValue.trim());
+    const hasImage = Boolean(selectedImage);
+    
+    console.log("입력값 검증:", { hasText, hasImage });
 
-    if (!token) {
-      Alert.alert('알림', '로그인이 필요합니다.')
-      setIsSubmitting(false)
-      return
+    if (!hasText && !hasImage) {
+        console.log("입력값 검증 실패");
+        Alert.alert('알림', '텍스트나 이미지를 입력해주세요.');
+        setIsSubmitting(false);
+        return;
     }
 
     try {
