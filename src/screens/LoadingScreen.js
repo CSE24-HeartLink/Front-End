@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Animated } from "react-native";
-import LottieView from "lottie-react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Colors from "../constants/colors";
+import React, { useEffect, useState } from 'react'
+import { View, StyleSheet, Animated } from 'react-native'
+import LottieView from 'lottie-react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import Colors from '../constants/colors'
 
 const LoadingScreen = () => {
-  const [scaleAnim] = useState(new Animated.Value(1)); // 텍스트 크기 애니메이션
+  const [scaleAnim] = useState(new Animated.Value(1)) // 텍스트 크기 애니메이션
 
   useEffect(() => {
     // 텍스트 크기 애니메이션 반복
@@ -21,21 +21,16 @@ const LoadingScreen = () => {
           duration: 500,
           useNativeDriver: true,
         }),
-      ])
-    ).start();
-  }, []);
+      ]),
+    ).start()
+  }, [])
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* 애니메이션과 텍스트를 감싸는 뷰 */}
         <View style={styles.animationContainer}>
-          <LottieView
-            source={require("../../../Front-End/assets/animations/heartbeat.json")}
-            autoPlay
-            loop
-            style={styles.lottie}
-          />
+          <LottieView source={require('../../assets/animations/heartbeat.json')} autoPlay loop style={styles.lottie} />
 
           <Animated.Text
             style={[
@@ -43,13 +38,13 @@ const LoadingScreen = () => {
               { transform: [{ scale: scaleAnim }] }, // 크기 애니메이션
             ]}
           >
-            마음을 연결중이에요.{"\n"}잠시만 기다려주세요!
+            마음을 연결중이에요.{'\n'}잠시만 기다려주세요!
           </Animated.Text>
         </View>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -58,13 +53,13 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Colors.primaryBeige,
   },
   animationContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 80,
   },
   lottie: {
@@ -76,12 +71,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: -0.3,
     color: Colors.pink40,
-    fontFamily: "Pretendard",
-    fontWeight: "600",
+    fontFamily: 'Pretendard',
+    fontWeight: '600',
     includeFontPadding: false,
-    textAlign: "center",
+    textAlign: 'center',
     lineHeight: 22,
   },
-});
+})
 
-export default LoadingScreen;
+export default LoadingScreen
