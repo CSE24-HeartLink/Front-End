@@ -47,7 +47,7 @@
     ],
     "extra": {
       "apiUrl": {
-        "development": "http://192.168.0.8:3000",
+        "development": "http://172.16.129.244:3000",
         "production": "https://your-production-api.com"
       }
     }

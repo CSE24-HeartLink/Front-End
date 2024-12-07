@@ -22,7 +22,7 @@ export const sttApi = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 30000,
+        timeout:30000 ,
       })
 
       return {
